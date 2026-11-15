@@ -23,7 +23,7 @@ A few concrete implementation records:
 - [Discovery-source recovery into the discovery engine](https://github.com/kn33r0s3/ForgeOS/pull/20)
 - [Owner-governed offer views on existing bets](https://github.com/kn33r0s3/ForgeOS/pull/24)
 
-**Status and evidence:** Hami is a work in progress. I do not claim verified customers, revenue, production reliability, or business impact without evidence for those specific outcomes. Deployment status, passing tests, and implemented code are not substitutes for real-world results.
+[Read the Hami engineering case study](case-studies/hami-engineering.md) for concrete implementation work, test history, and current verification limits.\n\n**Status and evidence:** Hami is a work in progress. I do not claim verified customers, revenue, production reliability, or business impact without evidence for those specific outcomes. Deployment status, passing tests, and implemented code are not substitutes for real-world results.
 
 ## Technologies I have worked with
 
