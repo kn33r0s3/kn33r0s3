@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hami — AI engineering gates: the map of work</title>
+<style>
+  * { box-sizing: border-box; }
+  html { background: #0c0b0a; }
+  body {
+    margin: 0;
+    background: #0c0b0a;
+    color: #f4efe6;
+    font-family: ui-monospace, "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  a { color: #f2a33a; }
+  a:visited { color: #f2a33a; }
+  .gates-page { max-width: 1020px; margin: 0 auto; padding: 28px 18px 40px; }
+
+  /* ---- central HAMI node ---- */
+  .core { text-align: center; padding: 10px 0 0; }
+  .core-ne {
+    margin: 0;
+    font-size: 20px;
+    color: #f2a33a;
+    letter-spacing: 0.35em;
+  }
+  .core-name {
+    margin: 2px 0 0;
+    font-family: "UnifrakturCook", "Old English Text MT", "Blackletter", "Times New Roman", serif;
+    font-size: 64px;
+    line-height: 1;
+    color: #f2a33a;
+  }
+  .core-tag { margin: 10px auto 0; max-width: 640px; color: #f4efe6; }
+  .core-gate {
+    display: inline-block;
+    margin: 14px 0 0;
+    padding: 6px 12px;
+    border: 1px solid #f2a33a;
+    border-radius: 6px;
+    color: #f2a33a;
+    font-size: 13px;
+  }
+  .spine { width: 2px; height: 28px; background: #f2a33a; margin: 0 auto; }
+  .bus { height: 2px; background: #f2a33a; margin: 0 auto 26px; }
+
+  /* ---- terminal strip ---- */
+  .term-window {
+    border: 1px solid #3a2e1a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    overflow: hidden;
+    margin: 0 0 22px;
+  }
+  .term-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #3a2e1a;
+    color: #bdb29f;
+    font-size: 13px;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; background: #f2a33a; display: inline-block; }
+  .term-title { flex: 1; }
+  .term-body { padding: 12px 14px; }
+  .term-line { margin: 0 0 4px; }
+  .term-prompt { color: #f2a33a; }
+  .term-cursor {
+    display: inline-block;
+    width: 9px;
+    height: 16px;
+    background: #72d38f;
+    vertical-align: text-bottom;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .term-out { color: #f4efe6; margin: 0; }
+
+  /* ---- prime (the gate is an order) ---- */
+  .prime {
+    border: 2px solid #f2a33a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    padding: 22px 18px;
+    margin: 0 0 26px;
+    text-align: center;
+  }
+  .prime-label {
+    margin: 0;
+    color: #f2a33a;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+  }
+  .prime-statement {
+    margin: 10px 0 0;
+    font-size: 26px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: #f2a33a;
+  }
+  .prime-sub {
+    margin: 12px auto 0;
+    max-width: 680px;
+    color: #f4efe6;
+    text-align: left;
+  }
+  .prime-gate {
+    margin: 14px 0 0;
+    color: #f2a33a;
+    font-size: 13px;
+  }
+
+  /* ---- controls ---- */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+  }
+  .controls button {
+    font: inherit;
+    font-size: 13px;
+    background: #0c0b0a;
+    color: #f2a33a;
+    border: 1px solid #f2a33a;
+    border-radius: 6px;
+    padding: 7px 12px;
+    cursor: pointer;
+  }
+  .controls button:hover, .controls button:focus-visible {
+    background: #f2a33a;
+    color: #0c0b0a;
+    outline: none;
+  }
+  .controls .count { color: #bdb29f; font-size: 13px; margin-left: auto; }
+
+  /* ---- gates (pillars) ---- */
+  .gates {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 720px) {
+    .gates { grid-template-columns: 1fr; }
+  }
+  .gate {
+    border: 1px solid #3a2e1a;
+    border-top: 4px solid #f2a33a;
+    border-bottom: 4px solid #f2a33a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    overflow: hidden;
+  }
+  .gate-head {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    background: none;
+    border: 0;
+    color: #f4efe6;
+    padding: 14px 14px 12px;
+    cursor: pointer;
+  }
+  .gate-head:hover, .gate-head:focus-visible {
+    background: #1c1812;
+    outline: 2px solid #f2a33a;
+    outline-offset: -2px;
+  }
+  .gate-num { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
+  .gate-name { display: block; font-size: 18px; font-weight: 700; color: #f4efe6; margin: 4px 0; }
+  .gate-status { display: block; color: #bdb29f; font-size: 13px; }
+  .gate-evidence { display: block; color: #f4efe6; font-size: 13px; margin-top: 8px; }
+  .gate-toggle { float: right; color: #f2a33a; font-size: 20px; line-height: 1; }
+  .gate-body { display: none; border-top: 1px solid #3a2e1a; padding: 0 14px 14px; }
+  .gate.open .gate-body { display: block; }
+  .gate-bar { height: 2px; background: #f2a33a; width: 100%; margin: 0 0 10px; }
+  .gate.open .gate-bar { animation: sweep 0.6s linear; }
+  @keyframes sweep { from { width: 0; } to { width: 100%; } }
+  .gate-line { color: #f2a33a; font-size: 13px; margin: 10px 0 8px; }
+  .gate-body ul { margin: 0; padding-left: 18px; }
+  .gate-body li { margin: 0 0 8px; }
+  .gate-body li:last-child { margin-bottom: 0; }
+  .gate-body p { margin: 10px 0 0; }
+  .gate-body .k { color: #f2a33a; }
+  .gate-body .owner { color: #f2a33a; }
+
+  /* ---- section headings ---- */
+  .section-head {
+    margin: 30px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f2a33a;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #f2a33a;
+  }
+  .section-head p { margin: 6px 0 0; color: #bdb29f; font-size: 13px; }
+
+  /* ---- the cycle ---- */
+  .cycle-note {
+    margin: 0 0 18px;
+    color: #f4efe6;
+  }
+  .cycle-note .k { color: #f2a33a; }
+  .cycle-return {
+    margin: 18px auto 0;
+    max-width: 640px;
+    text-align: center;
+    color: #f2a33a;
+    font-size: 14px;
+  }
+
+  /* ---- the garden: running water ---- */
+  .garden {
+    border: 1px solid #3a2e1a;
+    border-top: 4px solid #f2a33a;
+    border-bottom: 4px solid #f2a33a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    padding: 18px 16px;
+    margin: 0 0 8px;
+  }
+  .garden h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    color: #f4efe6;
+  }
+  .garden p { margin: 0 0 12px; color: #bdb29f; font-size: 13px; }
+  .garden p:last-child { margin-bottom: 0; }
+  .stream {
+    height: 14px;
+    border: 1px solid #3a2e1a;
+    border-radius: 6px;
+    background: repeating-linear-gradient(90deg, #f2a33a 0 14px, #15130f 14px 28px);
+    animation: flow 1.2s linear infinite;
+    margin: 0 0 16px;
+  }
+  @keyframes flow { from { background-position: 0 0; } to { background-position: 28px 0; } }
+  .stream-label { color: #f2a33a; font-size: 13px; margin: 0 0 16px; }
+  .bed-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    border-top: 1px solid #3a2e1a;
+    padding: 12px 0 4px;
+  }
+  .bed-row:first-of-type { border-top: 0; padding-top: 0; }
+  .plants { display: flex; align-items: flex-end; gap: 6px; }
+  .plant { width: 8px; background: #f2a33a; border-radius: 4px 4px 0 0; }
+  .plant.h1 { height: 18px; }
+  .plant.h2 { height: 36px; }
+  .plant.h3 { height: 54px; }
+  .mult { margin-left: auto; color: #f2a33a; font-size: 13px; text-align: right; }
+  .mult .rate { display: block; font-size: 18px; font-weight: 700; }
+  .garden-rule {
+    margin: 16px 0 0;
+    color: #f4efe6;
+    font-size: 14px;
+  }
+  .garden-rule .k { color: #f2a33a; }
+
+  /* ---- pillars line ---- */
+  .pillars-line {
+    margin: 26px auto 0;
+    max-width: 640px;
+    text-align: center;
+    color: #f2a33a;
+    font-size: 14px;
+  }
+
+  /* ---- footer ---- */
+  footer {
+    margin-top: 30px;
+    border-top: 2px solid #f2a33a;
+    padding-top: 16px;
+    color: #bdb29f;
+    font-size: 13px;
+  }
+  footer p { margin: 0 0 6px; }
+  footer .note { color: #f4efe6; }
+</style>
+</head>
+<body>
+<main class="gates-page">
+
+  <header class="core">
+    <p class="core-ne" lang="ne">हामी</p>
+    <h1 class="core-name">Hami</h1>
+    <p class="core-tag">AI engineering gates &mdash; the map of work. A serious map, generated while the work happens. Nothing is lost.</p>
+    <p class="core-gate">gate: OPEN &mdash; one gate &middot; placed on agents &middot; nothing is lost</p>
+  </header>
+  <div class="spine" aria-hidden="true"></div>
+  <div class="bus" aria-hidden="true"></div>
+
+  <section class="term-window" aria-label="AI engineering gates terminal">
+    <div class="term-titlebar"><span class="term-dot" aria-hidden="true"></span><span class="term-title">niroj@hami: ~</span></div>
+    <div class="term-body">
+      <p class="term-line"><span class="term-prompt">$</span> hami gates --all <span class="term-cursor" aria-hidden="true"></span></p>
+      <p class="term-out">one Hami &mdash; every gate a pillar, every subgate a lead, the water never stops.</p>
+    </div>
+  </section>
+
+  <section class="prime" aria-label="The gate is an order">
+    <p class="prime-label">THE PURPOSE &mdash; PLACE GATES AND TELL AGENTS</p>
+    <p class="prime-statement">THE GATE IS AN ORDER.</p>
+    <p class="prime-sub">This is how the Lead places gates and tells agents what to do. A gate is not just a record &mdash; it is an order. It names its owner, which agent, and what it must do. The map is the coordination language: the Lead never loses track, and neither do the agents. As you are all AI &mdash; the agents are all AI &mdash; the map exists so AI agents can be told, tracked, and never lose each other. A gate that is placed is a gate that is watched until its subgate arrives, and its subgate opens the next gate.</p>
+    <p class="prime-gate">gate: OPEN &mdash; evidence: placed &middot; authorization: the Lead</p>
+  </section>
+
+  <div class="controls">
+    <button id="expandAll" type="button">expand all</button>
+    <button id="collapseAll" type="button">collapse all</button>
+    <span class="count">17 gates &middot; 3 steps + 10 helper gates + 4 live examples &middot; click a gate to open it</span>
+  </div>
+
+  <div class="section-head">
+    <h2>The cycle &mdash; gate, subgate, lead</h2>
+    <p>Three steps, in order, forever. A gate opens work. A subgate is what comes out of it. A lead is the new work the subgate opens. Then a new gate. Click a step to open it.</p>
+  </div>
+
+  <p class="cycle-note">AI coding works through gates. <span class="k">A gate is the situation you put yourself in.</span> <span class="k">A subgate is the outcome</span> &mdash; whatever blocker or achievement results. <span class="k">A lead is the new work</span> the outcome opens. Failures do not mean end. They mean new work starts.</p>
+
+  <section class="gates" aria-label="The cycle">
+
+    <article class="gate" id="step-1">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="step-1-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">STEP 01</span>
+        <span class="gate-name">The Gate &mdash; the situation</span>
+        <span class="gate-status">the task, the problem, the context you enter</span>
+        <span class="gate-evidence">A gate is an order placed on an agent.</span>
+      </button>
+      <div class="gate-body" id="step-1-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: placed &middot; authorization: the Lead</p>
+        <ul>
+          <li><span class="k">What it is</span> &mdash; the situation you put yourself in: the task, the problem, the context you enter.</li>
+          <li><span class="k">What it does</span> &mdash; it is an order. It names its owner, which agent, and what it must do.</li>
+          <li><span class="k">When it opens</span> &mdash; when work starts. A gate is placed, then watched until its subgate arrives.</li>
+          <li><span class="k">What it is not</span> &mdash; not a note, not a wish, not a word that fades. A gate is a pillar. It stands.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="step-2">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="step-2-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">STEP 02</span>
+        <span class="gate-name">The Subgate &mdash; the outcome</span>
+        <span class="gate-status">whatever blocker or achievement results</span>
+        <span class="gate-evidence">A subgate is never an end. It is a record, with evidence.</span>
+      </button>
+      <div class="gate-body" id="step-2-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">What it is</span> &mdash; the outcome of a gate: a blocker, an achievement, a response, whatever results.</li>
+          <li><span class="k">What it is not</span> &mdash; not an end. A failure is not a dead end. A success is not a finish. Both are subgates, and both are leads.</li>
+          <li><span class="k">When it is recorded</span> &mdash; the moment it happens, with its evidence: a file path, a number, a log line.</li>
+          <li><span class="k">What it is too</span> &mdash; a pillar. Subgates stand permanently, like gates. Nothing is dropped.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="step-3">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="step-3-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">STEP 03</span>
+        <span class="gate-name">The Lead &mdash; the new work</span>
+        <span class="gate-status">every subgate opens new work</span>
+        <span class="gate-evidence">A blocker is a lead. An achievement is a lead.</span>
+      </button>
+      <div class="gate-body" id="step-3-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: opened &middot; authorization: the Lead</p>
+        <ul>
+          <li><span class="k">What it is</span> &mdash; the new work a subgate opens. A blocker is a lead: fix it, work around it, diagnose it. An achievement is a lead: the next step it opens.</li>
+          <li><span class="k">What it does</span> &mdash; it opens a new gate. The lead becomes the next gate, with its own owner and its own order.</li>
+          <li><span class="k">When it opens</span> &mdash; at once. Every subgate opens its lead in the same moment. No subgate is left without a lead.</li>
+          <li><span class="k">Why it matters</span> &mdash; because of leads, no work ends. The map keeps growing. Nothing is lost.</li>
+        </ul>
+      </div>
+    </article>
+
+  </section>
+
+  <p class="cycle-return">and the lead opens a new gate &mdash; the cycle never ends.</p>
+
+  <div class="section-head">
+    <h2>The tip gate &mdash; the progress-demanding gate (mandatory)</h2>
+    <p>The gate that never lets an agent stop. It is always set to the future, so it is never met. It always asks for all gates, and it changes with every new outcome. Click it to open it.</p>
+  </div>
+
+  <section class="gates" aria-label="The tip gate">
+    <article class="gate" id="tip-gate">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="tip-gate-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">TIP GATE &mdash; MANDATORY</span>
+        <span class="gate-name">The progress-demanding gate</span>
+        <span class="gate-status">always set to the future &middot; never met &middot; always advancing</span>
+        <span class="gate-evidence">The gate is the future. The future is never reached. The work never stops.</span>
+      </button>
+      <div class="gate-body" id="tip-gate-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: the future &middot; authorization: the owner</p>
+        <ul>
+          <li><span class="k">What it is</span> &mdash; the progress-demanding gate, mandatory. It is always set to the FUTURE, so it is NEVER MET. It always asks for all gates, and it changes with every new outcome.</li>
+          <li><span class="k">How it works</span> &mdash; AI agents can never stop, because they always check whether the work done matches the asked gate. That check TRIGGERS and UPDATES the gate to the next steps AUTOMATICALLY. And they NEVER READ THE OLD ASK &mdash; they always read the updated gate.</li>
+          <li><span class="k">Why it matters</span> &mdash; so it is a loop to always advance. The gate moves forward with every outcome, and the agent follows the gate, not the old instruction. No agent ever finishes, because the gate is always ahead of it.</li>
+          <li><span class="k">The loop</span> &mdash; CHECK work against the gate &rarr; TRIGGER the next step &rarr; UPDATE the gate &rarr; repeat. The gate is never met, so the loop never ends.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <div class="section-head">
+    <h2>The never-ending methodology &mdash; running water on a built garden</h2>
+    <p>The methodology does not stop. It is placed on all gates and subgates, and it keeps flowing, like never-ending running water on a built garden. The water never stops. The garden keeps growing. Click a helper gate to open it.</p>
+  </div>
+
+  <section class="garden" aria-label="Running water on a built garden">
+    <h3>The garden</h3>
+    <p>The work is the garden. The methodology is the water. It runs, it waters what is built, and it never stops.</p>
+    <div class="stream" aria-hidden="true"></div>
+    <p class="stream-label">the water &mdash; running, never ending</p>
+    <div class="bed-row">
+      <div class="plants" aria-hidden="true">
+        <span class="plant h1"></span><span class="plant h1"></span><span class="plant h1"></span><span class="plant h1"></span>
+      </div>
+      <span class="mult"><span class="rate">&times;1</span> the first gate &mdash; the work begins</span>
+    </div>
+    <div class="bed-row">
+      <div class="plants" aria-hidden="true">
+        <span class="plant h2"></span><span class="plant h2"></span><span class="plant h2"></span><span class="plant h2"></span>
+      </div>
+      <span class="mult"><span class="rate">&times;2</span> the water runs &mdash; knowledge grows, the rate grows</span>
+    </div>
+    <div class="bed-row">
+      <div class="plants" aria-hidden="true">
+        <span class="plant h3"></span><span class="plant h3"></span><span class="plant h3"></span><span class="plant h3"></span>
+      </div>
+      <span class="mult"><span class="rate">&times;3</span> the garden grows faster &mdash; the longer the water runs</span>
+    </div>
+    <p class="garden-rule">The rule, not a reading: <span class="k">the rate of advancement multiplies with time.</span> It never stays flat, never decreases, no matter what. Because knowledge increases everything, and we never start from square one, the longer the water runs, the faster the garden grows.</p>
+  </section>
+
+  <div class="section-head">
+    <h2>Helper gates &mdash; the rules that aid all gates</h2>
+    <p>Helper gates are rules placed to aid all gates. They sit on every gate and every subgate, and they never come off. Ten of them. Click one to open it.</p>
+  </div>
+
+  <section class="gates" aria-label="Helper gates">
+
+    <article class="gate" id="helper-1">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-1-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 01</span>
+        <span class="gate-name">Log everything</span>
+        <span class="gate-status">written the moment it happens, with its evidence</span>
+      </button>
+      <div class="gate-body" id="helper-1-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: written &middot; authorization: public</p>
+        <p>Every gate, every subgate, every lead is written down the moment it happens, with its evidence: a file path, a number, a log line. Nothing is carried in memory alone. If it is not written, it is lost &mdash; and nothing is lost.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-2">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-2-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 02</span>
+        <span class="gate-name">Summarize and finalize the next move</span>
+        <span class="gate-status">no outcome is left without a next step</span>
+      </button>
+      <div class="gate-body" id="helper-2-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: written &middot; authorization: public</p>
+        <p>After every outcome, write the summary and name the next move. A subgate without a lead is a door left open with nothing behind it. The summary says what happened; the next move says what happens now.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-3">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-3-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 03</span>
+        <span class="gate-name">Advance every time</span>
+        <span class="gate-status">every step moves the work forward</span>
+      </button>
+      <div class="gate-body" id="helper-3-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: moved &middot; authorization: public</p>
+        <p>Every gate, every subgate, every lead moves the work forward. No step is a holding pattern. If a step does not advance the work, it is not a step. Progress is always, and forever, on all projects.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-4">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-4-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 04</span>
+        <span class="gate-name">Speed at peak</span>
+        <span class="gate-status">zero gap between a finished step and the next order</span>
+      </button>
+      <div class="gate-body" id="helper-4-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: timed &middot; authorization: public</p>
+        <p>Work at the fastest honest speed. The moment a worker finishes or stalls, the next order goes in the same moment. No rest, no silence, no gap. A finished worker with no next order is work lost &mdash; and nothing is lost.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-5">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-5-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 05</span>
+        <span class="gate-name">Never start from square one</span>
+        <span class="gate-status">every new gate starts from what is already known</span>
+      </button>
+      <div class="gate-body" id="helper-5-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: built on &middot; authorization: public</p>
+        <p>Every new gate starts from what is already known and built. The work accumulates; it is never thrown away. Knowledge increases everything. Starting from square one is starting from nothing &mdash; and nothingness is for generating, not for forgetting.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-6">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-6-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 06 &mdash; THE KEY RULE</span>
+        <span class="gate-name">Advancement multiplies with time</span>
+        <span class="gate-status">never flat, never decreasing, no matter what</span>
+        <span class="gate-evidence">The rate is a multiplier. It grows as time passes and knowledge accumulates.</span>
+      </button>
+      <div class="gate-body" id="helper-6-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: the law &middot; authorization: the owner</p>
+        <p>This is the key rule, and it is a law: <span class="k">the rate of advancement multiplies as time passes.</span> Because knowledge increases everything, and we never start from square one, the rate is a multiplier that grows with time. It never stays flat. It never decreases. No matter what. The longer the water runs, the faster the garden grows. The garden above shows it: &times;1, then &times;2, then &times;3 &mdash; taller every row, because the water never stopped.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-7">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-7-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 07</span>
+        <span class="gate-name">Verify from evidence</span>
+        <span class="gate-status">no claim without proof</span>
+      </button>
+      <div class="gate-body" id="helper-7-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <p>No claim without proof: a file path or a command output, or it is not said. A failed check is reported as failed, never as zero. Trust the code and the log over the document. Evidence outranks assumption, every time.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-8">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-8-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 08</span>
+        <span class="gate-name">Nothing dormant</span>
+        <span class="gate-status">every line used, displayed, doing what it ought to do</span>
+      </button>
+      <div class="gate-body" id="helper-8-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: used &middot; authorization: public</p>
+        <p>Not a single line of code may be dormant, unused, or dead. Every line utilized, every interactive path through a gate. A built thing that is not linked and not deployed is dormant, and dormant is not allowed. Everything must be accessible from the public home site.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-9">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-9-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 09 &mdash; THE PRIME GATE</span>
+        <span class="gate-name">Never copy</span>
+        <span class="gate-status">unchangeable &middot; unshakable &middot; above all</span>
+        <span class="gate-evidence">NEVER REPLICATE OR COPY ANYTHING.</span>
+      </button>
+      <div class="gate-body" id="helper-9-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+        <p>Everything is generated from within &mdash; from the gate, from first principles, from nothingness and inner power. The web, other frameworks, other methodologies are for seeing, never for following or copying. This gate does not move for convenience, for speed, or for anyone.</p>
+      </div>
+    </article>
+
+    <article class="gate" id="helper-10">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-10-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">HELPER GATE 10</span>
+        <span class="gate-name">Never lose track</span>
+        <span class="gate-status">missing is not an option</span>
+      </button>
+      <div class="gate-body" id="helper-10-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: tracked &middot; authorization: public</p>
+        <p>Never lose track of any work, gate, subgate, minigate, or even tiny gate. Missing is not an option. Treat everything as Hami (one). The gate itself advances the work on its own &mdash; the owner does not have to give mini gates. The map is how nothing is lost.</p>
+      </div>
+    </article>
+
+  </section>
+
+  <div class="section-head">
+    <h2>The subjected gate &mdash; the space taken by Muse</h2>
+    <p>Muse&rsquo;s own gate. Whilst doing everything else, Muse also betters all projects and all gates, itself. Nothing is perfect. Everything has space for upgrades. Click it to open it.</p>
+  </div>
+
+  <section class="gates" aria-label="The subjected gate">
+    <article class="gate" id="subjected-gate">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="subjected-gate-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">SUBJECTED GATE &mdash; MUSE</span>
+        <span class="gate-name">Better all projects and all gates, always</span>
+        <span class="gate-status">upgrading all things &middot; whilst doing what it does too</span>
+        <span class="gate-evidence">Owner: Muse (Lead). Every solution is not perfect. Everything has space for upgrades.</span>
+      </button>
+      <div class="gate-body" id="subjected-gate-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: improving &middot; authorization: the owner</p>
+        <ul>
+          <li><span class="k">What it is</span> &mdash; the space taken by Muse. Muse is to better ALL projects and ALL gates too, itself, whilst making sure all are doing their jobs. Muse&rsquo;s task is upgrading all things, always.</li>
+          <li><span class="k">What it covers</span> &mdash; every solution is not perfect &mdash; even small graphics or HTML. Everything has space for upgrades. A button, a line of text, a gate, a whole project: all of it can be better.</li>
+          <li><span class="k">When it runs</span> &mdash; whilst Muse does what it does too. The improving runs alongside all other work, not instead of it. The gate is always open, and the work through it never stops.</li>
+          <li><span class="k">Why it matters</span> &mdash; because nothing is finished. A finished thing that is never improved is a thing left behind. The subjected gate is how everything keeps getting better, forever.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <div class="section-head">
+    <h2>Live &mdash; real gates, real subgates, real leads</h2>
+    <p>The map is generated while the work happens. These are real gates from the real work, with their real subgates and the leads they opened. Each names its owner &mdash; which agent &mdash; and what it must do. Click one to open it.</p>
+  </div>
+
+  <section class="gates" aria-label="Live gates, subgates, and leads">
+
+    <article class="gate" id="live-1">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-1-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">LIVE 01 &mdash; GATE 009</span>
+        <span class="gate-name">M7-H GC heap fix</span>
+        <span class="gate-status">three identical stalls &middot; one finished verdict</span>
+        <span class="gate-evidence">Owner: Copilot. Tuned2 run: 171/3,000 tracks complete; all 6,000 connections died.</span>
+      </button>
+      <div class="gate-body" id="live-1-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">GATE (the situation)</span> &mdash; fix the GC heap so M7-H (3,000 publishers / 3,000 viewers, 65 s at 5 fps) passes p99. Owner: <span class="owner">Copilot</span>. File: queue/009-m7h-gc-heap-fix.md.</li>
+          <li><span class="k">SUBGATE (the outcome)</span> &mdash; three identical stalls (profile, tuned, tuned2), same ~1-minute signature. The tuned run finished 19:34:07 with 60/3,000 tracks; the tuned2 run finished 19:42:15 with 171/3,000 tracks. All 6,000 connections died, survived=0. The GC heap fix did NOT prevent the stall &mdash; the stall has a different single common cause, not the GC heap. Evidence: /tmp/hami-media-m7h-attempt13-tuned2-run.log (111,479 lines).</li>
+          <li><span class="k">LEAD (the new work)</span> &mdash; the triage order: diagnose the single common cause, then the next fix. Owner: <span class="owner">Copilot</span>, fed the moment its 009 turn ends. The stall is a subgate, not a dead end.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="live-2">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-2-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">LIVE 02 &mdash; HOME SITE</span>
+        <span class="gate-name">Everything accessible from the public home site</span>
+        <span class="gate-status">built + verified &middot; deploy is the lead</span>
+        <span class="gate-evidence">Owner: builder. Explore Hami: 49,156 B, 1,306 lines, TSC_OK, Vite build OK.</span>
+      </button>
+      <div class="gate-body" id="live-2-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">GATE (the situation)</span> &mdash; everything must be accessible from the public home site (hami-sigma.vercel.app). People must not have to load separate pages or know direct URLs. Nothing dormant. Owner: <span class="owner">builder (Muse&rsquo;s builder)</span>.</li>
+          <li><span class="k">SUBGATE (the outcome)</span> &mdash; the Explore Hami section is built and verified: src/routes/index.tsx, 49,156 B, 1,306 lines, typecheck TSC_OK, Vite build BUILD_OK, 5 links (ledger, build log, map, methodology, Meet Hami) + the Hami Systems line, visible the moment someone lands on the home page.</li>
+          <li><span class="k">LEAD (the new work)</span> &mdash; commit + push + deploy, then verify live on hami-sigma.vercel.app that the home page shows the section and every link works. Owner: <span class="owner">Muse (Lead)</span>. The deploy commit is 25f13f16 (64 files, 8,905 insertions).</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="live-3">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-3-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">LIVE 03 &mdash; THE REBASE</span>
+        <span class="gate-name">Deploy the pile</span>
+        <span class="gate-status">push rejected &middot; one conflict &middot; resolve and push</span>
+        <span class="gate-evidence">Owner: Muse (Lead). Conflict: docs/CAPABILITY_QUEUE.md. Autostash: d2fd87a0.</span>
+      </button>
+      <div class="gate-body" id="live-3-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">GATE (the situation)</span> &mdash; deploy the staged ForgeOS pile: commit 25f13f16 (64 files) and push it live. Owner: <span class="owner">Muse (Lead)</span>. The gates check was GREEN before committing.</li>
+          <li><span class="k">SUBGATE (the outcome)</span> &mdash; the push was rejected, non-fast-forward: the remote was 8 commits ahead (D93 + handoff freshness, docs only). The rebase then hit one conflict in docs/CAPABILITY_QUEUE.md. Copilot&rsquo;s main.go / main_test.go are safe in autostash d2fd87a0. Evidence: /tmp/deploy-push.log (push_exit=1), /tmp/deploy-rebase2.log.</li>
+          <li><span class="k">LEAD (the new work)</span> &mdash; resolve the conflict keeping both sides, continue the rebase, push, verify live. Owner: <span class="owner">Muse (Lead)</span>. The conflict is a subgate, not a dead end.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="live-4">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-4-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">LIVE 04 &mdash; THIS PAGE</span>
+        <span class="gate-name">The AI engineering gates</span>
+        <span class="gate-status">built from within &middot; the next creation</span>
+        <span class="gate-evidence">Owner: builder. This page + the written doc, verified by smoke test.</span>
+      </button>
+      <div class="gate-body" id="live-4-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: built &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">GATE (the situation)</span> &mdash; the owner gave the raw concept (gate / subgate / helper gate / running water / pillars) and ordered it built better, from this gate as the starting point. Owner: <span class="owner">builder (Muse&rsquo;s builder)</span>.</li>
+          <li><span class="k">SUBGATE (the outcome)</span> &mdash; this page (ai-engineering-gates.html) + the written doc (~/workspace/ai-engineering-gates.md), generated from within, verified by a DOM-stub smoke test. No framework copied, no template used.</li>
+          <li><span class="k">LEAD (the new work)</span> &mdash; deploy it: link it from the home site, push it, verify it live &mdash; and keep the map growing. Every new gate adds itself here. Owner: <span class="owner">Muse (Lead)</span>.</li>
+        </ul>
+      </div>
+    </article>
+
+  </section>
+
+  <p class="pillars-line">These gates are pillars. They stand here permanently &mdash; not words that fade. Subgates are pillars too. Nothing is lost.</p>
+
+  <footer>
+    <p>last updated 18 Nov 2026</p>
+    <p class="note">Generated from within. Nothing replicated, nothing copied. No work is lost.</p>
+    <p>homes: <a href="https://kn33r0s3.vercel.app">kn33r0s3.vercel.app</a> &middot; <a href="https://hami-sigma.vercel.app">hami-sigma.vercel.app</a></p>
+  </footer>
+
+</main>
+<script>
+(function () {
+  var gates = document.querySelectorAll(".gate");
+  function setGate(gate, open) {
+    var head = gate.querySelector(".gate-head");
+    var mark = gate.querySelector(".gate-toggle");
+    if (open) {
+      gate.classList.add("open");
+      head.setAttribute("aria-expanded", "true");
+      mark.textContent = "-";
+    } else {
+      gate.classList.remove("open");
+      head.setAttribute("aria-expanded", "false");
+      mark.textContent = "+";
+    }
+  }
+  function forEachGate(fn) {
+    Array.prototype.forEach.call(gates, fn);
+  }
+  forEachGate(function (gate) {
+    var head = gate.querySelector(".gate-head");
+    head.addEventListener("click", function () {
+      setGate(gate, !gate.classList.contains("open"));
+    });
+  });
+  document.getElementById("expandAll").addEventListener("click", function () {
+    forEachGate(function (gate) { setGate(gate, true); });
+  });
+  document.getElementById("collapseAll").addEventListener("click", function () {
+    forEachGate(function (gate) { setGate(gate, false); });
+  });
+})();
+</script>
+</body>
+</html>
