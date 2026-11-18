@@ -22,20 +22,27 @@
   Never-Stopping (the work itself continues), Improvement (improve
   everything, no matter how small), Map (lists and links everything), and
   Apply All Gates to Hami (the gates govern the real work). At the bottom,
-  the DESTINATION: Hami AI becomes Lead Engineer — built now from the gates
+  the NEXT STAGE: Hami AI becomes Lead Engineer — built now from the gates
   and all the data, stepping into the Lead seat later (stage 3, hami builds).
+  There is no end state: every stage opens the next, and after it there is
+  always more.
 
-  EVERY GATE RUNS — and RUNNING is the ONLY state. Every FIELD entry's
+  EVERY GATE RUNS — and RUNNING is the ONLY work state. Every FIELD entry's
   state is "running", every subgate's state is "running", every node
-  pulses RUNNING with one badge in one colour and one word. There is no
-  other state: no completed, no verified-as-state, no blocked, no parked,
-  no pending, no contradicted-as-state. What used to be called a state
-  lives where it belongs — in the evidence (what the gate did, measured),
-  in the next step (what the result opened), and in the subgates. A result
-  is never shown as an ending — it is shown as the next step it opened
-  (the "next" field, framed in the drawer as "this result opened: ...").
-  Private is a VISIBILITY flag only, never a state: a private entry is
-  blurred, but its state is still running.
+  pulses RUNNING with one badge in one colour and one word. The work never
+  stops, so there is no completed, no parked, no pending, no done.
+  But RUNNING alone is not advancement: a gate marked RUNNING that has
+  produced nothing and shows no advancement is a hallucination. So every
+  gate also carries an EVIDENCE MARK (the "ev" field): PROVEN, IN PROGRESS,
+  UNKNOWN or BLOCKED — what the gate's own evidence shows, never a guess.
+  The mark is not a work state; the work stays RUNNING while the mark says
+  honestly what the evidence shows. Advancement is what the gates have
+  produced — the evidence, the next step, the subgates — counted from the
+  evidence itself, not from time passing. A result is never shown as an
+  ending — it is shown as the next step it opened (the "next" field,
+  framed in the drawer as "this result opened: ..."). Private is a
+  VISIBILITY flag only, never a state: a private entry is blurred, but its
+  state is still running and its mark still shows.
 
   HOW TO CHANGE THIS FIELD (read this first):
   1. To ADD a gate: add ONE entry to the FIELD array in the <script> below.
@@ -44,8 +51,9 @@
   2. Each entry needs: id (unique, lowercase, no spaces), region (one of
      the REGIONS ids below), num (the label shown, e.g. "GATE 01"),
      name, plain (one plain-words line: what it is), what (what it does),
-     why (why it matters), state (always "running" — the ONLY state; the
-     old state words live in evidence / next / sub, never as a state),
+     why (why it matters), state (always "running" — the ONLY work state),
+     ev (the evidence state: "proven", "progress", "unknown" or "blocked" —
+     what the gate's own evidence shows; shown as the mark beside RUNNING),
      evidence (the proof, with a file path or a number),
      date (YYYY-MM-DD), owner (who works it, or ""), next (the next step
      the result opened, or "UNKNOWN"), sub (a list of subgates, each
@@ -195,6 +203,76 @@
   body:not(.owner-on) .node.private .node-lock { display: inline; }
   body.owner-on .node.private .node-lock { display: none; }
 
+  /* ---- 7D: the gates are gate images, not flat nodes ----
+     Every node is drawn as a gate — an ancient door, a serious portal.
+     The gate image is built from code: an arch frame, two stone posts, a
+     keystone, a threshold step, and a real door that opens. The region
+     gives each gate its character (round stone arch, pointed temple arch,
+     glowing portal, round vault door, steady helper arch). The RUNNING
+     badge stays (the work never stops); the evidence mark beside it says
+     honestly what the gate's evidence shows: PROVEN, IN PROGRESS, UNKNOWN
+     or BLOCKED. */
+  .gate-shadow { fill: #000; opacity: 0.5; }
+  .gate-arch { fill: none; stroke: #f2a33a; stroke-width: 2; }
+  .gate-arch-fill { fill: #241f16; stroke: #6b5322; stroke-width: 1; }
+  .gate-post { fill: #241f16; stroke: #6b5322; stroke-width: 1; }
+  .gate-key { fill: #f2a33a; }
+  .gate-threshold { fill: #3a2e1a; }
+  .gate-door-panel { fill: #2a2113; stroke: #f2a33a; stroke-width: 1.5; }
+  .gate-door-plank { stroke: #6b5322; stroke-width: 1; }
+  .gate-door-ring { fill: none; stroke: #f5deb3; stroke-width: 1.5; }
+  .gate-glow { fill: #f2a33a; opacity: 0.2; animation: gateGlow 2.4s ease-in-out infinite; }
+  @keyframes gateGlow { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.35; } }
+  .gate-vault-spoke { stroke: #f2a33a; stroke-width: 2; }
+  .gate-vault-hub { fill: #f2a33a; }
+  /* Evidence marks: the honest mark beside RUNNING. Green = proven,
+     amber = in progress, grey = unknown, red = blocked. */
+  .ev-mark { font-size: 11px; letter-spacing: 1px; font-family: inherit; font-weight: 700; }
+  .ev-proven .ev-mark { fill: #72d38f; }
+  .ev-progress .ev-mark { fill: #f2a33a; }
+  .ev-unknown .ev-mark { fill: #bdb29f; }
+  .ev-blocked .ev-mark { fill: #ff6f6f; }
+  .ev-dot { animation: runpulse 1.6s ease-in-out infinite; }
+  .ev-proven .ev-dot { fill: #72d38f; }
+  .ev-progress .ev-dot { fill: #f2a33a; }
+  .ev-unknown .ev-dot { fill: #bdb29f; }
+  .ev-blocked .ev-dot { fill: #ff6f6f; }
+  /* Evidence view: gates not in the chosen state dim; the chosen state stands out. */
+  .node.ev-dim { opacity: 0.25; }
+  .node.ev-dim .gate-door { animation: none; }
+  body.view-evidence .ev-mark { font-size: 13px; }
+  /* Time view: gates from today stand out; older gates dim. */
+  .node.time-dim { opacity: 0.35; }
+  .node.time-fresh .node-box { stroke: #f5deb3; stroke-width: 2.5; }
+  /* Depth: the gates stand off the picture — a shadow under each gate,
+     zones as background layers, the flow of work above them. */
+  .zone-box { filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6)); }
+
+  /* ---- view switcher: MAP / EVIDENCE / TIME + the 7 dimensions ---- */
+  .viewbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 12px auto 0; max-width: 980px; }
+  .viewbar .view-label { color: #bdb29f; font-size: 13px; }
+  .view-btn { border: 1px solid #3a2e1a; background: #15130f; color: #e9e1d2; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 13px; }
+  .view-btn:hover { border-color: #f2a33a; }
+  .view-btn[aria-pressed="true"] { background: #f2a33a; color: #0c0b0a; border-color: #f2a33a; font-weight: 700; }
+  .view-btn:focus-visible { outline: 2px solid #f2a33a; outline-offset: 2px; }
+  .ev-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 10px auto 0; max-width: 980px; font-size: 13px; }
+  .ev-legend .ev-chip { border: 1px solid #3a2e1a; background: #15130f; color: #e9e1d2; border-radius: 20px; padding: 4px 10px; cursor: pointer; }
+  .ev-legend .ev-chip:hover { border-color: #f2a33a; }
+  .ev-legend .ev-chip[aria-pressed="true"] { border-color: #f2a33a; background: #f2a33a; color: #0c0b0a; font-weight: 700; }
+  .ev-legend .ev-chip .n { font-weight: 700; }
+  /* The advancement line: what the gates have actually produced, counted
+     from the evidence each gate carries — not time passing. */
+  .adv-line { color: #bdb29f; font-size: 12px; margin-left: 12px; }
+  /* The evidence state in the detail drawer: what this gate produced. */
+  .ev-state { font-weight: bold; color: #f2a33a; letter-spacing: 1px; }
+  /* In the Evidence view the marks stand out, so the eye reads proof first. */
+  body.view-evidence .ev-mark { font-size: 13px; font-weight: bold; }
+  .dims { margin: 18px auto 0; max-width: 980px; border: 1px solid #3a2e1a; border-radius: 6px; background: #15130f; padding: 12px 16px; }
+  .dims h2 { margin: 0 0 8px; font-size: 14px; color: #f2a33a; letter-spacing: 0.12em; }
+  .dims ol { margin: 0; padding-left: 20px; }
+  .dims li { margin: 0 0 6px; font-size: 13px; color: #e9e1d2; }
+  .dims li b { color: #f2a33a; }
+
   /* ---- SVG animated cartoon elements ----
      Nothing in the scene is still. Every animated element is real: the
      pace meter counts this page's own running pace, the loop counter counts
@@ -217,7 +295,7 @@
   /* The Improvement Gate's shimmer: an upgrade rising over the gate. */
   .upgrade-shimmer { fill: #f5deb3; opacity: 0; animation: shimmerRise 3s ease-in-out infinite; }
   @keyframes shimmerRise { 0% { transform: translateY(8px); opacity: 0; } 50% { opacity: 0.9; } 100% { transform: translateY(-8px); opacity: 0; } }
-  /* The succession, inside the destination gate: Muse hands the Lead seat
+  /* The succession, inside the next-stage gate: Muse hands the Lead seat
      to Hami AI — the handover dot travels from one to the other, always. */
   .succession-chip { fill: #0c0b0a; stroke: #f2a33a; stroke-width: 1.5; }
   .succession-next { animation: runpulse 1.6s ease-in-out infinite; }
@@ -308,7 +386,6 @@
     .topbar h1 { font-size: 44px; }
     .viewport { height: 70vh; min-height: 420px; }
   }
-
   /* ---- cartoons, art, VFX (Hami approach: drawn with code, SVG + CSS, never copied/stock/external) ---- */
   .field-mascot { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; }
   .field-mascot .mascot-svg { width: 56px; height: 56px; flex: 0 0 auto; }
@@ -340,7 +417,7 @@
       <button id="leaveOwnerBtn" class="btn" type="button" hidden>Leave owner mode</button>
       <button id="tourBtn" class="btn primary" type="button">▶ Take the tour</button>
     </div>
-    <p class="owner-status" id="ownerStatus"><span class="off">owner mode: OFF — public view: plain-words picture only. Full detail + private names unlock with your key.</span></p>
+    <p class="owner-status" id="ownerStatus"><span class="off">owner mode: OFF — public view: what each gate has produced, in plain words, with its evidence. What it does, why it matters, its subgates and the next step are owner-only and unlock with your key.</span></p>
   </header>
 
   <div class="fieldbar" role="toolbar" aria-label="Field controls">
@@ -351,7 +428,24 @@
       <option value="">jump to a region…</option>
     </select>
     <span class="spacer"></span>
-    <span class="hint">drag to move · scroll to zoom · tap a node for its detail · tap a line to follow it</span>
+    <span class="hint">drag to move · scroll to zoom · tap a gate to enter it · tap a line to follow it</span>
+  </div>
+
+  <div class="viewbar" role="toolbar" aria-label="Field views">
+    <span class="view-label">VIEW:</span>
+    <button id="viewMapBtn" class="view-btn" type="button" aria-pressed="true">Map</button>
+    <button id="viewEvBtn" class="view-btn" type="button" aria-pressed="false">Evidence</button>
+    <button id="viewTimeBtn" class="view-btn" type="button" aria-pressed="false">Time</button>
+    <span class="view-label">— enter a gate to see what is inside it.</span>
+  </div>
+  <div class="ev-legend" id="evLegend" aria-label="Evidence states">
+    <span class="view-label">EVIDENCE:</span>
+    <button class="ev-chip" type="button" data-ev="proven" aria-pressed="false">● PROVEN <span class="n" id="evCountProven"></span></button>
+    <button class="ev-chip" type="button" data-ev="progress" aria-pressed="false">● IN PROGRESS <span class="n" id="evCountProgress"></span></button>
+    <button class="ev-chip" type="button" data-ev="unknown" aria-pressed="false">● UNKNOWN <span class="n" id="evCountUnknown"></span></button>
+    <button class="ev-chip" type="button" data-ev="blocked" aria-pressed="false">● BLOCKED <span class="n" id="evCountBlocked"></span></button>
+    <button class="ev-chip" type="button" data-ev="" aria-pressed="true">ALL <span class="n" id="evCountAll"></span></button>
+    <span class="adv-line" id="advLine"></span>
   </div>
 
   <div class="viewport" id="viewport" aria-label="The Hami field — the picture of all of Hami. Drag to move, scroll to zoom.">
@@ -359,6 +453,19 @@
       <svg class="field-svg" id="fieldSvg" width="2620" height="3092" viewBox="0 0 2620 3092" role="img" aria-label="Diagram of all Hami gates: 12 zones, 59 gate nodes, connected by edges. Every gate runs."></svg>
     </div>
   </div>
+
+  <section class="dims" aria-label="The seven dimensions">
+    <h2>SEVEN DIMENSIONS — THE FIELD IS 7D, NOT FLAT</h2>
+    <ol>
+      <li><b>PLACE</b> — where: the 12 zones, the geography of the map.</li>
+      <li><b>GATE</b> — what: the gate itself, the door you enter.</li>
+      <li><b>WORK</b> — doing: the subgates, the action, the connections that carry work.</li>
+      <li><b>EVIDENCE</b> — proof: proven, in progress, unknown or blocked, from each gate's own evidence.</li>
+      <li><b>TIME</b> — when: the pace, the loops, the living now; the field moves in time.</li>
+      <li><b>OWNER</b> — who sees: public plain-words, or the owner with the key and the command.</li>
+      <li><b>OUTCOME</b> — where to: the next stage, Hami AI becomes Lead Engineer, the effect on Nepal's economy; after it there is always more.</li>
+    </ol>
+  </section>
 
   <section class="cmd-section" id="cmdSection" aria-label="Owner command" hidden>
     <h2>COMMAND THE GATES</h2>
@@ -372,7 +479,7 @@
 
   <footer>
     <p><b>HOW TO CHANGE THIS FIELD:</b> this page is data-driven. Every gate in the picture is ONE entry in the FIELD list at the top of the &lt;script&gt; at the bottom of this file. To add a gate, copy an entry and change its fields. To link two gates, add each other's id to their links lists. No other editing is needed.</p>
-    <p><b>EVERY GATE RUNS:</b> a gate never ends — a result only opens the next step. Every node carries one badge in one colour and one word: RUNNING. Progress is shown by what the gate is doing and what opens next — the evidence, the next step, the subgates. The picture moves: the pace climbs, the loop walks gate to gate, the work flows along the lines, every gate's door opens and closes. Private items are blurred by default; your key unlocks them for this session only — what unlocks is a name and a description, never a secret value, because no value is in this page. Your key lives only in memory while this page is open: never saved, never written to a file, never logged.</p>
+    <p><b>EVERY GATE RUNS:</b> a gate never ends — a result only opens the next step. Every node carries one badge in one colour and one word: RUNNING — the work never stops. Beside it, an evidence mark says honestly what that gate's evidence shows: PROVEN, IN PROGRESS, UNKNOWN or BLOCKED — so a visitor can tell what is real from what is only planned. The mark comes from the gate's own evidence, never from a guess. Progress is shown by what the gate is doing and what opens next — the evidence, the next step, the subgates. The picture moves: the pace climbs, the loop walks gate to gate, the work flows along the lines, every gate's door opens and closes. The field is 7D, not flat: place, gate, work, evidence, time, owner, outcome. Private items are blurred by default; your key unlocks them for this session only — what unlocks is a name and a description, never a secret value, because no value is in this page. Your key lives only in memory while this page is open: never saved, never written to a file, never logged.</p>
     <p class="note">Every fact in this picture is a measured result, a verified zero, or an explicit UNKNOWN. Nothing is invented.</p>
     <p>last updated 18 Nov 2026</p>
     <p>maps: <a href="index.html">Home</a> &middot; <a href="hami-systems-map.html">Visual map</a> · <a href="hami-methodology.html">Methodology</a> · <a href="ai-engineering-gates.html">AI engineering gates</a> · <a href="advancement-gates.html">Advancement gates</a></p>
@@ -389,6 +496,8 @@
   <p class="detail-run" id="detailRun"><span class="run-dot-inline" aria-hidden="true"></span>RUNNING — this gate runs, and it keeps running.</p>
   <h3>What it is</h3>
   <p id="detailPlain"></p>
+  <h3>What it has produced</h3>
+  <p id="detailEvLine"><span class="ev-state" id="detailEvState"></span> — <span id="detailEvText"></span></p>
   <div id="detailFull" hidden>
     <h3>What it does</h3>
     <p id="detailWhat"></p>
@@ -404,7 +513,7 @@
   </div>
   <h3>Connected gates</h3>
   <div class="conn-list" id="detailLinks"></div>
-  <p class="owner-note" id="detailOwnerNote">Full detail is owner-only. Enter your Hami API key above to see what it does, why it matters, its evidence, its subgates and the next step it opened.</p>
+  <p class="owner-note" id="detailOwnerNote">What it does, why it matters, its subgates and the next step it opened are owner-only. Enter your Hami API key above to see them. What it has produced — its evidence — is shown above for every gate.</p>
 </aside>
 
 <section class="tour" id="tour" aria-label="Guided tour" hidden>
@@ -446,7 +555,7 @@
   {
     "id": "nep",
     "title": "NEPALI TRAINING — Hami AI",
-    "sub": "Teaching Hami Nepali, from within. The end state is Hami as its own LLM.",
+    "sub": "Teaching Hami Nepali, from within. The next stage is Hami as its own LLM — and after it there is always more.",
     "x": 900,
     "y": 240,
     "w": 820
@@ -543,6 +652,7 @@
     "what": "The promise binds every worker and every gate: work never stops, progress always advances, and everything is always upgraded.",
     "why": "It is the owner's standing order. A promise that binds all the work is what keeps the field moving with no gap.",
     "state": "running",
+    "ev": "proven",
     "evidence": "The owner's standing order, 18 Nov 2026: 'promise gate: never stop working, always progress and upgrade everything.' It binds every worker and every gate.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -633,7 +743,7 @@
     "pin": {
       "x": 1030,
       "y": 16,
-      "w": 560,
+      "w": 720,
       "h": 64
     }
   },
@@ -646,6 +756,7 @@
     "what": "The engine passed M6-H: 1,000 publishers, 2,000 viewers, p95 0.34 ms, p99 17.8 ms, zero NACKs.",
     "why": "It proves Hami can carry live video itself, without borrowing another company's video system.",
     "state": "running",
+    "ev": "proven",
     "evidence": "p95 0.34 ms, p99 17.8 ms, zero NACKs. The fix was disabling mDNS. Source: hami-reports/2026-11-17-m6-h-proof-report.md.",
     "date": "2026-11-17",
     "owner": "media engine",
@@ -679,6 +790,7 @@
     "what": "M7-H parked: p95 passes all 3,000 viewers (median 11.2 ms); p99 fails — only 115 of 3,000 pass (median ~294 ms).",
     "why": "A contradicted claim is shown, never hidden. The 9-streamer / 4,000-viewer target is NOT proven on one laptop.",
     "state": "running",
+    "ev": "blocked",
     "evidence": "p95 passes all 3,000 (11.2 ms median); p99 fails, 115 of 3,000 pass (~294 ms median). Source: docs/CAPABILITY_QUEUE.md (M7-H park entry).",
     "date": "2026-11-18",
     "owner": "media engine",
@@ -714,6 +826,7 @@
     "what": "Three identical stalls (profile, tuned, tuned2), same ~1-minute signature. The tuned run finished 19:34:07 with 60/3,000 tracks; the tuned2 run finished 19:42:15 with 171/3,000 tracks. All 6,000 connections died.",
     "why": "The GC heap fix did NOT prevent the stall — the stall has a different single common cause, not the GC heap. Finding it is the next work.",
     "state": "running",
+    "ev": "blocked",
     "evidence": "Tuned run finished 19:34:07, 60/3,000 tracks; tuned2 finished 19:42:15, 171/3,000 tracks; all 6,000 connections died, survived=0. Log: /tmp/hami-media-m7h-attempt13-tuned2-run.log (111,479 lines).",
     "date": "2026-11-18",
     "owner": "Copilot",
@@ -751,6 +864,7 @@
     "what": "Diagnose the single common cause of the identical stalls, then the next fix.",
     "why": "Three stalls with the same signature mean one cause. Guessing fixes wastes runs; a diagnosis ends the guessing.",
     "state": "running",
+    "ev": "progress",
     "evidence": "Triage order placed 18 Nov 2026. Owner: Copilot, fed the moment its 009 turn ends.",
     "date": "2026-11-18",
     "owner": "Copilot",
@@ -778,6 +892,7 @@
     "what": "Held-out eval: base 73/120 vs adapter 58/120 on 20 rows (4 adapter wins, 9 base wins, 7 ties).",
     "why": "Data quality is the blocker. Training harder on weak data will not fix it — the data must be fixed first.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Base 73/120 vs adapter 58/120, 20 rows. Smoke test: 500-example MLX LoRA on Qwen3-4B, loss 1.265 → 0.810.",
     "date": "2026-11-18",
     "owner": "Hami AI",
@@ -819,6 +934,7 @@
     "what": "The dataset is a Stanford Alpaca translation under CC BY-NC 4.0, research-only. 52,005 rows (alpaca-nepali-sft).",
     "why": "Rights were the blocker; now they are settled. What blocks the work now is data quality, not rights.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Stanford Alpaca translation, CC BY-NC 4.0, research-only, no commercial use.",
     "date": "2026-11-18",
     "owner": "Hami AI",
@@ -834,21 +950,27 @@
   {
     "id": "endstate",
     "region": "nep",
-    "num": "GATE 02 · END STATE",
-    "name": "END STATE — HAMI BECOMES ITS OWN LLM",
-    "plain": "The destination: Hami itself becomes a language model — its own, independent, needing no outside model. This is the direction, not a measurement.",
-    "what": "In the end Hami must NOT need GPT or any model — Hami ITSELF becomes an LLM, and a NEED (essential, not optional).",
+    "num": "GATE 02 · NEXT STAGE",
+    "name": "NEXT STAGE — HAMI BECOMES ITS OWN LLM",
+    "plain": "The next stage: Hami itself becomes a language model — its own, independent, needing no outside model. This is the direction, not a measurement. There is no end state — this stage opens onward, and after it there is always more.",
+    "what": "Hami must NOT need GPT or any model — Hami ITSELF becomes an LLM, and a NEED (essential, not optional). This is the next stage, not an end state: the model must be BUILT and must BEAT ALL LLMs — that is the whole point.",
     "why": "That is why the gates and the uniqueness, perseverance and non-leak stages exist: the gates make Hami its own gated way; uniqueness makes Hami its own thing; perseverance makes Hami keep learning on its own; non-leak keeps Hami's knowledge inside Hami.",
     "state": "running",
-    "evidence": "Direction set by the owner, 18 Nov 2026. The Nepali fine-tuning (Qwen3-4B LoRA) is a stepping stone, NOT the destination.",
+    "ev": "progress",
+    "evidence": "The owner set the gate 18 Nov 2026: the Hami AI LLM must be BUILT and BEAT ALL LLMs. Honest measured state: the Nepali adapter scores 58/120 on the held-out eval, worse than its own base Qwen3-4B at 73/120 — it beats nothing yet. Data quality is the blocker. The weight-space experiment is the first step. The fine-tuning is a stepping stone, NOT the destination.",
     "date": "2026-11-18",
     "owner": "owner",
-    "next": "Keep building the stepping stones: data, then LoRA, then independence.",
+    "next": "Keep building the stepping stones: data, then LoRA, then independence — and the next stage opens onward, never finished.",
     "sub": [
       {
         "t": "Stepping stone: Nepali fine-tuning",
         "s": "running",
         "e": "Qwen3-4B MLX LoRA on the Mac — a step, not the end"
+      },
+      {
+        "t": "The gate: build it and beat all LLMs",
+        "s": "running",
+        "e": "Adapter 58/120 vs base 73/120 — it beats nothing yet; the weight-space experiment is the first step"
       }
     ],
     "links": [
@@ -870,6 +992,7 @@
     "what": "Lamsal 2020 (compiled.txt, 1.71 GB, 90M+ words, non-commercial) is not downloaded — IEEE DataPort needs a logged-in account.",
     "why": "It is the biggest Nepali text pile available to Hami. Without it, the training data stays thin.",
     "state": "running",
+    "ev": "blocked",
     "evidence": "BLOCKED on IEEE login. Unblock: the owner creates a FREE IEEE account, logs in, downloads compiled.txt.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -892,6 +1015,7 @@
     "what": "Hami chat is live with real replies. A real reply landed 18 Nov 19:18 (the six primitives, North Star, Purpose).",
     "why": "Talking to Hami is the whole point of Meet Hami — a living system you can ask, not a page you read.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Real reply 18 Nov 19:18. Full path works: Vercel → tunnel → gateway → Ollama gpt-oss:20b.",
     "date": "2026-11-18",
     "owner": "Hami Systems",
@@ -920,6 +1044,7 @@
     "what": "Cross-origin chat is now allowed — commit e566f4cb: Access-Control-Allow-Origin * on the chat reply, plus an OPTIONS handler returning 204.",
     "why": "This is what makes Hami Systems work on ANY site worldwide with one script tag, not just on Knee Rose.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Commit e566f4cb, 1 file, 25 insertions. Pushed to ForgeOS main (238ebbda..f97637c6).",
     "date": "2026-11-18",
     "owner": "Muse (Lead)",
@@ -940,6 +1065,7 @@
     "what": "The gated pop-up is live on Knee Rose and staged on the Hami site. Presentation button, 90 s timeout, 6-slide deck.",
     "why": "One Hami backend, one gate, every surface. The pop-up is what delivers Hami to the world.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Live on Knee Rose; staged on the Hami site (script tag in the shared layout). Widget waits 90 s; route retries transient 502s.",
     "date": "2026-11-18",
     "owner": "Hami Systems",
@@ -962,6 +1088,7 @@
     "what": "Permanence is BLOCKED on approvals/001: it needs the owner's Cloudflare account + zone/hostname for a named tunnel.",
     "why": "A temporary tunnel can drop. A named tunnel stays — Hami stays reachable, always.",
     "state": "running",
+    "ev": "blocked",
     "evidence": "BLOCKED on approvals/001. The tunnel today is UP and stable; the earlier failure was latency/timeout, not a dead tunnel.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -982,6 +1109,7 @@
     "what": "Verified real rupees earned by Hami so far: Rs 0. No seller has paid, no pilot has run, no revenue has been received.",
     "why": "Zero is the measured number. The counter moves only when a real payment lands and is verified.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Rs 0 verified. Source: src/lib/ledger.ts (RS-0 claim).",
     "date": "2026-11-18",
     "owner": "income",
@@ -1004,6 +1132,7 @@
     "what": "Experiment 1 proposes to test whether faster replies recover real sales for one seller in one week.",
     "why": "Slow replies lose real orders. If faster replies recover them, that is Hami's first proven value to a seller.",
     "state": "running",
+    "ev": "proven",
     "evidence": "0 sellers agreed, 0 sales recovered (measured). Source: src/lib/ledger.ts (EXP-1, proposed, log empty).",
     "date": "2026-11-18",
     "owner": "income",
@@ -1025,6 +1154,7 @@
     "what": "Questionnaire SENT by email 18 Nov 12:13 (14 questions), awaiting reply.",
     "why": "Hamsawears is the nearest real seller. Their answers show whether slow replies are losing them orders.",
     "state": "running",
+    "ev": "progress",
     "evidence": "Questionnaire sent by email 18 Nov 12:13 (14 questions). No reply yet.",
     "date": "2026-11-18",
     "owner": "income",
@@ -1045,6 +1175,7 @@
     "what": "Application parked: the macOS question was sent 16 Nov, and there is NO REPLY as of 18 Nov.",
     "why": "CloudFactory is a real employer door. Until they answer, the application cannot move.",
     "state": "running",
+    "ev": "progress",
     "evidence": "macOS question sent 16 Nov. NO REPLY as of 18 Nov.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1064,6 +1195,7 @@
     "what": "Signup is name/email only, pays via PayPal, Starter Assessment takes ~1 hour, one attempt. The plan is ready.",
     "why": "It is the fastest honest route to first paid AI work — if the account is created and the assessment passed.",
     "state": "running",
+    "ev": "unknown",
     "evidence": "Plan ready. Whether Niroj created an account is NOT ESTABLISHED.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1083,6 +1215,7 @@
     "what": "Verified: 1,380 backend tests passed, gates tests 14/14, GREEN.",
     "why": "The gates guard every other gate. A green 007 means the guard itself holds.",
     "state": "running",
+    "ev": "proven",
     "evidence": "1,380 backend tests passed, gates 14/14, GREEN.",
     "date": "2026-11-18",
     "owner": "gates",
@@ -1109,6 +1242,7 @@
     "what": "Verified: 64 tests passed, gates 14/14, GREEN. Telegram delivery is a subgate, BLOCKED_BY_MISSING_ACCESS.",
     "why": "The work stands; only the delivery channel is missing. A blocked subgate is shown, not hidden.",
     "state": "running",
+    "ev": "proven",
     "evidence": "64 tests passed, gates 14/14, GREEN. Telegram subgate: owner channel not configured.",
     "date": "2026-11-18",
     "owner": "gates",
@@ -1141,6 +1275,7 @@
     "what": "PROVE IT (step 8) is PENDING: it waits for 009 to land.",
     "why": "Proof comes in order. Step 8 cannot run until the fix it must prove has landed.",
     "state": "running",
+    "ev": "blocked",
     "evidence": "Pending, waits for 009.",
     "date": "2026-11-18",
     "owner": "gates",
@@ -1160,6 +1295,7 @@
     "what": "Live: help, whoami, projects, music, play, hami, about, contact, clear, exit. Music: 3 tracks — Summit, Kanai Huncha Mast, Pilkington Dr 37.",
     "why": "The home page is not a poster; it is a place you can use. The terminal is how visitors touch Hami.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Live on kn33r0s3.vercel.app. Cursor fixed: green blink sits right after $.",
     "date": "2026-11-18",
     "owner": "Knee Rose",
@@ -1181,6 +1317,7 @@
     "what": "All three Hami pages are now linked from home — Visual map, Methodology, AI engineering gates — commit 8dd0219.",
     "why": "A built thing that is not linked is dormant, and dormant is not allowed. Every page must be reachable.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Commit 8dd0219. Index.html Hami list, lines 285–287.",
     "date": "2026-11-18",
     "owner": "Muse (Lead)",
@@ -1204,6 +1341,7 @@
     "what": "Was @diojitree; updated everywhere live to @np.explains.",
     "why": "One name, everywhere. A wrong handle sends people to the wrong place.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Updated everywhere live, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "Knee Rose",
@@ -1223,6 +1361,7 @@
     "what": "The ledger is live with 6 real claims: EXP-1 proposed, M6-H passed, M7-H-TARGET contradicted, SFT-EVAL measured, A6-KEYS measured, RS-0 measured.",
     "why": "A claim renders only with state + evidence. Contradicted claims are shown, never hidden.",
     "state": "running",
+    "ev": "proven",
     "evidence": "src/routes/ledger.tsx (6,658 B, 185 lines), typecheck OK, Vite build OK. 6 claims, each with state + evidence.",
     "date": "2026-11-18",
     "owner": "ledger",
@@ -1253,6 +1392,7 @@
     "what": "The build log is live with 10 entries, newest first. Every entry is a measured result or an explicit zero.",
     "why": "The track is how any visual is traced from beginning to end and re-checked, again and again.",
     "state": "running",
+    "ev": "proven",
     "evidence": "10 entries in src/routes/build-log.tsx, newest first.",
     "date": "2026-11-18",
     "owner": "ledger",
@@ -1285,6 +1425,7 @@
     "what": "A full-history scan of 14,064 blobs (2,148,503,946 bytes) found zero private-key headers for the specified marker set.",
     "why": "Secrets in history are a leak that never heals. The scan proves the markers are absent — and is honest that it is not the whole story.",
     "state": "running",
+    "ev": "proven",
     "evidence": "0 matches in 14,064 blobs. A6 stays TESTED, NOT CLEAN: 103 Gitleaks and 129 TruffleHog candidates still need triage.",
     "date": "2026-11-18",
     "owner": "audit",
@@ -1305,6 +1446,7 @@
     "what": "Live on Knee Rose + Hami site, commit f97637c. GATE (situation) → SUBGATE (outcome) → LEAD (new work), 10 helper gates, TIP GATE, SUBJECTED GATE, running-water garden, 4 live gates.",
     "why": "The map is the coordination language: the Lead never loses track, and neither do the agents.",
     "state": "running",
+    "ev": "proven",
     "evidence": "ai-engineering-gates.html (40,006 B, 764 lines), commit f97637c.",
     "date": "2026-11-18",
     "owner": "builder",
@@ -1332,6 +1474,7 @@
     "what": "The progress-demanding gate, mandatory. Always set to the FUTURE, so it is NEVER MET. It always asks for all gates and changes with every new outcome.",
     "why": "CHECK work against the gate → TRIGGER the next step → UPDATE the gate → repeat. The gate is never met, so the loop never ends.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place, 18 Nov 2026. The loop: CHECK → TRIGGER → UPDATE → repeat.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1355,6 +1498,7 @@
     "what": "Muse's gate: improve everything whilst doing everything. Every solution is not perfect; everything has space for upgrades.",
     "why": "A finished thing that is never improved is a thing left behind. The improving runs alongside all other work, not instead of it.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place, 18 Nov 2026. Owner: Muse (Lead).",
     "date": "2026-11-18",
     "owner": "Muse (Lead)",
@@ -1377,6 +1521,7 @@
     "what": "Built 18 Nov 2026: advancement-gates.html (39,008 B, 732 lines), linked from both home sites. Pacer gate with a live pace meter, Revision gate with 3 live revisions, Loop gates with a loop ring that walks itself and never closes.",
     "why": "Pace keeps the work moving, revision keeps it honest, and the loop means it never stops. They are one engine.",
     "state": "running",
+    "ev": "proven",
     "evidence": "advancement-gates.html (39,008 B, 732 lines). Smoke test 67 passed, 0 failed. Commits: Knee Rose 324621a, ForgeOS 2bf8fc6a.",
     "date": "2026-11-18",
     "owner": "builder",
@@ -1415,6 +1560,7 @@
     "what": "NEVER REPLICATE OR COPY ANYTHING. Everything Hami makes is generated from within — from the gate, from first principles, from nothingness and inner power.",
     "why": "A gate that moves is not a gate. This one does not move for convenience, for speed, or for anyone.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Unchangeable, unshakable. From the methodology: the prime gate, first.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1438,6 +1584,7 @@
     "what": "Every action is checked against the rules before Hami acts.",
     "why": "Nothing happens without a check, so Hami never does something it was not allowed to do.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Verified. From the visual map: the Decision Gate.",
     "date": "2026-11-18",
     "owner": "engine",
@@ -1457,6 +1604,7 @@
     "what": "One queue, one door — every message leaves through the same door.",
     "why": "One door means no message can slip out by a side path, and every send is recorded.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Verified. From the visual map: the Outbox.",
     "date": "2026-11-18",
     "owner": "engine",
@@ -1477,6 +1625,7 @@
     "what": "Hami thinks with its own engine, on its own machine.",
     "why": "The thinking stays ours — it does not depend on someone else's service.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Verified. From the visual map: the Engine.",
     "date": "2026-11-18",
     "owner": "engine",
@@ -1497,6 +1646,7 @@
     "what": "Every claim Hami makes carries its proof with it.",
     "why": "A claim without proof does not show. What you see is what was measured.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Verified. 6 real claims, each with state + evidence.",
     "date": "2026-11-18",
     "owner": "engine",
@@ -1519,6 +1669,7 @@
     "what": "Hami carries live video itself, publisher to viewer, without borrowing another company's video system.",
     "why": "Measured: 1,000 publishers and 2,000 viewers passed (p95 0.34 ms, p99 17.8 ms).",
     "state": "running",
+    "ev": "proven",
     "evidence": "Measured: 1,000 publishers, 2,000 viewers, p95 0.34 ms, p99 17.8 ms.",
     "date": "2026-11-18",
     "owner": "engine",
@@ -1541,6 +1692,7 @@
     "what": "Hami's doors are locked. Only the owner holds the key.",
     "why": "Private work stays private. Public work is public by a written reason, never by accident.",
     "state": "running",
+    "ev": "proven",
     "evidence": "Verified. From the visual map: the Locks.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1566,6 +1718,7 @@
     "what": "A shared OAuth client secret used by a live preview login.",
     "why": "A secret that identifies a login must never be shown. Its rotation is under owner review.",
     "state": "running",
+    "ev": "blocked",
     "evidence": "State: rotation under owner review (approvals/003). The value is never in this page.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1587,6 +1740,7 @@
     "what": "The key the chat backend uses to reach the Mac gateway.",
     "why": "Whoever holds it can reach the gateway. It is named here; its value is never here.",
     "state": "running",
+    "ev": "proven",
     "evidence": "State: in use by the chat backend, server-side only. The value is never in this page.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1607,6 +1761,7 @@
     "what": "Name, email, phone, citizenship — the owner's own identity details.",
     "why": "Personal details belong to the owner alone. This field names the category and shows nothing else.",
     "state": "running",
+    "ev": "proven",
     "evidence": "State: never shown, never written here. The values are never in this page.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1627,6 +1782,7 @@
     "what": "A loose file in Downloads that needs securing.",
     "why": "Spare codes are a second door. A loose file is a door left open.",
     "state": "running",
+    "ev": "blocked",
     "evidence": "State: needs securing. Its content was never read and is never shown here.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1647,6 +1803,7 @@
     "what": "Date of birth, phone, citizenship — facts from the CloudFactory application.",
     "why": "Application facts identify a real person. They are named as a category and never recorded here.",
     "state": "running",
+    "ev": "proven",
     "evidence": "State: never recorded, never shown. The values are never in this page.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1667,6 +1824,7 @@
     "what": "Every gate, every subgate, every lead is written down the moment it happens, with its evidence: a file path, a number, a log line.",
     "why": "Nothing is carried in memory alone.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1688,6 +1846,7 @@
     "what": "A subgate without a lead is a door left open with nothing behind it. The summary says what happened; the next move says what happens now.",
     "why": "No outcome is left without a next step.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1706,6 +1865,7 @@
     "what": "Every gate, every subgate, every lead moves the work forward. No step is a holding pattern.",
     "why": "Progress is always, and forever, on all projects.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1726,6 +1886,7 @@
     "what": "Work at the fastest honest speed. The moment a worker finishes or stalls, the next order goes in the same moment.",
     "why": "A finished worker with no next order is work lost — and nothing is lost.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1745,6 +1906,7 @@
     "what": "Every new gate starts from what is already known and built. The work accumulates; it is never thrown away.",
     "why": "Knowledge increases everything. Starting from square one is starting from nothing — and nothingness is for generating, not for forgetting.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1763,6 +1925,7 @@
     "what": "The rate is a multiplier that grows with time, because knowledge increases everything and we never start from square one.",
     "why": "The longer the water runs, the faster the garden grows.",
     "state": "running",
+    "ev": "proven",
     "evidence": "The law. In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1782,6 +1945,7 @@
     "what": "Trust the code and the log over the document. Evidence outranks assumption, every time. A failed check is reported as failed, never as zero.",
     "why": "Without proof, a claim is a wish.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1804,6 +1968,7 @@
     "what": "Every line utilized, every interactive path through a gate. A built thing that is not linked and not deployed is dormant, and dormant is not allowed.",
     "why": "Everything must be accessible from the public home site.",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1823,6 +1988,7 @@
     "what": "The web, other frameworks, other methodologies are for seeing, never for following or copying.",
     "why": "This gate does not move for convenience, for speed, or for anyone.",
     "state": "running",
+    "ev": "proven",
     "evidence": "NEVER REPLICATE OR COPY ANYTHING. Unchangeable, unshakable.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -1846,6 +2012,7 @@
     "what": "Never lose track of any work, gate, subgate, minigate, or even tiny gate. The gate itself advances the work on its own.",
     "why": "Treat everything as Hami (one).",
     "state": "running",
+    "ev": "proven",
     "evidence": "In place on every gate, 18 Nov 2026.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1867,6 +2034,7 @@
     "what": "The gate asks one question: did this come from within? If any part was taken from elsewhere, it does not pass.",
     "why": "A gate that moves is not a gate.",
     "state": "running",
+    "ev": "proven",
     "evidence": "From the methodology: the prime, first.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1888,6 +2056,7 @@
     "what": "Nothingness is starting from zero and generating from inside. Inner power is the same thing from the other side: the power is already inside the gate.",
     "why": "The web, ChatGPT, LiveKit, Ollama are for SEEING. They are never for following or copying.",
     "state": "running",
+    "ev": "proven",
     "evidence": "From the methodology: dimension 02.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1908,6 +2077,7 @@
     "what": "Every piece of work prints a gate line first, and a 2px amber gate bar sweeps when a gate opens. The terminal. Devanagari-first headings.",
     "why": "When you see amber on black, a gate line, and a terminal prompt, you are looking at the gate itself.",
     "state": "running",
+    "ev": "proven",
     "evidence": "From the methodology: dimension 03. This field carries the same tokens.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1927,6 +2097,7 @@
     "what": "Hami networks all gates. A gate is never alone, and a visual is never alone: each one is a node in the network, and the network holds it.",
     "why": "The network remembers every gate, every subgate, every minigate, every tiny gate.",
     "state": "running",
+    "ev": "proven",
     "evidence": "From the methodology: dimension 04. This field is the network, drawn.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1947,6 +2118,7 @@
     "what": "Every visual has a track: from its first idea, through its build, through its verification, to its live state — and back again.",
     "why": "A track that stops is a visual that can no longer be checked, and a visual that cannot be checked cannot be trusted.",
     "state": "running",
+    "ev": "proven",
     "evidence": "From the methodology: dimension 05. The ledger and build log are the live track.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1969,6 +2141,7 @@
     "what": "The gate is not decoration; it is the philosophy made visible. A visual that carries no meaning carries nothing.",
     "why": "Every visual is asked: who does this serve? If it serves no one, it does not pass the gate.",
     "state": "running",
+    "ev": "proven",
     "evidence": "From the methodology: dimension 06.",
     "date": "2026-11-18",
     "owner": "all",
@@ -1987,6 +2160,7 @@
     "what": "The work continues on its own: workers move, code is built, progress fills — never still. The work outlives any single worker.",
     "why": "Real engineering, not hypothesis and quick works. We are all engineering Hami and all of Hami.",
     "state": "running",
+    "ev": "proven",
     "evidence": "The owner's order, 18 Nov 2026: no AI working for Hami stops working — each advances instead, to the point the work itself continues. Real engineering, not hypothesis.",
     "date": "2026-11-18",
     "owner": "all",
@@ -2027,6 +2201,7 @@
     "what": "Existing things are upgraded: a gate gets brighter and sharper, a page refines itself. An upgrade shimmer passes over the gates and pages, each one brightening, sharpening, refining.",
     "why": "Nothing is finished; everything has space for upgrades. What exists gets better instead of being left as it is.",
     "state": "running",
+    "ev": "proven",
     "evidence": "The owner's order, 18 Nov 2026: improve everything that exists in Hami — every page, every gate, every file, every system, no matter how small.",
     "date": "2026-11-18",
     "owner": "all",
@@ -2065,6 +2240,7 @@
     "what": "The map is a living web of links between all the field's parts. The connections pulse and update, always being upgraded at insane speed, so the map never loses touch with the real state.",
     "why": "One well-built engine where every part works for every other part. The field's own map of itself.",
     "state": "running",
+    "ev": "proven",
     "evidence": "The owner's order, 18 Nov 2026: a gate that lists everything and links everything in Hami — every file, page, gate, workstream, claim, route.",
     "date": "2026-11-18",
     "owner": "all",
@@ -2107,6 +2283,7 @@
     "what": "The field is the gates governing the real work: the RUNNING pulse on every gate, the pace rising, the loop walking, the work flowing, the upgrades landing. This picture is the government of the real work, not a poster.",
     "why": "A gate that is only displayed changes nothing. Applied, the gates govern the system, the work and the workers.",
     "state": "running",
+    "ev": "proven",
     "evidence": "The owner's order, 18 Nov 2026: apply all gates to Hami — the gates govern Hami itself.",
     "date": "2026-11-18",
     "owner": "owner",
@@ -2143,13 +2320,14 @@
   {
     "id": "leadeng",
     "region": "nep",
-    "num": "LEAD ENGINEER — DESTINATION",
+    "num": "LEAD ENGINEER — NEXT STAGE",
     "name": "HAMI AI BECOMES LEAD ENGINEER",
-    "plain": "Hami AI is being built now so it later takes the Lead Engineer position — the succession, and the destination.",
+    "plain": "Hami AI is being built now so it later takes the Lead Engineer position — the succession, the next stage. After it there is always more.",
     "what": "Muse, the current Lead, builds Hami AI from the gates and from all the data: reports, chronicle, knowledge, code, decisions, Nepali data — everything. Hami AI later steps into the Lead seat and takes up the work.",
-    "why": "The end state: Hami AI itself becomes the Lead Engineer — it coordinates the workers, places the gates, makes the decisions, does what Muse does now. Stage 3 is hami builds: Hami builds itself.",
+    "why": "The next stage: Hami AI itself becomes the Lead Engineer — it coordinates the workers, places the gates, makes the decisions, does what Muse does now. Stage 3 is hami builds: Hami builds itself. And after that stage there is always more.",
     "state": "running",
-    "evidence": "The owner's order, 18 Nov 2026: Hami AI becomes Lead Engineer — the succession. The advancement gates page names the destination: 'HAMI ITSELF BECOMES AN LLM — A NEED'. Stages: (1) teambuild, (2) hami build, (3) hami builds.",
+    "ev": "progress",
+    "evidence": "The owner's order, 18 Nov 2026: Hami AI becomes Lead Engineer — the succession. The advancement gates page names the next stage: 'HAMI ITSELF BECOMES AN LLM — A NEED'. Stages: (1) teambuild, (2) hami build, (3) hami builds.",
     "date": "2026-11-18",
     "owner": "Muse (Lead)",
     "next": "The building continues — the gates + data feeding Hami AI, the handover approaching.",
@@ -2202,8 +2380,9 @@
     "name": "WEIGHT SPACE PROGRAMMING GATE",
     "plain": "The model's weights are the space where Hami AI lives — the gates are the program, the weights are where it runs.",
     "what": "Weight Space Programming is Hami's own gated way of programming that space: every weight update passes through a gate — evidence first, authorization, no copying, nothingness, generated from within, from Hami's own knowledge and data, never by copying an external model's weights.",
-    "why": "The gates shape the weights, and the weights carry Hami. The end state: Hami AI's weights ARE Hami — the model is the Lead Engineer, programmed in weight space by the gates and by all the data.",
+    "why": "The gates shape the weights, and the weights carry Hami. The next stage: Hami AI's weights ARE Hami — the model is the Lead Engineer, programmed in weight space by the gates and by all the data. And after that stage there is always more.",
     "state": "running",
+    "ev": "proven",
     "evidence": "The stepping stone is measured: the MLX LoRA of Qwen3-4B adds low-rank weight updates trained on Nepali data + the gates. Held-out eval: base 73/120 vs adapter 58/120 — the adapter loses, data quality is the blocker. That honest result is the evidence, and the gate keeps running on it.",
     "date": "2026-11-18",
     "owner": "Hami AI",
@@ -2220,7 +2399,7 @@
         "e": "Base 73/120 vs adapter 58/120 — the adapter loses; data quality is the blocker."
       },
       {
-        "t": "End state: weights ARE Hami",
+        "t": "Next stage: weights ARE Hami",
         "s": "running",
         "e": "Hami AI's weights ARE Hami — the model is the Lead Engineer."
       }
@@ -2397,7 +2576,7 @@
         g.nw = NODE_W; g.nh = NODE_H;
       }
       /* Pinned gates take their pinned place, not a grid slot. Bottom-pinned
-         gates (the destination) are placed after maxBottom is known. */
+         gates (the next stage) are placed after maxBottom is known. */
       for (var m = 0; m < FIELD.length; m++) {
         if (FIELD[m].region === r.id && FIELD[m].pin && !FIELD[m].pin.bottom && !FIELD[m].hidden) {
           FIELD[m].gx = FIELD[m].pin.x; FIELD[m].gy = FIELD[m].pin.y;
@@ -2407,8 +2586,8 @@
     }
     var maxBottom = 0;
     for (i = 0; i < REGIONS.length; i++) { maxBottom = Math.max(maxBottom, REGIONS[i].y + REGIONS[i].h); }
-    /* The destination gate stands below every region: the place the whole
-       picture leads to. */
+    /* The next-stage gate stands below every region: the place the whole
+       picture leads to, and past it there is always more. */
     for (i = 0; i < FIELD.length; i++) {
       if (FIELD[i].pin && FIELD[i].pin.bottom && !FIELD[i].hidden) {
         FIELD[i].gx = FIELD[i].pin.x;
@@ -2418,6 +2597,7 @@
       }
     }
     var worldH = maxBottom + 40;
+    WORLD_H = worldH;
     world.style.width = "2620px";
     world.style.height = worldH + "px";
     svg.setAttribute("width", "2620");
@@ -2591,56 +2771,110 @@
     }
   }
 
+  /* ---- the gate's character, from its region ----
+     Four archetypes, Hami's own way: a round stone arch with a wooden
+     door; a pointed temple arch with a carved door; a glowing open portal
+     with no leaf (the doorway itself is the light); a round vault door,
+     locked. The helper gates keep a steady arch. The Promise Gate and the
+     Lead Engineer gate are the grand ones. */
+  function gateStyle(region) {
+    if (region === "nep" || region === "meth") { return { arch: "pointed", door: "carved" }; }
+    if (region === "meet" || region === "net") { return { arch: "portal", door: "glow" }; }
+    if (region === "priv" || region === "vault") { return { arch: "vault", door: "vault" }; }
+    if (region === "help") { return { arch: "helper", door: "plain" }; }
+    return { arch: "round", door: "wood" };
+  }
+  var EV_LABEL = { proven: "PROVEN", progress: "IN PROGRESS", unknown: "UNKNOWN", blocked: "BLOCKED" };
+  function evOf(g) { return (g.ev && EV_LABEL[g.ev]) ? g.ev : "unknown"; }
+
   function renderNode(g, idx) {
     var nw = g.nw || NODE_W, nh = g.nh || NODE_H;
-    /* Title + badge layout, computed first: the RUNNING badge sits on its
-       own row below the title, never on it. It used to anchor to the
-       node's bottom (nh - 14), which collided with the title on short
-       nodes — the Promise Gate (64 tall) had its badge drawn across its
-       one-line title. Now the badge is placed at least 18px below the
-       title's last line, and a node too short to hold both grows just
-       enough to fit them. Normal 100-tall nodes are unaffected. */
-    var maxChars = Math.max(18, Math.floor((nw - 48) / 7.5));
+    /* The gate's door stands on the right, clear of the title: the title
+       wraps to the space left of the door. Monospace at 15px is ~9px a
+       character (the old divisor 7.5 let long titles run past the node's
+       right border — the Promise Gate's final "G" hung outside). */
+    var DOOR_W = 34;
+    var maxChars = Math.max(18, Math.floor((nw - 16 - DOOR_W - 12) / 9.2));
     var nameLines = wrapText(g.name, maxChars).slice(0, 2);
     var titleLast = g.gy + 42 + (nameLines.length - 1) * 20;
     var badgeY = Math.max(g.gy + nh - 14, titleLast + 18);
     if (badgeY > g.gy + nh - 8) { nh = badgeY + 10 - g.gy; g.nh = nh; }
+    var ev = evOf(g);
     var grp = svgEl("g", {
-      "id": "gate-" + g.id, "class": "node running" + (g.private ? " private" : ""),
-      tabindex: "0", role: "button", "data-gate-id": g.id,
-      "aria-label": g.name + " — RUNNING"
+      "id": "gate-" + g.id, "class": "node running ev-" + ev + (g.private ? " private" : ""),
+      tabindex: "0", role: "button", "data-gate-id": g.id, "data-ev": ev,
+      "aria-label": g.name + " — RUNNING — " + EV_LABEL[ev]
     });
+    /* Depth: a shadow under the gate, so it stands off the picture. */
+    grp.appendChild(svgEl("rect", { x: g.gx + 4, y: g.gy + 5, width: nw, height: nh, rx: 6, "class": "gate-shadow" }));
     grp.appendChild(svgEl("rect", { x: g.gx, y: g.gy, width: nw, height: nh, rx: 6, "class": "node-box" }));
     grp.appendChild(svgEl("rect", { x: g.gx, y: g.gy, width: nw, height: nh, rx: 6, "class": "node-box-pulse" }));
+    /* The gate's frame: an arch across the top, two stone posts, a
+       keystone at the peak, a threshold step at the bottom. The arch is
+       round, pointed, or a glowing portal, by the gate's region. */
+    var st = gateStyle(g.region);
+    var cx = g.gx + nw / 2;
+    if (st.arch === "pointed") {
+      grp.appendChild(svgEl("path", { d: "M " + g.gx + " " + (g.gy + 26) + " L " + cx + " " + (g.gy + 6) + " L " + (g.gx + nw) + " " + (g.gy + 26) + " L " + (g.gx + nw) + " " + (g.gy + 30) + " L " + cx + " " + (g.gy + 12) + " L " + g.gx + " " + (g.gy + 30) + " Z", "class": "gate-arch-fill" }));
+      grp.appendChild(svgEl("path", { d: "M " + g.gx + " " + (g.gy + 26) + " L " + cx + " " + (g.gy + 6) + " L " + (g.gx + nw) + " " + (g.gy + 26), "class": "gate-arch" }));
+    } else {
+      grp.appendChild(svgEl("path", { d: "M " + g.gx + " " + (g.gy + 26) + " Q " + cx + " " + (g.gy + 4) + " " + (g.gx + nw) + " " + (g.gy + 26) + " L " + (g.gx + nw) + " " + (g.gy + 30) + " Q " + cx + " " + (g.gy + 10) + " " + g.gx + " " + (g.gy + 30) + " Z", "class": "gate-arch-fill" }));
+      grp.appendChild(svgEl("path", { d: "M " + g.gx + " " + (g.gy + 26) + " Q " + cx + " " + (g.gy + 4) + " " + (g.gx + nw) + " " + (g.gy + 26), "class": "gate-arch" }));
+    }
+    grp.appendChild(svgEl("path", { d: "M " + (cx - 8) + " " + (g.gy + 8) + " L " + (cx + 8) + " " + (g.gy + 8) + " L " + (cx + 5) + " " + (g.gy + 22) + " L " + (cx - 5) + " " + (g.gy + 22) + " Z", "class": "gate-key" }));
+    grp.appendChild(svgEl("rect", { x: g.gx + 2, y: g.gy + 30, width: 8, height: nh - 38, "class": "gate-post" }));
+    grp.appendChild(svgEl("rect", { x: g.gx + nw - 10, y: g.gy + 30, width: 8, height: nh - 38, "class": "gate-post" }));
+    grp.appendChild(svgEl("rect", { x: g.gx + 2, y: g.gy + nh - 4, width: nw - 4, height: 3, "class": "gate-threshold" }));
     grp.appendChild(svgEl("rect", { x: g.gx, y: g.gy + 6, width: 5, height: nh - 12, "class": "node-bar" }));
     grp.appendChild(svgText(g.gx + 16, g.gy + 20, "node-num node-label", g.num));
     /* The gate's door: it opens and closes as work passes through —
-       the gate cycle GATE → SUBGATE → LEAD, lived, not written. */
-    var doorH = Math.min(40, nh - 16);
-    var door = svgEl("rect", {
-      x: g.gx + nw - 16, y: g.gy + (nh - doorH) / 2, width: 8, height: doorH, rx: 2, "class": "gate-door"
-    });
+       the gate cycle GATE → SUBGATE → LEAD, lived, not written. The door
+       is a real door now: planks and a ring handle, or a glowing opening,
+       or a round vault door — by the gate's region. It slides open. */
+    var doorX = g.gx + nw - DOOR_W - 12, doorY = g.gy + 30, doorH = Math.max(24, nh - 30 - 16);
+    var door = svgEl("g", { "class": "gate-door" });
     door.style.animationDelay = ((idx * 137) % 1200) + "ms";
+    if (st.door === "glow") {
+      door.appendChild(svgEl("rect", { x: doorX, y: doorY, width: DOOR_W - 6, height: doorH, rx: 10, "class": "gate-glow" }));
+      door.appendChild(svgEl("rect", { x: doorX, y: doorY, width: DOOR_W - 6, height: doorH, rx: 10, "class": "gate-door-panel" }));
+    } else if (st.door === "vault") {
+      var vr = Math.min(doorH, DOOR_W - 6) / 2;
+      var vcx = doorX + (DOOR_W - 6) / 2, vcy = doorY + doorH / 2;
+      door.appendChild(svgEl("circle", { cx: vcx, cy: vcy, r: vr, "class": "gate-door-panel" }));
+      door.appendChild(svgEl("line", { x1: vcx - vr, y1: vcy, x2: vcx + vr, y2: vcy, "class": "gate-vault-spoke" }));
+      door.appendChild(svgEl("line", { x1: vcx, y1: vcy - vr, x2: vcx, y2: vcy + vr, "class": "gate-vault-spoke" }));
+      door.appendChild(svgEl("circle", { cx: vcx, cy: vcy, r: 3, "class": "gate-vault-hub" }));
+    } else {
+      door.appendChild(svgEl("rect", { x: doorX, y: doorY, width: DOOR_W - 6, height: doorH, rx: 3, "class": "gate-door-panel" }));
+      door.appendChild(svgEl("line", { x1: doorX + 9, y1: doorY + 3, x2: doorX + 9, y2: doorY + doorH - 3, "class": "gate-door-plank" }));
+      door.appendChild(svgEl("line", { x1: doorX + 18, y1: doorY + 3, x2: doorX + 18, y2: doorY + doorH - 3, "class": "gate-door-plank" }));
+      if (st.door === "carved") {
+        door.appendChild(svgEl("line", { x1: doorX + 3, y1: doorY + doorH / 2, x2: doorX + (DOOR_W - 6) - 3, y2: doorY + doorH / 2, "class": "gate-door-plank" }));
+      }
+      door.appendChild(svgEl("circle", { cx: doorX + (DOOR_W - 6) - 6, cy: doorY + doorH / 2, r: 3, "class": "gate-door-ring" }));
+    }
     grp.appendChild(door);
     /* The Improvement Gate's upgrade shimmer rises over its own gate. */
     if (g.id === "improve") {
       grp.appendChild(svgEl("rect", { x: g.gx + 16, y: g.gy + nh - 24, width: nw - 32, height: 4, rx: 2, "class": "upgrade-shimmer" }));
     }
     /* The Weight Space Programming Gate: the weights lighting up as Hami —
-       the gates programming the weight space, block by block. */
+       the gates programming the weight space, block by block. The blocks
+       sit left of the door, clear of it. */
     if (g.id === "wsp") {
       for (var wb = 0; wb < 6; wb++) {
         var block = svgEl("rect", {
-          x: g.gx + nw - 16 - (6 - wb) * 12, y: g.gy + nh - 18, width: 8, height: 8, rx: 1, "class": "weight-block"
+          x: doorX - 8 - (6 - wb) * 12, y: g.gy + nh - 18, width: 8, height: 8, rx: 1, "class": "weight-block"
         });
         block.style.animationDelay = (wb * 200) + "ms";
         grp.appendChild(block);
       }
     }
-    /* The succession, inside the destination gate: Muse (Lead now) hands
+    /* The succession, inside the next-stage gate: Muse (Lead now) hands
        the seat to Hami AI (Lead next); the gates + all data flow into it.
-       Hami AI is being built now — the Lead seat is the destination it
-       steps into, not a seat it already holds. */
+       Hami AI is being built now — the Lead seat is the next stage it
+       steps into, not a seat it already holds, and after it there is
+       always more. */
     if (g.id === "leadeng") {
       var flowX = g.gx + (nw - 454) / 2;
       var chipY = g.gy + 54;
@@ -2660,6 +2894,12 @@
     }
     grp.appendChild(svgEl("circle", { cx: g.gx + 22, cy: badgeY - 4, r: 5, "class": "run-dot" }));
     grp.appendChild(svgText(g.gx + 34, badgeY, "run-label", "RUNNING"));
+    /* The evidence mark: the honest word beside RUNNING, from the gate's
+       own evidence. The work never stops (RUNNING); the mark says what the
+       evidence shows — PROVEN, IN PROGRESS, UNKNOWN or BLOCKED. */
+    var evX = g.gx + 118;
+    grp.appendChild(svgEl("circle", { cx: evX, cy: badgeY - 4, r: 4, "class": "ev-dot" }));
+    grp.appendChild(svgText(evX + 10, badgeY, "ev-mark", EV_LABEL[ev]));
     if (g.progress) {
       var barW = nw - 32, fillW = Math.round(barW * g.progress.done / g.progress.total);
       grp.appendChild(svgEl("rect", { x: g.gx + 16, y: g.gy + nh - 9, width: barW, height: 5, rx: 2.5, "class": "node-progress-bg" }));
@@ -2670,9 +2910,9 @@
     }
     if (g.private) {
       var lock = svgEl("g", { "class": "node-lock" });
-      lock.appendChild(svgEl("rect", { x: g.gx + nw - 34, y: g.gy + nh - 26, width: 18, height: 14, rx: 2, "class": "node-lock-mark" }));
-      lock.appendChild(svgEl("path", { d: "M " + (g.gx + nw - 30) + " " + (g.gy + nh - 26) + " v -4 a 5 5 0 0 1 10 0 v 4", fill: "none", stroke: "#f2a33a", "stroke-width": 2, "class": "node-lock-mark" }));
-      lock.appendChild(svgText(g.gx + nw - 40, g.gy + nh - 32, "node-lock-text", "LOCKED", "end"));
+      lock.appendChild(svgEl("rect", { x: g.gx + nw - DOOR_W - 12 - 20, y: g.gy + nh - 26, width: 18, height: 14, rx: 2, "class": "node-lock-mark" }));
+      lock.appendChild(svgEl("path", { d: "M " + (g.gx + nw - DOOR_W - 12 - 16) + " " + (g.gy + nh - 26) + " v -4 a 5 5 0 0 1 10 0 v 4", fill: "none", stroke: "#f2a33a", "stroke-width": 2, "class": "node-lock-mark" }));
+      lock.appendChild(svgText(g.gx + nw - DOOR_W - 12 - 26, g.gy + nh - 32, "node-lock-text", "LOCKED", "end"));
       grp.appendChild(lock);
     }
     grp.addEventListener("click", function () {
@@ -2700,19 +2940,23 @@
   /* Whether the view is the default fit (nothing panned/zoomed by hand).
      Resize re-fits only while this is true, so it never yanks the user
      back after they have moved the picture themselves. */
+  var WORLD_H = 0;
   var viewIsFit = true;
   function fitView() {
-    /* Fit the whole 2620px-wide world into the viewport, top-aligned.
-       The old default (k=1, x=0, y=0) showed only the left half at 1920px:
-       the Promise Gate, the prime gate, Nepali Training and the End State
-       were cut off on the right. Fit-to-width shows the full width on load;
-       the user drags down for the height. Never upscale past 1:1. */
+    /* Fit the WHOLE diagram into the viewport on first load AND on Reset:
+       both dimensions, centred. The old fit was width-only, top-aligned —
+       the whole diagram did not fit on first load or after Reset, and the
+       lower zones sat below the fold. The world is 2620 wide and WORLD_H
+       tall (stored by renderField); the scale is the smaller of the two
+       fits, never past 1:1. After the fit, the tour, the jump menu and the
+       zoom buttons are the reading tools — the whole map is shown first. */
     var s = vpSize();
     var ww = world.clientWidth || 2620;
-    var k = Math.min(1, s.w / ww);
+    var wh = WORLD_H || 3092;
+    var k = Math.min(1, s.w / ww, s.h / wh);
     view.k = k;
     view.x = (s.w - ww * k) / 2;
-    view.y = 0;
+    view.y = (s.h - wh * k) / 2;
     viewIsFit = true;
     applyView();
   }
@@ -2750,9 +2994,9 @@
     panTo(r.x + r.w / 2, r.y + (r.h || 300) / 2, 0.8);
   }
   function resetView() {
-    /* Reset means fit: the whole width visible, top of the field.
-       The old reset (k=1, x=0, y=0) showed only the left half, so
-       "reset view" did not fix the cut-off right side. */
+    /* Reset means fit: the whole diagram visible, centred.
+       The old reset restored the width-only fit, so the lower zones
+       stayed below the fold and "reset view" did not show the whole map. */
     /* Mutate, never reassign: window.__hamiField.view holds this object. */
     fitView();
   }
@@ -2857,6 +3101,13 @@
     var plainEl = $("detailPlain");
     plainEl.textContent = g.plain;
     plainEl.classList.toggle("blur-zone", !!g.private && !ownerKey);
+    /* What the gate has actually produced — visible to everyone, not just
+       the owner. A gate marked RUNNING that shows no evidence and no
+       advancement is a hallucination; this line is the advancement, in
+       plain words, with its evidence. Private gates stay blurred. */
+    $("detailEvState").textContent = EV_LABEL[evOf(g)];
+    $("detailEvText").textContent = g.evidence;
+    $("detailEvLine").classList.toggle("blur-zone", !!g.private && !ownerKey);
     if (ownerKey) {
       $("detailFull").removeAttribute("hidden");
       $("detailWhat").textContent = g.what;
@@ -2927,6 +3178,71 @@
   jumpSelect.addEventListener("change", function () {
     if (jumpSelect.value) { panToRegion(jumpSelect.value); }
   });
+
+  /* ---- views: map / evidence / time — and the evidence legend ----
+     The field is 7D: the same gates, seen by place (Map), by what their
+     evidence shows (Evidence), or by when the work happens (Time). The
+     legend counts are computed from the FIELD data itself — they are the
+     advancement, what the gates have actually produced, not time passing.
+     A gate marked RUNNING that has produced nothing and shows no
+     advancement is a hallucination; the evidence mark says honestly what
+     each gate's evidence shows. */
+  var currentView = "map";
+  var evFilter = "";
+  function evCounts() {
+    var c = { proven: 0, progress: 0, unknown: 0, blocked: 0 };
+    for (var i = 0; i < FIELD.length; i++) { c[evOf(FIELD[i])]++; }
+    c.all = FIELD.length;
+    return c;
+  }
+  function fillEvLegend() {
+    var c = evCounts();
+    $("evCountProven").textContent = c.proven;
+    $("evCountProgress").textContent = c.progress;
+    $("evCountUnknown").textContent = c.unknown;
+    $("evCountBlocked").textContent = c.blocked;
+    $("evCountAll").textContent = c.all;
+    var adv = $("advLine");
+    if (adv) {
+      adv.textContent = "Advancement is what the gates have produced, not time passing: " +
+        c.proven + " gates PROVEN, " + c.progress + " IN PROGRESS, " +
+        c.unknown + " UNKNOWN, " + c.blocked + " BLOCKED — counted from the evidence each gate carries.";
+    }
+  }
+  function applyEvFilter() {
+    for (var i = 0; i < FIELD.length; i++) {
+      var el = gateEls[FIELD[i].id];
+      if (!el) { continue; }
+      el.classList.toggle("ev-dim", !!evFilter && evOf(FIELD[i]) !== evFilter);
+    }
+  }
+  function setView(v) {
+    currentView = v;
+    $("viewMapBtn").setAttribute("aria-pressed", v === "map" ? "true" : "false");
+    $("viewEvBtn").setAttribute("aria-pressed", v === "evidence" ? "true" : "false");
+    $("viewTimeBtn").setAttribute("aria-pressed", v === "time" ? "true" : "false");
+    document.body.classList.toggle("view-evidence", v === "evidence");
+    document.body.classList.toggle("view-time", v === "time");
+    if (v === "evidence") { fitView(); }
+    if (v === "time") { stepLoop(); }
+  }
+  $("viewMapBtn").addEventListener("click", function () { setView("map"); });
+  $("viewEvBtn").addEventListener("click", function () { setView("evidence"); });
+  $("viewTimeBtn").addEventListener("click", function () { setView("time"); });
+  (function wireEvLegend() {
+    var chips = document.querySelectorAll("#evLegend .ev-chip");
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].addEventListener("click", function () {
+        var v = this.getAttribute("data-ev");
+        evFilter = (evFilter === v) ? "" : v;
+        for (var j = 0; j < chips.length; j++) {
+          chips[j].setAttribute("aria-pressed", chips[j].getAttribute("data-ev") === evFilter ? "true" : "false");
+        }
+        applyEvFilter();
+      });
+    }
+  })();
+  fillEvLegend();
 
   /* ---- guided tour (the 6-slide deck, folded into the field) ---- */
   var tour = $("tour");
@@ -3006,7 +3322,7 @@
     if (ownerKey) {
       ownerStatus.innerHTML = '<span class="on">owner mode: ON — full detail + private names visible for this session. Key held only in memory; leave owner mode or close the page to drop it.</span>';
     } else {
-      ownerStatus.innerHTML = '<span class="off">owner mode: OFF — public view: plain-words picture only. Full detail + private names unlock with your key.</span>';
+      ownerStatus.innerHTML = '<span class="off">owner mode: OFF — public view: what each gate has produced, in plain words, with its evidence. What it does, why it matters, its subgates and the next step are owner-only and unlock with your key.</span>';
     }
   }
   function enterOwner() {
@@ -3120,6 +3436,9 @@
     enterOwner: enterOwner, leaveOwner: leaveOwner,
     sendOwnerCommand: sendOwnerCommand,
     panToGate: panToGate, panToRegion: panToRegion, resetView: resetView, fitView: fitView,
+    setView: setView, evCounts: evCounts,
+    currentView: function () { return currentView; },
+    worldH: function () { return WORLD_H; },
     zoomCenter: zoomCenter, connected: connected,
     tickPace: tickPace, stepLoop: stepLoop, stepPackets: stepPackets,
     paceMs: function () { return paceMs; },
