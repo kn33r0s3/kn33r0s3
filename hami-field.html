@@ -11,8 +11,8 @@
   links entry is a visible edge between nodes. The water is the connections:
   it runs along the edges. The work is LIVED as animation, not written in
   text boxes: every gate's door opens and closes (GATE → SUBGATE → LEAD),
-  the pacer heartbeat counts the pace climbing since the page loaded, the
-  loop ring walks gate to gate and never closes, progress fills show real
+  the pace is a rule, the loop ring walks gate to gate and never closes,
+  progress fills show real
   measured fractions, and small shapes flow along the connections as the
   work travelling gate to gate. Text is only tiny labels on the animation.
   The PROMISE GATE stands at the top centre above HAMI itself: never stop
@@ -93,8 +93,9 @@
 <title>The Hami Field — the map the owner sees always</title>
 <style>
   * { box-sizing: border-box; }
-  html { background: #0c0b0a; }
+  html { height: 100%; overflow: hidden; background: #0c0b0a; }
   body {
+    height: 100%; overflow: hidden;
     margin: 0; background: #0c0b0a; color: #e9e1d2;
     font-family: ui-monospace, "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
     font-size: 16px; line-height: 1.7;
@@ -104,24 +105,28 @@
   a:hover { color: #f7c873; text-decoration-thickness: 2px; }
   a:focus-visible { outline: 2px solid #f2a33a; outline-offset: 2px; }
   button { font: inherit; }
-  .field { max-width: 1240px; margin: 0 auto; padding: 20px 18px 40px; }
+  .field {
+    display: flex; flex-direction: column;
+    width: 100%; max-width: none; height: 100vh; height: 100dvh;
+    margin: 0; padding: 8px 12px 12px; overflow-y: auto;
+  }
 
   /* ---- minimal header: title + gate line + key + tour, nothing else ---- */
-  .topbar { text-align: center; padding: 6px 0 0; }
+  .topbar { flex: 0 0 auto; text-align: center; padding: 0; }
   .topbar .core-ne { margin: 0; font-size: 18px; color: #f2a33a; letter-spacing: 0.35em; }
   .topbar h1 {
     margin: 2px 0 0; font-family: "UnifrakturCook", "Old English Text MT", "Blackletter", "Times New Roman", serif;
-    font-size: 56px; line-height: 1; color: #f2a33a;
+    font-size: 44px; line-height: 1; color: #f2a33a;
   }
-  .topbar .gate-line { margin: 10px 0 0; color: #f2a33a; font-size: 13px; }
+  .topbar .gate-line { margin: 4px 0 0; color: #f2a33a; font-size: 12px; }
   .topbar .gate-line b { color: #e9e1d2; font-weight: 400; }
-  .owner-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 14px auto 0; max-width: 720px; }
+  .owner-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 6px auto 0; max-width: 720px; }
   .owner-row input[type="password"] {
     flex: 1; min-width: 200px; background: #15130f; color: #e9e1d2;
     border: 1px solid #3a2e1a; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 14px;
   }
   .owner-row input:focus { outline: 2px solid #f2a33a; outline-offset: 1px; }
-  .owner-status { color: #bdb29f; font-size: 13px; margin: 8px 0 0; }
+  .owner-status { color: #bdb29f; font-size: 12px; margin: 4px 0 0; }
   .owner-status .on { color: #72d38f; } .owner-status .off { color: #bdb29f; }
 
   /* ---- buttons ---- */
@@ -136,20 +141,24 @@
 
   /* ---- field toolbar ---- */
   .fieldbar {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0 12px;
+    display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 4px;
     position: sticky; top: 0; z-index: 30; background: #0c0b0a; padding: 8px 0;
     border-bottom: 1px solid #3a2e1a;
   }
+  .fieldbar .btn { padding: 5px 8px; }
   .fieldbar .spacer { flex: 1; }
   .fieldbar select {
     background: #0c0b0a; color: #f2a33a; border: 1px solid #f2a33a;
-    border-radius: 6px; padding: 7px 10px; font: inherit; font-size: 13px;
+    border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 12px;
   }
-  .fieldbar .hint { color: #bdb29f; font-size: 12px; }
+  .fieldbar .hint { color: #bdb29f; font-size: 11px; }
 
   /* ---- the picture: viewport + SVG world ---- */
   .viewport {
-    position: relative; height: 82vh; min-height: 520px; overflow: hidden;
+    position: relative; flex: 0 0 auto;
+    height: clamp(280px, calc(100vh - 424px), 800px);
+    height: clamp(280px, calc(100dvh - 424px), 800px);
+    min-height: 280px; overflow: hidden;
     border: 1px solid #3a2e1a; border-radius: 6px; background: #0c0b0a;
     box-shadow: 4px 4px 0 #000; touch-action: none; cursor: grab;
   }
@@ -249,20 +258,20 @@
   .zone-box { filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6)); }
 
   /* ---- view switcher: MAP / EVIDENCE / TIME + the 7 dimensions ---- */
-  .viewbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 12px auto 0; max-width: 980px; }
+  .viewbar { display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; margin: 4px auto 0; width: 100%; max-width: none; }
   .viewbar .view-label { color: #bdb29f; font-size: 13px; }
   .view-btn { border: 1px solid #3a2e1a; background: #15130f; color: #e9e1d2; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 13px; }
   .view-btn:hover { border-color: #f2a33a; }
   .view-btn[aria-pressed="true"] { background: #f2a33a; color: #0c0b0a; border-color: #f2a33a; font-weight: 700; }
   .view-btn:focus-visible { outline: 2px solid #f2a33a; outline-offset: 2px; }
-  .ev-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 10px auto 0; max-width: 980px; font-size: 13px; }
-  .ev-legend .ev-chip { border: 1px solid #3a2e1a; background: #15130f; color: #e9e1d2; border-radius: 20px; padding: 4px 10px; cursor: pointer; }
+  .ev-legend { display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; margin: 4px auto 0; width: 100%; max-width: none; font-size: 11px; }
+  .ev-legend .ev-chip { border: 1px solid #3a2e1a; background: #15130f; color: #e9e1d2; border-radius: 20px; padding: 3px 8px; cursor: pointer; }
   .ev-legend .ev-chip:hover { border-color: #f2a33a; }
   .ev-legend .ev-chip[aria-pressed="true"] { border-color: #f2a33a; background: #f2a33a; color: #0c0b0a; font-weight: 700; }
   .ev-legend .ev-chip .n { font-weight: 700; }
   /* The advancement line: what the gates have actually produced, counted
      from the evidence each gate carries — not time passing. */
-  .adv-line { color: #bdb29f; font-size: 12px; margin-left: 12px; }
+  .adv-line { color: #bdb29f; font-size: 11px; margin-left: 6px; }
   /* The evidence state in the detail drawer: what this gate produced. */
   .ev-state { font-weight: bold; color: #f2a33a; letter-spacing: 1px; }
   /* In the Evidence view the marks stand out, so the eye reads proof first. */
@@ -273,12 +282,9 @@
   .dims li { margin: 0 0 6px; font-size: 13px; color: #e9e1d2; }
   .dims li b { color: #f2a33a; }
 
-  /* ---- SVG animated cartoon elements ----
-     Nothing in the scene is still. Every animated element is real: the
-     pace meter counts this page's own running pace, the loop counter counts
-     the loops this page has run, the progress fills are real measured
-     fractions from the sources, the packets stand for work flowing along
-     the real connections, the doors are the gate cycle opening and closing. */
+  /* ---- SVG animated elements ----
+     The loop follows the gates; progress fills use measured fractions, and
+     packets show work flowing along the real connections. */
   .gate-door { fill: #f2a33a; opacity: 0.9; animation: doorSlide 2.4s ease-in-out infinite; }
   @keyframes doorSlide { 0%, 100% { transform: translateX(0); opacity: 0.9; } 50% { transform: translateX(-9px); opacity: 0.3; } }
   .node-progress-bg { fill: #0c0b0a; stroke: #3a2e1a; stroke-width: 1; }
@@ -309,10 +315,7 @@
   .panel-box { fill: #15130f; stroke: #f2a33a; stroke-width: 1.5; }
   .panel-title { fill: #f2a33a; font-size: 14px; font-weight: 700; letter-spacing: 1px; font-family: inherit; }
   .panel-big { fill: #f4efe6; font-size: 20px; font-weight: 700; font-family: inherit; }
-  .panel-mult { fill: #72d38f; font-size: 20px; font-weight: 700; font-family: inherit; }
   .panel-small { fill: #bdb29f; font-size: 11px; font-family: inherit; }
-  .heartbeat-line { fill: none; stroke: #72d38f; stroke-width: 2; stroke-dasharray: 300; animation: heartbeat 2.4s linear infinite; }
-  @keyframes heartbeat { from { stroke-dashoffset: 300; } to { stroke-dashoffset: 0; } }
 
   /* ---- owner command section (owner only) ---- */
   .cmd-section {
@@ -384,7 +387,6 @@
   footer b { color: #f2a33a; }
   @media (max-width: 720px) {
     .topbar h1 { font-size: 44px; }
-    .viewport { height: 70vh; min-height: 420px; }
   }
   /* ---- cartoons, art, VFX (Hami approach: drawn with code, SVG + CSS, never copied/stock/external) ---- */
   .field-mascot { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; }
@@ -448,9 +450,9 @@
     <span class="adv-line" id="advLine"></span>
   </div>
 
-  <div class="viewport" id="viewport" aria-label="The Hami field — the picture of all of Hami. Drag to move, scroll to zoom.">
+  <div class="viewport" id="viewport" aria-label="The Hami field — the picture of all of Hami. Drag to move, scroll the page, or hold Alt/Option while scrolling to zoom.">
     <div class="world" id="world">
-      <svg class="field-svg" id="fieldSvg" width="2620" height="3092" viewBox="0 0 2620 3092" role="img" aria-label="Diagram of all Hami gates: 12 zones, 59 gate nodes, connected by edges. Every gate runs."></svg>
+      <svg class="field-svg" id="fieldSvg" width="2620" height="3092" viewBox="0 0 2620 3092" role="img" aria-label="Diagram of all Hami gates: 12 zones, 62 gate nodes, connected by edges. Every gate runs."></svg>
     </div>
   </div>
 
@@ -461,7 +463,7 @@
       <li><b>GATE</b> — what: the gate itself, the door you enter.</li>
       <li><b>WORK</b> — doing: the subgates, the action, the connections that carry work.</li>
       <li><b>EVIDENCE</b> — proof: proven, in progress, unknown or blocked, from each gate's own evidence.</li>
-      <li><b>TIME</b> — when: the pace, the loops, the living now; the field moves in time.</li>
+      <li><b>TIME</b> — when: the pace rule and the loop; time is context, not a progress counter.</li>
       <li><b>OWNER</b> — who sees: public plain-words, or the owner with the key and the command.</li>
       <li><b>OUTCOME</b> — where to: the next stage, Hami AI becomes Lead Engineer, the effect on Nepal's economy; after it there is always more.</li>
     </ol>
@@ -479,7 +481,7 @@
 
   <footer>
     <p><b>HOW TO CHANGE THIS FIELD:</b> this page is data-driven. Every gate in the picture is ONE entry in the FIELD list at the top of the &lt;script&gt; at the bottom of this file. To add a gate, copy an entry and change its fields. To link two gates, add each other's id to their links lists. No other editing is needed.</p>
-    <p><b>EVERY GATE RUNS:</b> a gate never ends — a result only opens the next step. Every node carries one badge in one colour and one word: RUNNING — the work never stops. Beside it, an evidence mark says honestly what that gate's evidence shows: PROVEN, IN PROGRESS, UNKNOWN or BLOCKED — so a visitor can tell what is real from what is only planned. The mark comes from the gate's own evidence, never from a guess. Progress is shown by what the gate is doing and what opens next — the evidence, the next step, the subgates. The picture moves: the pace climbs, the loop walks gate to gate, the work flows along the lines, every gate's door opens and closes. The field is 7D, not flat: place, gate, work, evidence, time, owner, outcome. Private items are blurred by default; your key unlocks them for this session only — what unlocks is a name and a description, never a secret value, because no value is in this page. Your key lives only in memory while this page is open: never saved, never written to a file, never logged.</p>
+    <p><b>EVERY GATE RUNS:</b> a gate never ends — a result only opens the next step. Every node carries one badge in one colour and one word: RUNNING — the work never stops. Beside it, an evidence mark says honestly what that gate's evidence shows: PROVEN, IN PROGRESS, UNKNOWN or BLOCKED — so a visitor can tell what is real from what is only planned. The mark comes from the gate's own evidence, never from a guess. Progress is shown by what the gate is doing and what opens next — the evidence, the next step, the subgates. The pace is a rule, not a time-based counter; the loop walks gate to gate, work flows along the lines, and every gate's door opens and closes. The field is 7D, not flat: place, gate, work, evidence, time, owner, outcome. Private items are blurred by default; your key unlocks them for this session only — what unlocks is a name and a description, never a secret value, because no value is in this page. Your key lives only in memory while this page is open: never saved, never written to a file, never logged.</p>
     <p class="note">Every fact in this picture is a measured result, a verified zero, or an explicit UNKNOWN. Nothing is invented.</p>
     <p>last updated 18 Nov 2026</p>
     <p>maps: <a href="index.html">Home</a> &middot; <a href="hami-systems-map.html">Visual map</a> · <a href="hami-methodology.html">Methodology</a> · <a href="ai-engineering-gates.html">AI engineering gates</a> · <a href="advancement-gates.html">Advancement gates</a></p>
@@ -666,7 +668,7 @@
       {
         "t": "Always progress",
         "s": "running",
-        "e": "Progress always advances — the pace only rises."
+        "e": "Progress is verified from evidence, not from elapsed time."
       },
       {
         "t": "Always upgrade everything",
@@ -1450,20 +1452,20 @@
     "region": "net",
     "num": "PACER + REVISION + LOOP",
     "name": "PACER + REVISION + LOOP GATES",
-    "plain": "The gates that set the pace, revise the work, and loop forever — now built and live.",
-    "what": "Built 18 Nov 2026: advancement-gates.html (39,008 B, 732 lines), linked from both home sites. Pacer gate with a live pace meter, Revision gate with 3 live revisions, Loop gates with a loop ring that walks itself and never closes.",
+    "plain": "The gates that set a pace rule, revise the work, and loop forever — now built and live.",
+    "what": "Built 18 Nov 2026: advancement-gates.html (39,008 B, 732 lines), linked from both home sites. Pace is a rule, not a time-based counter; Revision has 3 live revisions, and the Loop gates have a ring that walks itself and never closes.",
     "why": "Pace keeps the work moving, revision keeps it honest, and the loop means it never stops. They are one engine.",
     "state": "running",
     "ev": "proven",
     "evidence": "advancement-gates.html (39,008 B, 732 lines). Smoke test 67 passed, 0 failed. Commits: Knee Rose 324621a, ForgeOS 2bf8fc6a.",
     "date": "2026-11-18",
     "owner": "builder",
-    "next": "Live verification of the pace meter and loop ring.",
+    "next": "Keep the pace rule evidence-based and verify the loop ring.",
     "sub": [
       {
         "t": "Pacer gate",
         "s": "running",
-        "e": "Live pace meter: pulsing heartbeat + ms counter + multiplier that grows"
+        "e": "The pace is a rule, not a time-based display."
       },
       {
         "t": "Revision gate",
@@ -2212,7 +2214,7 @@
     "num": "APPLY ALL GATES",
     "name": "APPLY ALL GATES TO HAMI",
     "plain": "The gates are not just displayed — they are applied to Hami itself: the system, the work, the workers.",
-    "what": "The field is the gates governing the real work: the RUNNING pulse on every gate, the pace rising, the loop walking, the work flowing, the upgrades landing. This picture is the government of the real work, not a poster.",
+    "what": "The field is the gates governing the real work: the RUNNING pulse on every gate, an evidence-based pace rule, the loop walking, the work flowing, the upgrades landing. This picture is the government of the real work, not a poster.",
     "why": "A gate that is only displayed changes nothing. Applied, the gates govern the system, the work and the workers.",
     "state": "running",
     "ev": "proven",
@@ -2547,31 +2549,10 @@
     renderPackets();
   }
 
-  /* ---- the living panels: pacer heartbeat + loop ring counter ----
-     Both count this page's own live run: the pace meter counts milliseconds
-     since this page loaded (multiplier growing with time, as on the
-     advancement-gates page); the loop counter counts the loops this page
-     has walked. Both are real counts of the animation itself. */
-  var paceMs = 121, paceMult = 1.00, loopCount = 0, loopIdx = -1;
-  var paceMsEl = null, paceMultEl = null, loopCountEl = null, loopGateEl = null, loopRingEl = null;
-  function tickPace() {
-    paceMs += 7;
-    paceMult = 1 + (paceMs - 121) / 60000;
-    if (paceMsEl) { paceMsEl.textContent = paceMs.toLocaleString("en-US") + " ms"; }
-    if (paceMultEl) { paceMultEl.textContent = "×" + paceMult.toFixed(2); }
-  }
+  /* ---- the living loop panel and ring ---- */
+  var loopCount = 0, loopIdx = -1;
+  var loopCountEl = null, loopGateEl = null, loopRingEl = null;
   function renderPanels() {
-    var p = svgEl("g", { "class": "panel", "aria-label": "Pacer — the pace of the work, counting since this page loaded" });
-    p.appendChild(svgEl("rect", { x: 40, y: 24, width: 420, height: 120, rx: 6, "class": "panel-box" }));
-    p.appendChild(svgText(56, 52, "panel-title", "PACER — THE PACE OF THE WORK"));
-    p.appendChild(svgEl("polyline", { points: "56,82 76,82 86,66 96,94 106,74 116,82 200,82 210,66 220,94 230,74 240,82 320,82", "class": "heartbeat-line" }));
-    paceMsEl = svgText(56, 116, "panel-big", "121 ms");
-    paceMultEl = svgText(300, 116, "panel-mult", "×1.00");
-    p.appendChild(paceMsEl);
-    p.appendChild(paceMultEl);
-    p.appendChild(svgText(56, 136, "panel-small", "counting since this page loaded — the pace only rises"));
-    svg.appendChild(p);
-
     var l = svgEl("g", { "class": "panel", "aria-label": "Loop — the ring walks gate to gate and never closes" });
     l.appendChild(svgEl("rect", { x: 2160, y: 24, width: 420, height: 120, rx: 6, "class": "panel-box" }));
     l.appendChild(svgText(2176, 52, "panel-title", "LOOP — THE RING WALKS"));
@@ -2987,6 +2968,7 @@
   viewport.addEventListener("pointerup", endPointer);
   viewport.addEventListener("pointercancel", endPointer);
   viewport.addEventListener("wheel", function (e) {
+    if (!e.altKey) { return; }
     e.preventDefault();
     var rect = viewport.getBoundingClientRect();
     zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY < 0 ? 1.12 : 1 / 1.12);
@@ -3359,9 +3341,8 @@
   renderField();
   applyView();
   resetView();
-  /* The scene keeps moving: the pace climbs, the loop walks, the work flows. */
+  /* The loop walks and the work flows along the connections. */
   if (typeof setInterval !== "undefined") {
-    setInterval(tickPace, 100);
     setInterval(stepLoop, 2000);
     setInterval(stepPackets, 50);
   }
@@ -3381,9 +3362,7 @@
     currentView: function () { return currentView; },
     worldH: function () { return WORLD_H; },
     zoomCenter: zoomCenter, connected: connected,
-    tickPace: tickPace, stepLoop: stepLoop, stepPackets: stepPackets,
-    paceMs: function () { return paceMs; },
-    paceMult: function () { return paceMult; },
+    stepLoop: stepLoop, stepPackets: stepPackets,
     loopCount: function () { return loopCount; },
     packetCount: function () { return packets.length; },
     ownerOn: function () { return !!ownerKey; },
