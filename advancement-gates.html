@@ -178,6 +178,8 @@
   .gate-num { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
   .gate-name { display: block; font-size: 18px; font-weight: 700; color: #f4efe6; margin: 4px 0; }
   .gate-status { display: block; color: #bdb29f; font-size: 13px; }
+  .gate-state { display: inline-block; color: #72d38f; border: 1px solid #72d38f; border-radius: 4px; padding: 1px 6px; font-size: 12px; letter-spacing: 0.12em; margin: 6px 0 2px; animation: runpulse 1.6s ease-in-out infinite; }
+  @keyframes runpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   .gate-evidence { display: block; color: #f4efe6; font-size: 13px; margin-top: 8px; }
   .gate-toggle { float: right; color: #f2a33a; font-size: 20px; line-height: 1; }
   .gate-body { display: none; border-top: 1px solid #3a2e1a; padding: 0 14px 14px; }
@@ -348,6 +350,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 01</span>
         <span class="gate-name">What pacing means</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">work moves every second, every millisecond, or less</span>
       </button>
       <div class="gate-body" id="pacer-1-body">
@@ -366,6 +369,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 02</span>
         <span class="gate-name">How it paces</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every gate, every subgate, every agent gets a pace</span>
       </button>
       <div class="gate-body" id="pacer-2-body">
@@ -384,6 +388,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 03</span>
         <span class="gate-name">It adapts to what is needed</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">blocked or human-needed &mdash; the pacer routes around</span>
       </button>
       <div class="gate-body" id="pacer-3-body">
@@ -402,6 +407,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 04</span>
         <span class="gate-name">It never forgets</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every gate&rsquo;s pace remembered &mdash; nothing left idle</span>
       </button>
       <div class="gate-body" id="pacer-4-body">
@@ -429,6 +435,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">REVISION 01</span>
         <span class="gate-name">What it revises</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every note, every doc, every page, every gate</span>
       </button>
       <div class="gate-body" id="revision-1-body">
@@ -447,6 +454,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">REVISION 02</span>
         <span class="gate-name">Every revision places an upgrade gate</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">revision is never a dead end &mdash; it opens the next improvement</span>
       </button>
       <div class="gate-body" id="revision-2-body">
@@ -465,6 +473,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">REVISION 03</span>
         <span class="gate-name">It runs on everything, always</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">no note is final, no page is done</span>
       </button>
       <div class="gate-body" id="revision-3-body">
@@ -492,6 +501,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE REVISION 01</span>
         <span class="gate-name">The AI engineering gates page</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">built, then TIP GATE + SUBJECTED GATE added after</span>
         <span class="gate-evidence">35,610 B / 710 lines &rarr; 40,006 B / 764 lines. The revision gate in action.</span>
       </button>
@@ -511,6 +521,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE REVISION 02</span>
         <span class="gate-name">The Instagram handle</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">@diojitree &rarr; @np.explains, everywhere live</span>
         <span class="gate-evidence">index.html lines 297 + 559. Commit 2c24a54.</span>
       </button>
@@ -530,6 +541,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE REVISION 03</span>
         <span class="gate-name">The home links</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">Explore Hami added after the owner said nothing dormant</span>
         <span class="gate-evidence">src/routes/index.tsx, 49,156 B, 1,306 lines. Commit 25f13f16. Deploy 238ebbda.</span>
       </button>
@@ -564,7 +576,7 @@
       <span class="loop-step" id="loop-step-4">NEW GATE &mdash; the next step</span>
     </div>
     <p class="loop-return">&looparrowright; and the new gate loops back to the start &mdash; the ring never closes, it opens the next gate.</p>
-    <p class="loop-count">loops completed on this page: <span class="k" id="loopCount">0</span></p>
+    <p class="loop-count">loops run on this page: <span class="k" id="loopCount">0</span></p>
   </section>
 
   <section class="gates" aria-label="Loop gates">
@@ -574,6 +586,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LOOP 01</span>
         <span class="gate-name">The loop</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every finished gate loops back to its next step</span>
       </button>
       <div class="gate-body" id="loop-1-body">
@@ -592,6 +605,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LOOP 02</span>
         <span class="gate-name">How the loop is engineered</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">each gate&rsquo;s output feeds its own next input</span>
       </button>
       <div class="gate-body" id="loop-2-body">
@@ -611,6 +625,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LOOP 03</span>
         <span class="gate-name">The loop covers everywhere</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every page, every project, every agent, every gate</span>
       </button>
       <div class="gate-body" id="loop-3-body">
@@ -638,6 +653,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">ENGINE 01</span>
         <span class="gate-name">Three gates, one engine</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">the pacer moves it &middot; the revision improves it &middot; the loop carries it</span>
         <span class="gate-evidence">Pace never drops. Revision never ends. The loop never closes. Hami becomes its own LLM.</span>
       </button>
@@ -712,15 +728,15 @@
   var loopSteps = document.querySelectorAll(".loop-step");
   var loopCount = document.getElementById("loopCount");
   var loopIndex = 0;
-  var loopsDone = 0;
+  var loopsRun = 0;
   function tickLoop() {
     Array.prototype.forEach.call(loopSteps, function (step) {
       step.classList.remove("active");
     });
     loopSteps[loopIndex].classList.add("active");
     if (loopIndex === 0) {
-      loopsDone += 1;
-      loopCount.textContent = String(loopsDone);
+      loopsRun += 1;
+      loopCount.textContent = String(loopsRun);
     }
     loopIndex = (loopIndex + 1) % loopSteps.length;
   }

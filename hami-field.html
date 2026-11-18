@@ -1,0 +1,3083 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  THE HAMI FIELD — the map the owner sees always.
+  One file, self-contained: all CSS + JS inline. No external deps, no CDN,
+  no external fonts, no external images.
+
+  THE PICTURE IS THE FIELD, AND THE PICTURE MOVES. The page opens on one
+  large SVG diagram of all of Hami, drawn from the FIELD data below. The 12
+  regions are visual zones in the SVG; every FIELD entry is a node; every
+  links entry is a visible edge between nodes. The water is the connections:
+  it runs along the edges. The work is LIVED as animation, not written in
+  text boxes: every gate's door opens and closes (GATE → SUBGATE → LEAD),
+  the pacer heartbeat counts the pace climbing since the page loaded, the
+  loop ring walks gate to gate and never closes, progress fills show real
+  measured fractions, and small shapes flow along the connections as the
+  work travelling gate to gate. Text is only tiny labels on the animation.
+  The PROMISE GATE stands at the top centre above HAMI itself: never stop
+  working, always progress, always upgrade everything — it binds every
+  worker and every gate, so it links to all of them, and its animation is
+  the whole field keeping moving. Four more standing gates stand with it:
+  Never-Stopping (the work itself continues), Improvement (improve
+  everything, no matter how small), Map (lists and links everything), and
+  Apply All Gates to Hami (the gates govern the real work). At the bottom,
+  the DESTINATION: Hami AI becomes Lead Engineer — built now from the gates
+  and all the data, stepping into the Lead seat later (stage 3, hami builds).
+
+  EVERY GATE RUNS — and RUNNING is the ONLY state. Every FIELD entry's
+  state is "running", every subgate's state is "running", every node
+  pulses RUNNING with one badge in one colour and one word. There is no
+  other state: no completed, no verified-as-state, no blocked, no parked,
+  no pending, no contradicted-as-state. What used to be called a state
+  lives where it belongs — in the evidence (what the gate did, measured),
+  in the next step (what the result opened), and in the subgates. A result
+  is never shown as an ending — it is shown as the next step it opened
+  (the "next" field, framed in the drawer as "this result opened: ...").
+  Private is a VISIBILITY flag only, never a state: a private entry is
+  blurred, but its state is still running.
+
+  HOW TO CHANGE THIS FIELD (read this first):
+  1. To ADD a gate: add ONE entry to the FIELD array in the <script> below.
+     Copy any existing entry and change its fields. That is all — the SVG
+     renders every gate from FIELD, so nothing else needs editing.
+  2. Each entry needs: id (unique, lowercase, no spaces), region (one of
+     the REGIONS ids below), num (the label shown, e.g. "GATE 01"),
+     name, plain (one plain-words line: what it is), what (what it does),
+     why (why it matters), state (always "running" — the ONLY state; the
+     old state words live in evidence / next / sub, never as a state),
+     evidence (the proof, with a file path or a number),
+     date (YYYY-MM-DD), owner (who works it, or ""), next (the next step
+     the result opened, or "UNKNOWN"), sub (a list of subgates, each
+     {t, s, e} — or []), links (ids of connected gates, or []).
+  3. To LINK two gates: add each other's id to their links lists. Link
+     only real relationships from the sources (a gate's evidence, subgates
+     or next step naming another gate; a ledger claim naming the work it
+     proves; a build-log entry naming its gate; a methodology dimension
+     naming the gates it describes). If no real relationship is in the
+     sources, do not link it.
+  4. To CHANGE a gate: edit its entry in FIELD. To MOVE a gate to another
+     region: change its region. To HIDE a gate without deleting it: set
+     hidden: true on its entry.
+  5. To ADD a region: add ONE entry to REGIONS (id, title, sub, x, y, w)
+     and point gates at it. Regions are laid out on a 2620 x ~3030 field;
+     keep x + w under 2620. The HAMI core node sits at the top centre.
+  6. PRIVATE data: an entry with private: true is LOCKED and BLURRED by
+     default — in the SVG and in the drawer — and shows only its name and
+     a plain-words description. NEVER put a secret, credential, or personal
+     VALUE in any entry — the value is never in this file, so unblurring
+     can only ever reveal a name and a description. Full detail (what, why,
+     evidence, result, subgates, next step, date, owner) is OWNER-ONLY:
+     the public drawer shows only the plain-words name + one plain-words
+     line + connected gates. The owner's key is held only in a JS variable
+     in memory: never in localStorage, never in sessionStorage, never
+     written to any file, never logged. It is sent only as the X-API-Key
+     header on owner commands to the owner's own Hami API.
+  7. Every fact must be real: a measured result, a verified zero, or an
+     explicit UNKNOWN. If a fact is not in the sources, write UNKNOWN.
+  8. After any change, run the smoke test: node ~/workspace/hami-field-smoke-test.js
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Hami Field — the map the owner sees always</title>
+<style>
+  * { box-sizing: border-box; }
+  html { background: #0c0b0a; }
+  body {
+    margin: 0; background: #0c0b0a; color: #f4efe6;
+    font-family: ui-monospace, "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 15px; line-height: 1.55;
+  }
+  a { color: #f2a33a; } a:visited { color: #f2a33a; }
+  button { font: inherit; }
+  .field { max-width: 1240px; margin: 0 auto; padding: 20px 18px 40px; }
+
+  /* ---- minimal header: title + gate line + key + tour, nothing else ---- */
+  .topbar { text-align: center; padding: 6px 0 0; }
+  .topbar .core-ne { margin: 0; font-size: 18px; color: #f2a33a; letter-spacing: 0.35em; }
+  .topbar h1 {
+    margin: 2px 0 0; font-family: "UnifrakturCook", "Old English Text MT", "Blackletter", "Times New Roman", serif;
+    font-size: 56px; line-height: 1; color: #f2a33a;
+  }
+  .topbar .gate-line { margin: 10px 0 0; color: #f2a33a; font-size: 13px; }
+  .topbar .gate-line b { color: #f4efe6; font-weight: 400; }
+  .owner-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 14px auto 0; max-width: 720px; }
+  .owner-row input[type="password"] {
+    flex: 1; min-width: 200px; background: #15130f; color: #f4efe6;
+    border: 1px solid #3a2e1a; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 14px;
+  }
+  .owner-row input:focus { outline: 2px solid #f2a33a; outline-offset: 1px; }
+  .owner-status { color: #bdb29f; font-size: 13px; margin: 8px 0 0; }
+  .owner-status .on { color: #72d38f; } .owner-status .off { color: #bdb29f; }
+
+  /* ---- buttons ---- */
+  .btn {
+    background: #0c0b0a; color: #f2a33a; border: 1px solid #f2a33a;
+    border-radius: 6px; padding: 7px 12px; cursor: pointer; font-size: 13px;
+  }
+  .btn:hover, .btn:focus-visible { background: #f2a33a; color: #0c0b0a; outline: none; }
+  .btn.primary { background: #f2a33a; color: #0c0b0a; font-weight: 700; }
+  .btn.primary:hover, .btn.primary:focus-visible { background: #f5deb3; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+
+  /* ---- field toolbar ---- */
+  .fieldbar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0 12px;
+    position: sticky; top: 0; z-index: 30; background: #0c0b0a; padding: 8px 0;
+    border-bottom: 1px solid #3a2e1a;
+  }
+  .fieldbar .spacer { flex: 1; }
+  .fieldbar select {
+    background: #0c0b0a; color: #f2a33a; border: 1px solid #f2a33a;
+    border-radius: 6px; padding: 7px 10px; font: inherit; font-size: 13px;
+  }
+  .fieldbar .hint { color: #bdb29f; font-size: 12px; }
+
+  /* ---- the picture: viewport + SVG world ---- */
+  .viewport {
+    position: relative; height: 82vh; min-height: 520px; overflow: hidden;
+    border: 1px solid #3a2e1a; border-radius: 6px; background: #0c0b0a;
+    box-shadow: 4px 4px 0 #000; touch-action: none; cursor: grab;
+  }
+  .viewport.dragging { cursor: grabbing; }
+  .world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .field-svg { display: block; }
+
+  /* ---- SVG zones ---- */
+  .zone-box { fill: rgba(21, 19, 15, 0.88); stroke: #3a2e1a; stroke-width: 1; }
+  .zone-top { fill: #f2a33a; }
+  .zone-title { fill: #f2a33a; font-size: 17px; font-weight: 700; font-family: inherit; }
+  .zone-sub { fill: #bdb29f; font-size: 12.5px; font-family: inherit; }
+  .zone-count { fill: #f4efe6; font-size: 12.5px; font-family: inherit; }
+
+  /* ---- SVG core node ---- */
+  .core-box { fill: #15130f; stroke: #f2a33a; stroke-width: 2; }
+  .core-name { fill: #f2a33a; font-size: 26px; font-weight: 700; font-family: inherit; }
+  .core-sub { fill: #f4efe6; font-size: 13px; font-family: inherit; }
+  .prime-text { fill: #f2a33a; font-size: 20px; font-weight: 700; letter-spacing: 2px; font-family: inherit; }
+  .prime-sub { fill: #bdb29f; font-size: 13px; font-family: inherit; }
+
+  /* ---- SVG edges: the water is the connections ---- */
+  .edge {
+    stroke: #f2a33a; stroke-width: 2; opacity: 0.28; fill: none;
+    stroke-dasharray: 10 8; animation: edgeflow 2.4s linear infinite;
+    cursor: pointer; pointer-events: stroke;
+  }
+  @keyframes edgeflow { to { stroke-dashoffset: -18; } }
+  .edge.lit { opacity: 0.95; stroke-width: 3.5; stroke: #f5deb3; }
+  .edge:hover { opacity: 0.7; }
+
+  /* ---- SVG nodes ---- */
+  .node { cursor: pointer; outline: none; }
+  .node-box { fill: #15130f; stroke: #f2a33a; stroke-width: 1.5; }
+  .node-bar { fill: #f2a33a; }
+  .node-num { fill: #f2a33a; font-size: 11px; letter-spacing: 2px; font-family: inherit; }
+  .node-name { fill: #f4efe6; font-size: 15px; font-weight: 700; font-family: inherit; }
+  .run-dot { fill: #72d38f; animation: runpulse 1.6s ease-in-out infinite; }
+  @keyframes runpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .run-label { fill: #72d38f; font-size: 12px; letter-spacing: 2px; font-family: inherit; }
+  .node-box-pulse { fill: none; stroke: #72d38f; stroke-width: 1; opacity: 0; animation: nodepulse 1.6s ease-in-out infinite; }
+  @keyframes nodepulse { 0%, 100% { opacity: 0; } 50% { opacity: 0.55; } }
+  .node:focus-visible .node-box, .node:hover .node-box { stroke: #f5deb3; stroke-width: 2.5; }
+  .node.linked .node-box { stroke: #f5deb3; stroke-width: 3; }
+  .node.selected .node-box { stroke: #f5deb3; stroke-width: 3.5; }
+  .node.tour-target .node-box { stroke: #f5deb3; stroke-width: 3.5; stroke-dasharray: 6 3; }
+  .node-lock-mark { fill: #f2a33a; }
+  .node-lock-text { fill: #f2a33a; font-size: 11px; letter-spacing: 1px; font-family: inherit; }
+  /* private nodes: name + number blurred until the owner key unlocks them */
+  body:not(.owner-on) .node.private .node-label { filter: blur(4px); }
+  body:not(.owner-on) .node.private .node-lock { display: inline; }
+  body.owner-on .node.private .node-lock { display: none; }
+
+  /* ---- SVG animated cartoon elements ----
+     Nothing in the scene is still. Every animated element is real: the
+     pace meter counts this page's own running pace, the loop counter counts
+     the loops this page has run, the progress fills are real measured
+     fractions from the sources, the packets stand for work flowing along
+     the real connections, the doors are the gate cycle opening and closing. */
+  .gate-door { fill: #f2a33a; opacity: 0.9; animation: doorSlide 2.4s ease-in-out infinite; }
+  @keyframes doorSlide { 0%, 100% { transform: translateX(0); opacity: 0.9; } 50% { transform: translateX(-9px); opacity: 0.3; } }
+  .node-progress-bg { fill: #0c0b0a; stroke: #3a2e1a; stroke-width: 1; }
+  .node-progress-fill { fill: #72d38f; }
+  .node-progress-label { fill: #bdb29f; font-size: 9px; font-family: inherit; }
+  /* The Weight Space Programming Gate: the weights lighting up as Hami. */
+  .weight-block { fill: #72d38f; animation: weightLight 1.8s ease-in-out infinite; }
+  @keyframes weightLight { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+  .packet { fill: #f5deb3; stroke: #f2a33a; stroke-width: 1; }
+  .edge-promise { opacity: 0.15; }
+  .edge-promise.lit { opacity: 0.9; }
+  /* The Map Gate's own links update faster — the web never loses touch. */
+  .edge-map { animation-duration: 1.2s; opacity: 0.45; }
+  /* The Improvement Gate's shimmer: an upgrade rising over the gate. */
+  .upgrade-shimmer { fill: #f5deb3; opacity: 0; animation: shimmerRise 3s ease-in-out infinite; }
+  @keyframes shimmerRise { 0% { transform: translateY(8px); opacity: 0; } 50% { opacity: 0.9; } 100% { transform: translateY(-8px); opacity: 0; } }
+  /* The succession, inside the destination gate: Muse hands the Lead seat
+     to Hami AI — the handover dot travels from one to the other, always. */
+  .succession-chip { fill: #0c0b0a; stroke: #f2a33a; stroke-width: 1.5; }
+  .succession-next { animation: runpulse 1.6s ease-in-out infinite; }
+  .succession-label { fill: #f4efe6; font-size: 12px; font-family: inherit; }
+  .succession-arrow { fill: #f2a33a; font-size: 20px; font-family: inherit; }
+  .succession-sub { fill: #bdb29f; font-size: 11px; font-family: inherit; }
+  .handover-dot { fill: #f5deb3; stroke: #f2a33a; stroke-width: 1; animation: handoverMove 2.4s ease-in-out infinite; }
+  @keyframes handoverMove { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(48px); opacity: 0; } }
+  .loop-ring { fill: none; stroke: #f5deb3; stroke-width: 3; stroke-dasharray: 8 6; animation: loopringflow 1.2s linear infinite; }
+  @keyframes loopringflow { to { stroke-dashoffset: -14; } }
+  .panel-box { fill: #15130f; stroke: #f2a33a; stroke-width: 1.5; }
+  .panel-title { fill: #f2a33a; font-size: 14px; font-weight: 700; letter-spacing: 1px; font-family: inherit; }
+  .panel-big { fill: #f4efe6; font-size: 20px; font-weight: 700; font-family: inherit; }
+  .panel-mult { fill: #72d38f; font-size: 20px; font-weight: 700; font-family: inherit; }
+  .panel-small { fill: #bdb29f; font-size: 11px; font-family: inherit; }
+  .heartbeat-line { fill: none; stroke: #72d38f; stroke-width: 2; stroke-dasharray: 300; animation: heartbeat 2.4s linear infinite; }
+  @keyframes heartbeat { from { stroke-dashoffset: 300; } to { stroke-dashoffset: 0; } }
+
+  /* ---- owner command section (owner only) ---- */
+  .cmd-section {
+    border: 2px solid #f2a33a; border-radius: 6px; background: #15130f;
+    box-shadow: 4px 4px 0 #000; padding: 14px 16px; margin: 22px 0 0;
+  }
+  .cmd-section[hidden] { display: none; }
+  .cmd-section h2 { margin: 0 0 6px; font-size: 16px; color: #f2a33a; }
+  .cmd-section p { margin: 0 0 10px; color: #bdb29f; font-size: 13px; }
+  .cmd-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .cmd-row input[type="text"] {
+    flex: 1; min-width: 200px; background: #0c0b0a; color: #f4efe6;
+    border: 1px solid #3a2e1a; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 14px;
+  }
+  .cmd-row input:focus { outline: 2px solid #f2a33a; outline-offset: 1px; }
+  .cmd-log {
+    margin-top: 12px; border-top: 1px solid #3a2e1a; padding-top: 10px;
+    max-height: 220px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+  }
+  .cmd-log p { margin: 0 0 8px; color: #f4efe6; font-size: 14px; }
+  .cmd-log .cmd-mark { color: #f2a33a; }
+  .cmd-log .cmd-hami { color: #f4efe6; }
+  .cmd-log .cmd-hami::before { content: "hami: "; color: #72d38f; }
+  .cmd-log .cmd-muted { color: #bdb29f; }
+
+  /* ---- detail drawer ---- */
+  .detail {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 50;
+    width: min(430px, 94vw); background: #15130f; border-left: 2px solid #f2a33a;
+    box-shadow: -4px 0 0 #000; padding: 18px; overflow-y: auto;
+  }
+  .detail[hidden] { display: none; }
+  .detail .detail-bar { height: 2px; background: #f2a33a; width: 100%; margin: 0 0 12px; animation: sweep 0.6s linear; }
+  @keyframes sweep { from { width: 0; } to { width: 100%; } }
+  .detail h2 { margin: 0 0 4px; font-size: 19px; color: #f4efe6; }
+  .detail .detail-num { color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
+  .detail .detail-run { color: #72d38f; font-size: 13px; letter-spacing: 0.12em; margin: 8px 0; }
+  .detail .detail-run .run-dot-inline { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #72d38f; animation: runpulse 1.6s ease-in-out infinite; margin-right: 6px; }
+  .detail h3 { margin: 16px 0 6px; font-size: 13px; color: #f2a33a; letter-spacing: 0.12em; text-transform: uppercase; }
+  .detail p { margin: 0 0 10px; font-size: 14px; }
+  .detail .k { color: #f2a33a; }
+  .detail .muted { color: #bdb29f; font-size: 13px; }
+  .detail ul { margin: 0; padding-left: 18px; }
+  .detail li { margin: 0 0 10px; font-size: 14px; }
+  .detail .detail-close { margin-bottom: 12px; }
+  .detail .conn-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+  .detail .conn-list .btn { padding: 4px 9px; font-size: 12px; }
+  .detail .blur-zone { filter: blur(7px); user-select: none; pointer-events: none; }
+  body.owner-on .detail .blur-zone { filter: none; user-select: auto; pointer-events: auto; }
+  .detail .owner-note { border: 1px dashed #f2a33a; border-radius: 6px; padding: 10px 12px; color: #bdb29f; font-size: 13px; margin: 12px 0 0; }
+
+  /* ---- tour card ---- */
+  .tour {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 60;
+    width: min(620px, calc(100vw - 24px)); background: #15130f; border: 2px solid #f2a33a;
+    border-radius: 6px; box-shadow: 4px 4px 0 #000; padding: 16px 18px;
+  }
+  .tour[hidden] { display: none; }
+  .tour .tour-count { color: #bdb29f; font-size: 12px; margin: 0 0 4px; }
+  .tour h2 { margin: 0 0 6px; font-size: 18px; color: #f2a33a; }
+  .tour p { margin: 0 0 12px; font-size: 14px; }
+  .tour .tour-nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tour .tour-nav .spacer { flex: 1; }
+
+  /* ---- footer ---- */
+  footer { margin-top: 30px; border-top: 2px solid #f2a33a; padding-top: 16px; color: #bdb29f; font-size: 13px; }
+  footer p { margin: 0 0 6px; }
+  footer .note { color: #f4efe6; }
+  footer b { color: #f2a33a; }
+  @media (max-width: 720px) {
+    .topbar h1 { font-size: 44px; }
+    .viewport { height: 70vh; min-height: 420px; }
+  }
+</style>
+</head>
+<body>
+<main class="field">
+
+  <header class="topbar">
+    <p class="core-ne" lang="ne">हामी</p>
+    <h1>Hami — the field</h1>
+    <p class="gate-line">gate: OPEN &mdash; one gate &middot; one Hami &middot; serving the globe &nbsp;·&nbsp; <b>the picture below IS the map — look, move through it, tap a gate.</b></p>
+    <div class="owner-row">
+      <input id="keyInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your Hami API key — owner sees all" aria-label="Hami API key">
+      <button id="enterOwnerBtn" class="btn primary" type="button">Enter as owner</button>
+      <button id="leaveOwnerBtn" class="btn" type="button" hidden>Leave owner mode</button>
+      <button id="tourBtn" class="btn primary" type="button">▶ Take the tour</button>
+    </div>
+    <p class="owner-status" id="ownerStatus"><span class="off">owner mode: OFF — public view: plain-words picture only. Full detail + private names unlock with your key.</span></p>
+  </header>
+
+  <div class="fieldbar" role="toolbar" aria-label="Field controls">
+    <button id="zoomInBtn" class="btn" type="button" aria-label="Zoom in">zoom +</button>
+    <button id="zoomOutBtn" class="btn" type="button" aria-label="Zoom out">zoom −</button>
+    <button id="zoomResetBtn" class="btn" type="button">reset view</button>
+    <select id="jumpSelect" aria-label="Jump to a region">
+      <option value="">jump to a region…</option>
+    </select>
+    <span class="spacer"></span>
+    <span class="hint">drag to move · scroll to zoom · tap a node for its detail · tap a line to follow it</span>
+  </div>
+
+  <div class="viewport" id="viewport" aria-label="The Hami field — the picture of all of Hami. Drag to move, scroll to zoom.">
+    <div class="world" id="world">
+      <svg class="field-svg" id="fieldSvg" width="2620" height="3092" viewBox="0 0 2620 3092" role="img" aria-label="Diagram of all Hami gates: 12 zones, 59 gate nodes, connected by edges. Every gate runs."></svg>
+    </div>
+  </div>
+
+  <section class="cmd-section" id="cmdSection" aria-label="Owner command" hidden>
+    <h2>COMMAND THE GATES</h2>
+    <p>Owner command. Type an order for the gates and their engineers — it goes to Hami as an owner command (marked <span class="cmd-mark">[owner command]</span> so Hami knows it is a command from the owner) through the Hami chat API, with your key as the X-API-Key header. The reply shows below.</p>
+    <div class="cmd-row">
+      <input id="cmdInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="command the gates…" aria-label="Owner command">
+      <button id="cmdSendBtn" class="btn primary" type="button">Send command</button>
+    </div>
+    <div class="cmd-log" id="cmdLog" aria-live="polite"></div>
+  </section>
+
+  <footer>
+    <p><b>HOW TO CHANGE THIS FIELD:</b> this page is data-driven. Every gate in the picture is ONE entry in the FIELD list at the top of the &lt;script&gt; at the bottom of this file. To add a gate, copy an entry and change its fields. To link two gates, add each other's id to their links lists. No other editing is needed.</p>
+    <p><b>EVERY GATE RUNS:</b> a gate never ends — a result only opens the next step. Every node carries one badge in one colour and one word: RUNNING. Progress is shown by what the gate is doing and what opens next — the evidence, the next step, the subgates. The picture moves: the pace climbs, the loop walks gate to gate, the work flows along the lines, every gate's door opens and closes. Private items are blurred by default; your key unlocks them for this session only — what unlocks is a name and a description, never a secret value, because no value is in this page. Your key lives only in memory while this page is open: never saved, never written to a file, never logged.</p>
+    <p class="note">Every fact in this picture is a measured result, a verified zero, or an explicit UNKNOWN. Nothing is invented.</p>
+    <p>last updated 18 Nov 2026</p>
+    <p>maps: <a href="hami-systems-map.html">Visual map</a> · <a href="hami-methodology.html">Methodology</a> · <a href="ai-engineering-gates.html">AI engineering gates</a> · <a href="advancement-gates.html">Advancement gates</a></p>
+    <p>homes: <a href="https://kn33r0s3.vercel.app">kn33r0s3.vercel.app</a> · <a href="https://hami-sigma.vercel.app">hami-sigma.vercel.app</a></p>
+  </footer>
+
+</main>
+
+<aside class="detail" id="detail" aria-label="Gate detail" hidden>
+  <button id="detailClose" class="btn detail-close" type="button">close ×</button>
+  <div class="detail-bar" aria-hidden="true"></div>
+  <p class="detail-num" id="detailNum"></p>
+  <h2 id="detailName"></h2>
+  <p class="detail-run" id="detailRun"><span class="run-dot-inline" aria-hidden="true"></span>RUNNING — this gate runs, and it keeps running.</p>
+  <h3>What it is</h3>
+  <p id="detailPlain"></p>
+  <div id="detailFull" hidden>
+    <h3>What it does</h3>
+    <p id="detailWhat"></p>
+    <h3>Why it matters</h3>
+    <p id="detailWhy"></p>
+    <h3>Evidence</h3>
+    <p id="detailEvidence"></p>
+    <h3>Subgates</h3>
+    <ul id="detailSubs"></ul>
+    <h3>This result opened</h3>
+    <p id="detailNext"></p>
+    <p class="muted" id="detailMeta"></p>
+  </div>
+  <h3>Connected gates</h3>
+  <div class="conn-list" id="detailLinks"></div>
+  <p class="owner-note" id="detailOwnerNote">Full detail is owner-only. Enter your Hami API key above to see what it does, why it matters, its evidence, its subgates and the next step it opened.</p>
+</aside>
+
+<section class="tour" id="tour" aria-label="Guided tour" hidden>
+  <p class="tour-count" id="tourCount">1 / 6</p>
+  <h2 id="tourTitle"></h2>
+  <p id="tourText"></p>
+  <div class="tour-nav">
+    <button id="tourBack" class="btn" type="button">Back</button>
+    <span class="spacer"></span>
+    <button id="tourClose" class="btn" type="button">Close tour</button>
+    <button id="tourNext" class="btn primary" type="button">Next</button>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ==========================================================================
+     THE FIELD DATA — the one place to change. See the comment block at the
+     top of this file for how to add / change / move / link a gate.
+     Fields: id, region, num, name, plain, what, why, state (always
+     "running" — the ONLY state there is), evidence,
+     date, owner, next (the next step the result opened), sub [{t, s, e}],
+     links [ids of connected gates], private (true/false), hidden.
+     The gate itself is always RUNNING: every node pulses RUNNING, and the
+     drawer shows "RUNNING". Progress lives in evidence, next, and sub.
+     Anything not in the sources is written UNKNOWN.
+     ========================================================================== */
+  var REGIONS = [
+  {
+    "id": "cap",
+    "title": "CAPACITY PROOF — the media engine",
+    "sub": "Hami carries live video itself. Target: 9,000 streamers + 10,000 viewers in ONE room.",
+    "x": 40,
+    "y": 240,
+    "w": 820
+  },
+  {
+    "id": "nep",
+    "title": "NEPALI TRAINING — Hami AI",
+    "sub": "Teaching Hami Nepali, from within. The end state is Hami as its own LLM.",
+    "x": 900,
+    "y": 240,
+    "w": 820
+  },
+  {
+    "id": "meet",
+    "title": "MEET HAMI — chat",
+    "sub": "Talk to Hami. Every message passes through the gate.",
+    "x": 1760,
+    "y": 240,
+    "w": 820
+  },
+  {
+    "id": "inc",
+    "title": "INCOME + CLOUDFACTORY",
+    "sub": "Real money, verified. Rs 0 so far — zero is the measured number.",
+    "x": 40,
+    "y": 1060,
+    "w": 820
+  },
+  {
+    "id": "enf",
+    "title": "GATES ENFORCEMENT",
+    "sub": "The gates that guard all other gates.",
+    "x": 900,
+    "y": 1060,
+    "w": 820
+  },
+  {
+    "id": "knee",
+    "title": "KNEE ROSE SITE",
+    "sub": "The public home. Everything reachable from here.",
+    "x": 1760,
+    "y": 1060,
+    "w": 820
+  },
+  {
+    "id": "led",
+    "title": "PROOF LEDGER + BUILD LOG",
+    "sub": "Every claim with state + evidence. Contradicted claims are shown, never hidden.",
+    "x": 40,
+    "y": 1720,
+    "w": 820
+  },
+  {
+    "id": "net",
+    "title": "THE GATES — the network",
+    "sub": "This whole network of gates IS Hami. All work is building Hami.",
+    "x": 900,
+    "y": 1720,
+    "w": 820
+  },
+  {
+    "id": "priv",
+    "title": "PRIVATE GATES — the engine underneath",
+    "sub": "Shown in plain words, so anyone can understand them.",
+    "x": 1760,
+    "y": 1720,
+    "w": 820
+  },
+  {
+    "id": "vault",
+    "title": "PRIVATE DATA — blurred",
+    "sub": "Names only. No value is in this page, so nothing can leak from it.",
+    "x": 40,
+    "y": 2380,
+    "w": 820
+  },
+  {
+    "id": "help",
+    "title": "HELPER GATES — rules that aid all gates",
+    "sub": "They sit on every gate and every subgate, and they never come off.",
+    "x": 900,
+    "y": 2380,
+    "w": 820
+  },
+  {
+    "id": "meth",
+    "title": "METHODOLOGY — six dimensions",
+    "sub": "One methodology: universal, dimensional, spiritual — made from the gate.",
+    "x": 1760,
+    "y": 2380,
+    "w": 820
+  }
+];
+
+  var FIELD = [
+  {
+    "id": "promise",
+    "region": "net",
+    "num": "THE PROMISE GATE",
+    "name": "NEVER STOP WORKING — ALWAYS PROGRESS — ALWAYS UPGRADE EVERYTHING",
+    "plain": "Never stop working. Always progress. Always upgrade everything.",
+    "what": "The promise binds every worker and every gate: work never stops, progress always advances, and everything is always upgraded.",
+    "why": "It is the owner's standing order. A promise that binds all the work is what keeps the field moving with no gap.",
+    "state": "running",
+    "evidence": "The owner's standing order, 18 Nov 2026: 'promise gate: never stop working, always progress and upgrade everything.' It binds every worker and every gate.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "The next upgrade — the promise renews itself.",
+    "sub": [
+      {
+        "t": "Never stop working",
+        "s": "running",
+        "e": "The work never stops — the promise binds every worker."
+      },
+      {
+        "t": "Always progress",
+        "s": "running",
+        "e": "Progress always advances — the pace only rises."
+      },
+      {
+        "t": "Always upgrade everything",
+        "s": "running",
+        "e": "Everything is always upgraded — the next upgrade is always the next step."
+      }
+    ],
+    "links": [
+      "a6keys",
+      "applygates",
+      "att13",
+      "buildlog",
+      "cf",
+      "chat",
+      "cors",
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6",
+      "da",
+      "decision",
+      "endstate",
+      "engine",
+      "evid",
+      "exp1",
+      "g007",
+      "g008",
+      "gatespage",
+      "h1",
+      "h10",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "h7",
+      "h8",
+      "h9",
+      "hamsa",
+      "homelinks",
+      "ig",
+      "improve",
+      "lamsal",
+      "leadeng",
+      "ledger",
+      "livevid",
+      "locks",
+      "m6h",
+      "m7h",
+      "mapgate",
+      "neverstop",
+      "outbox",
+      "pacer",
+      "perm",
+      "prime",
+      "proveit",
+      "pv-backup",
+      "pv-cf",
+      "pv-gwkey",
+      "pv-identity",
+      "pv-secret",
+      "q009",
+      "rights",
+      "rs0",
+      "sfteval",
+      "subgate",
+      "term",
+      "tipgate",
+      "widget",
+      "wsp"
+    ],
+    "pin": {
+      "x": 1030,
+      "y": 16,
+      "w": 560,
+      "h": 64
+    }
+  },
+  {
+    "id": "m6h",
+    "region": "cap",
+    "num": "GATE 01 · M6-H",
+    "name": "M6-H PASSED",
+    "plain": "Hami's own media engine carried 1,000 live publishers to 2,000 viewers on one MacBook, fast and clean.",
+    "what": "The engine passed M6-H: 1,000 publishers, 2,000 viewers, p95 0.34 ms, p99 17.8 ms, zero NACKs.",
+    "why": "It proves Hami can carry live video itself, without borrowing another company's video system.",
+    "state": "running",
+    "evidence": "p95 0.34 ms, p99 17.8 ms, zero NACKs. The fix was disabling mDNS. Source: hami-reports/2026-11-17-m6-h-proof-report.md.",
+    "date": "2026-11-17",
+    "owner": "media engine",
+    "next": "M7-H: chase the p99 tail.",
+    "sub": [
+      {
+        "t": "M6-H proof report",
+        "s": "running",
+        "e": "hami-reports/2026-11-17-m6-h-proof-report.md"
+      }
+    ],
+    "progress": {
+      "label": "viewers carried",
+      "done": 2000,
+      "total": 2000
+    },
+    "links": [
+      "buildlog",
+      "ledger",
+      "livevid",
+      "m7h",
+      "promise"
+    ]
+  },
+  {
+    "id": "m7h",
+    "region": "cap",
+    "num": "GATE 01 · M7-H",
+    "name": "M7-H PARKED",
+    "plain": "The bigger test is parked: most viewers are fast, but the slowest ones are far too slow — so the target is not proven.",
+    "what": "M7-H parked: p95 passes all 3,000 viewers (median 11.2 ms); p99 fails — only 115 of 3,000 pass (median ~294 ms).",
+    "why": "A contradicted claim is shown, never hidden. The 9-streamer / 4,000-viewer target is NOT proven on one laptop.",
+    "state": "running",
+    "evidence": "p95 passes all 3,000 (11.2 ms median); p99 fails, 115 of 3,000 pass (~294 ms median). Source: docs/CAPABILITY_QUEUE.md (M7-H park entry).",
+    "date": "2026-11-18",
+    "owner": "media engine",
+    "next": "Diagnose the single common cause (queue/009), then the next fix.",
+    "sub": [
+      {
+        "t": "M7-H park entry",
+        "s": "running",
+        "e": "docs/CAPABILITY_QUEUE.md — p99 fails, 115/3,000"
+      }
+    ],
+    "progress": {
+      "label": "p99 viewers passing",
+      "done": 115,
+      "total": 3000
+    },
+    "links": [
+      "att13",
+      "buildlog",
+      "ledger",
+      "livevid",
+      "m6h",
+      "promise",
+      "q009"
+    ]
+  },
+  {
+    "id": "att13",
+    "region": "cap",
+    "num": "GATE 01 · ATTEMPT 13",
+    "name": "ATTEMPT 13 STALLED",
+    "plain": "The engine stalls the same way three times in a row. A stall is a subgate, not a dead end — it opens new work.",
+    "what": "Three identical stalls (profile, tuned, tuned2), same ~1-minute signature. The tuned run finished 19:34:07 with 60/3,000 tracks; the tuned2 run finished 19:42:15 with 171/3,000 tracks. All 6,000 connections died.",
+    "why": "The GC heap fix did NOT prevent the stall — the stall has a different single common cause, not the GC heap. Finding it is the next work.",
+    "state": "running",
+    "evidence": "Tuned run finished 19:34:07, 60/3,000 tracks; tuned2 finished 19:42:15, 171/3,000 tracks; all 6,000 connections died, survived=0. Log: /tmp/hami-media-m7h-attempt13-tuned2-run.log (111,479 lines).",
+    "date": "2026-11-18",
+    "owner": "Copilot",
+    "next": "Triage: diagnose the single common cause.",
+    "sub": [
+      {
+        "t": "Tuned run",
+        "s": "running",
+        "e": "Finished 19:34:07, 60/3,000 tracks, all 6,000 connections died"
+      },
+      {
+        "t": "Tuned2 run",
+        "s": "running",
+        "e": "Finished 19:42:15, 171/3,000 tracks, all 6,000 connections died"
+      }
+    ],
+    "progress": {
+      "label": "tracks in tuned2 run",
+      "done": 171,
+      "total": 3000
+    },
+    "links": [
+      "buildlog",
+      "m7h",
+      "promise",
+      "q009"
+    ]
+  },
+  {
+    "id": "q009",
+    "region": "cap",
+    "num": "GATE 01 · QUEUE/009",
+    "name": "QUEUE/009 TRIAGE",
+    "plain": "One job: find the one cause behind all three identical stalls.",
+    "what": "Diagnose the single common cause of the identical stalls, then the next fix.",
+    "why": "Three stalls with the same signature mean one cause. Guessing fixes wastes runs; a diagnosis ends the guessing.",
+    "state": "running",
+    "evidence": "Triage order placed 18 Nov 2026. Owner: Copilot, fed the moment its 009 turn ends.",
+    "date": "2026-11-18",
+    "owner": "Copilot",
+    "next": "The diagnosis itself.",
+    "sub": [
+      {
+        "t": "Triage order",
+        "s": "running",
+        "e": "Diagnose the single common cause, then the next fix"
+      }
+    ],
+    "links": [
+      "att13",
+      "m7h",
+      "promise",
+      "proveit"
+    ]
+  },
+  {
+    "id": "sfteval",
+    "region": "nep",
+    "num": "GATE 02 · SFT-EVAL",
+    "name": "SFT-EVAL — ADAPTER LOSES",
+    "plain": "The Nepali-tuned adapter scores worse than the plain base model. The data is the problem, not the training.",
+    "what": "Held-out eval: base 73/120 vs adapter 58/120 on 20 rows (4 adapter wins, 9 base wins, 7 ties).",
+    "why": "Data quality is the blocker. Training harder on weak data will not fix it — the data must be fixed first.",
+    "state": "running",
+    "evidence": "Base 73/120 vs adapter 58/120, 20 rows. Smoke test: 500-example MLX LoRA on Qwen3-4B, loss 1.265 → 0.810.",
+    "date": "2026-11-18",
+    "owner": "Hami AI",
+    "next": "Fix the data, not the model — data quality is the suspected bottleneck.",
+    "sub": [
+      {
+        "t": "Smoke test",
+        "s": "running",
+        "e": "500-example MLX LoRA on Qwen3-4B, loss 1.265 → 0.810"
+      },
+      {
+        "t": "Held-out eval",
+        "s": "running",
+        "e": "Base 73/120 vs adapter 58/120 (20 rows)"
+      }
+    ],
+    "progress": {
+      "label": "adapter score",
+      "done": 58,
+      "total": 120
+    },
+    "links": [
+      "buildlog",
+      "endstate",
+      "lamsal",
+      "leadeng",
+      "ledger",
+      "promise",
+      "rights",
+      "wsp"
+    ]
+  },
+  {
+    "id": "rights",
+    "region": "nep",
+    "num": "GATE 02 · RIGHTS",
+    "name": "DATASET RIGHTS",
+    "plain": "The training data's rights are settled: research use is allowed, commercial use is not.",
+    "what": "The dataset is a Stanford Alpaca translation under CC BY-NC 4.0, research-only. 52,005 rows (alpaca-nepali-sft).",
+    "why": "Rights were the blocker; now they are settled. What blocks the work now is data quality, not rights.",
+    "state": "running",
+    "evidence": "Stanford Alpaca translation, CC BY-NC 4.0, research-only, no commercial use.",
+    "date": "2026-11-18",
+    "owner": "Hami AI",
+    "next": "Improve data quality.",
+    "sub": [],
+    "links": [
+      "endstate",
+      "leadeng",
+      "promise",
+      "sfteval"
+    ]
+  },
+  {
+    "id": "endstate",
+    "region": "nep",
+    "num": "GATE 02 · END STATE",
+    "name": "END STATE — HAMI BECOMES ITS OWN LLM",
+    "plain": "The destination: Hami itself becomes a language model — its own, independent, needing no outside model. This is the direction, not a measurement.",
+    "what": "In the end Hami must NOT need GPT or any model — Hami ITSELF becomes an LLM, and a NEED (essential, not optional).",
+    "why": "That is why the gates and the uniqueness, perseverance and non-leak stages exist: the gates make Hami its own gated way; uniqueness makes Hami its own thing; perseverance makes Hami keep learning on its own; non-leak keeps Hami's knowledge inside Hami.",
+    "state": "running",
+    "evidence": "Direction set by the owner, 18 Nov 2026. The Nepali fine-tuning (Qwen3-4B LoRA) is a stepping stone, NOT the destination.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "Keep building the stepping stones: data, then LoRA, then independence.",
+    "sub": [
+      {
+        "t": "Stepping stone: Nepali fine-tuning",
+        "s": "running",
+        "e": "Qwen3-4B MLX LoRA on the Mac — a step, not the end"
+      }
+    ],
+    "links": [
+      "d2",
+      "lamsal",
+      "leadeng",
+      "promise",
+      "rights",
+      "sfteval",
+      "wsp"
+    ]
+  },
+  {
+    "id": "lamsal",
+    "region": "nep",
+    "num": "GATE 02 · LAMSAL",
+    "name": "LAMSAL CORPUS",
+    "plain": "A huge Nepali corpus (90 million words) waits behind a free account the owner must create.",
+    "what": "Lamsal 2020 (compiled.txt, 1.71 GB, 90M+ words, non-commercial) is not downloaded — IEEE DataPort needs a logged-in account.",
+    "why": "It is the biggest Nepali text pile available to Hami. Without it, the training data stays thin.",
+    "state": "running",
+    "evidence": "BLOCKED on IEEE login. Unblock: the owner creates a FREE IEEE account, logs in, downloads compiled.txt.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "Owner creates a free IEEE account.",
+    "sub": [],
+    "links": [
+      "endstate",
+      "leadeng",
+      "promise",
+      "sfteval",
+      "wsp"
+    ]
+  },
+  {
+    "id": "chat",
+    "region": "meet",
+    "num": "GATE 03 · CHAT",
+    "name": "HAMI CHAT LIVE",
+    "plain": "You can talk to Hami and get a real answer back, through the whole chain from the website to the Mac.",
+    "what": "Hami chat is live with real replies. A real reply landed 18 Nov 19:18 (the six primitives, North Star, Purpose).",
+    "why": "Talking to Hami is the whole point of Meet Hami — a living system you can ask, not a page you read.",
+    "state": "running",
+    "evidence": "Real reply 18 Nov 19:18. Full path works: Vercel → tunnel → gateway → Ollama gpt-oss:20b.",
+    "date": "2026-11-18",
+    "owner": "Hami Systems",
+    "next": "Keep it live; permanence is the subgate below.",
+    "sub": [
+      {
+        "t": "Real reply",
+        "s": "running",
+        "e": "Landed 18 Nov 19:18 — the six primitives, North Star, Purpose"
+      }
+    ],
+    "links": [
+      "buildlog",
+      "cors",
+      "perm",
+      "promise",
+      "widget"
+    ]
+  },
+  {
+    "id": "cors",
+    "region": "meet",
+    "num": "GATE 03 · CORS",
+    "name": "CORS FIX",
+    "plain": "The chat used to fail on other websites because the browser blocked it. The fix opens it to every site.",
+    "what": "Cross-origin chat is now allowed — commit e566f4cb: Access-Control-Allow-Origin * on the chat reply, plus an OPTIONS handler returning 204.",
+    "why": "This is what makes Hami Systems work on ANY site worldwide with one script tag, not just on Knee Rose.",
+    "state": "running",
+    "evidence": "Commit e566f4cb, 1 file, 25 insertions. Pushed to ForgeOS main (238ebbda..f97637c6).",
+    "date": "2026-11-18",
+    "owner": "Muse (Lead)",
+    "next": "Verify live: a real reply from Knee Rose.",
+    "sub": [],
+    "links": [
+      "chat",
+      "promise",
+      "widget"
+    ]
+  },
+  {
+    "id": "widget",
+    "region": "meet",
+    "num": "GATE 03 · WIDGET",
+    "name": "HAMI SYSTEMS WIDGET",
+    "plain": "One small script tag puts Hami on any website in the world.",
+    "what": "The gated pop-up is live on Knee Rose and staged on the Hami site. Presentation button, 90 s timeout, 6-slide deck.",
+    "why": "One Hami backend, one gate, every surface. The pop-up is what delivers Hami to the world.",
+    "state": "running",
+    "evidence": "Live on Knee Rose; staged on the Hami site (script tag in the shared layout). Widget waits 90 s; route retries transient 502s.",
+    "date": "2026-11-18",
+    "owner": "Hami Systems",
+    "next": "The Presentation button now leads to this field.",
+    "sub": [],
+    "links": [
+      "buildlog",
+      "chat",
+      "cors",
+      "perm",
+      "promise"
+    ]
+  },
+  {
+    "id": "perm",
+    "region": "meet",
+    "num": "GATE 03 · PERMANENCE",
+    "name": "PERMANENCE — NAMED TUNNEL",
+    "plain": "Hami's connection to the world should be permanent, not a temporary tunnel. That needs the owner's Cloudflare details.",
+    "what": "Permanence is BLOCKED on approvals/001: it needs the owner's Cloudflare account + zone/hostname for a named tunnel.",
+    "why": "A temporary tunnel can drop. A named tunnel stays — Hami stays reachable, always.",
+    "state": "running",
+    "evidence": "BLOCKED on approvals/001. The tunnel today is UP and stable; the earlier failure was latency/timeout, not a dead tunnel.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "Owner supplies Cloudflare account + zone/hostname.",
+    "sub": [],
+    "links": [
+      "chat",
+      "promise",
+      "widget"
+    ]
+  },
+  {
+    "id": "rs0",
+    "region": "inc",
+    "num": "GATE 04 · RS-0",
+    "name": "RS-0 — VERIFIED RUPEES",
+    "plain": "Honest zero: Hami has earned no rupees yet, and the counter says so instead of hiding it.",
+    "what": "Verified real rupees earned by Hami so far: Rs 0. No seller has paid, no pilot has run, no revenue has been received.",
+    "why": "Zero is the measured number. The counter moves only when a real payment lands and is verified.",
+    "state": "running",
+    "evidence": "Rs 0 verified. Source: src/lib/ledger.ts (RS-0 claim).",
+    "date": "2026-11-18",
+    "owner": "income",
+    "next": "First verified payment — Hamsawears is the nearest door.",
+    "sub": [],
+    "links": [
+      "da",
+      "exp1",
+      "hamsa",
+      "ledger",
+      "promise"
+    ]
+  },
+  {
+    "id": "exp1",
+    "region": "inc",
+    "num": "GATE 04 · EXP-1",
+    "name": "EXP-1 SLOW-REPLY RECOVERY",
+    "plain": "An experiment waiting for its first seller: do faster replies win back lost sales?",
+    "what": "Experiment 1 proposes to test whether faster replies recover real sales for one seller in one week.",
+    "why": "Slow replies lose real orders. If faster replies recover them, that is Hami's first proven value to a seller.",
+    "state": "running",
+    "evidence": "0 sellers agreed, 0 sales recovered (measured). Source: src/lib/ledger.ts (EXP-1, proposed, log empty).",
+    "date": "2026-11-18",
+    "owner": "income",
+    "next": "A seller agrees, then one week runs.",
+    "sub": [],
+    "links": [
+      "hamsa",
+      "ledger",
+      "promise",
+      "rs0"
+    ]
+  },
+  {
+    "id": "hamsa",
+    "region": "inc",
+    "num": "GATE 04 · HAMSAWEARS",
+    "name": "HAMSAWEARS",
+    "plain": "A custom-clothing business in Bafal, Kathmandu. We asked 14 questions about their orders. Waiting for their answer.",
+    "what": "Questionnaire SENT by email 18 Nov 12:13 (14 questions), awaiting reply.",
+    "why": "Hamsawears is the nearest real seller. Their answers show whether slow replies are losing them orders.",
+    "state": "running",
+    "evidence": "Questionnaire sent by email 18 Nov 12:13 (14 questions). No reply yet.",
+    "date": "2026-11-18",
+    "owner": "income",
+    "next": "Wait for the reply, then follow up.",
+    "sub": [],
+    "links": [
+      "exp1",
+      "promise",
+      "rs0"
+    ]
+  },
+  {
+    "id": "cf",
+    "region": "inc",
+    "num": "GATE 04 · CLOUDFACTORY",
+    "name": "CLOUDFACTORY",
+    "plain": "A job application parked on one question: is macOS accepted for the Nepal Data Specialist role? No answer yet.",
+    "what": "Application parked: the macOS question was sent 16 Nov, and there is NO REPLY as of 18 Nov.",
+    "why": "CloudFactory is a real employer door. Until they answer, the application cannot move.",
+    "state": "running",
+    "evidence": "macOS question sent 16 Nov. NO REPLY as of 18 Nov.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "Wait for the reply; application stays parked.",
+    "sub": [],
+    "links": [
+      "promise",
+      "pv-cf"
+    ]
+  },
+  {
+    "id": "da",
+    "region": "inc",
+    "num": "GATE 04 · DATAANNOTATION",
+    "name": "DATAANNOTATION — THE OPEN DOOR",
+    "plain": "A real door to paid AI work. The plan is ready; whether the account exists is not yet known.",
+    "what": "Signup is name/email only, pays via PayPal, Starter Assessment takes ~1 hour, one attempt. The plan is ready.",
+    "why": "It is the fastest honest route to first paid AI work — if the account is created and the assessment passed.",
+    "state": "running",
+    "evidence": "Plan ready. Whether Niroj created an account is NOT ESTABLISHED.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "Establish whether the account was created.",
+    "sub": [],
+    "links": [
+      "promise",
+      "rs0"
+    ]
+  },
+  {
+    "id": "g007",
+    "region": "enf",
+    "num": "GATE 05 · 007",
+    "name": "GATE 007",
+    "plain": "Fourteen checks, all green, over more than a thousand tests.",
+    "what": "Verified: 1,380 backend tests passed, gates tests 14/14, GREEN.",
+    "why": "The gates guard every other gate. A green 007 means the guard itself holds.",
+    "state": "running",
+    "evidence": "1,380 backend tests passed, gates 14/14, GREEN.",
+    "date": "2026-11-18",
+    "owner": "gates",
+    "next": "Keep the gates green on every change.",
+    "sub": [],
+    "progress": {
+      "label": "gates green",
+      "done": 14,
+      "total": 14
+    },
+    "links": [
+      "applygates",
+      "buildlog",
+      "g008",
+      "promise"
+    ]
+  },
+  {
+    "id": "g008",
+    "region": "enf",
+    "num": "GATE 05 · 008",
+    "name": "GATE 008",
+    "plain": "Green — except one small delivery that waits for the owner to set up a channel.",
+    "what": "Verified: 64 tests passed, gates 14/14, GREEN. Telegram delivery is a subgate, BLOCKED_BY_MISSING_ACCESS.",
+    "why": "The work stands; only the delivery channel is missing. A blocked subgate is shown, not hidden.",
+    "state": "running",
+    "evidence": "64 tests passed, gates 14/14, GREEN. Telegram subgate: owner channel not configured.",
+    "date": "2026-11-18",
+    "owner": "gates",
+    "next": "Owner configures a Telegram channel; then delivery unblocks.",
+    "sub": [
+      {
+        "t": "Telegram delivery",
+        "s": "running",
+        "e": "BLOCKED_BY_MISSING_ACCESS — owner channel not configured"
+      }
+    ],
+    "progress": {
+      "label": "gates green",
+      "done": 14,
+      "total": 14
+    },
+    "links": [
+      "applygates",
+      "buildlog",
+      "g007",
+      "promise"
+    ]
+  },
+  {
+    "id": "proveit",
+    "region": "enf",
+    "num": "GATE 05 · PROVE IT",
+    "name": "PROVE IT — STEP 8",
+    "plain": "The final proof step, waiting its turn behind the 009 fix.",
+    "what": "PROVE IT (step 8) is PENDING: it waits for 009 to land.",
+    "why": "Proof comes in order. Step 8 cannot run until the fix it must prove has landed.",
+    "state": "running",
+    "evidence": "Pending, waits for 009.",
+    "date": "2026-11-18",
+    "owner": "gates",
+    "next": "009 lands, then step 8 runs.",
+    "sub": [],
+    "links": [
+      "promise",
+      "q009"
+    ]
+  },
+  {
+    "id": "term",
+    "region": "knee",
+    "num": "GATE 06 · TERMINAL",
+    "name": "INTERACTIVE TERMINAL",
+    "plain": "A real terminal on the home page — type commands, play music.",
+    "what": "Live: help, whoami, projects, music, play, hami, about, contact, clear, exit. Music: 3 tracks — Summit, Kanai Huncha Mast, Pilkington Dr 37.",
+    "why": "The home page is not a poster; it is a place you can use. The terminal is how visitors touch Hami.",
+    "state": "running",
+    "evidence": "Live on kn33r0s3.vercel.app. Cursor fixed: green blink sits right after $.",
+    "date": "2026-11-18",
+    "owner": "Knee Rose",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "buildlog",
+      "d3",
+      "homelinks",
+      "promise"
+    ]
+  },
+  {
+    "id": "homelinks",
+    "region": "knee",
+    "num": "GATE 06 · HOME LINKS",
+    "name": "HOME LINKS",
+    "plain": "Every Hami page is one click from the home page. Nothing dormant.",
+    "what": "All three Hami pages are now linked from home — Visual map, Methodology, AI engineering gates — commit 8dd0219.",
+    "why": "A built thing that is not linked is dormant, and dormant is not allowed. Every page must be reachable.",
+    "state": "running",
+    "evidence": "Commit 8dd0219. Index.html Hami list, lines 285–287.",
+    "date": "2026-11-18",
+    "owner": "Muse (Lead)",
+    "next": "Link this field from home too (parent's job).",
+    "sub": [],
+    "links": [
+      "gatespage",
+      "h8",
+      "ig",
+      "mapgate",
+      "promise",
+      "term"
+    ]
+  },
+  {
+    "id": "ig",
+    "region": "knee",
+    "num": "GATE 06 · INSTAGRAM",
+    "name": "INSTAGRAM @np.explains",
+    "plain": "The Nepal channel's handle, corrected everywhere it appears.",
+    "what": "Was @diojitree; updated everywhere live to @np.explains.",
+    "why": "One name, everywhere. A wrong handle sends people to the wrong place.",
+    "state": "running",
+    "evidence": "Updated everywhere live, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "Knee Rose",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "homelinks",
+      "promise"
+    ]
+  },
+  {
+    "id": "ledger",
+    "region": "led",
+    "num": "GATE 07 · LEDGER",
+    "name": "PROOF LEDGER — /ledger",
+    "plain": "The public proof book: six claims, each with its state and its evidence.",
+    "what": "The ledger is live with 6 real claims: EXP-1 proposed, M6-H passed, M7-H-TARGET contradicted, SFT-EVAL measured, A6-KEYS measured, RS-0 measured.",
+    "why": "A claim renders only with state + evidence. Contradicted claims are shown, never hidden.",
+    "state": "running",
+    "evidence": "src/routes/ledger.tsx (6,658 B, 185 lines), typecheck OK, Vite build OK. 6 claims, each with state + evidence.",
+    "date": "2026-11-18",
+    "owner": "ledger",
+    "next": "Keep every new claim gated the same way.",
+    "sub": [],
+    "links": [
+      "a6keys",
+      "buildlog",
+      "d5",
+      "evid",
+      "exp1",
+      "h7",
+      "leadeng",
+      "m6h",
+      "m7h",
+      "mapgate",
+      "promise",
+      "rs0",
+      "sfteval"
+    ]
+  },
+  {
+    "id": "buildlog",
+    "region": "led",
+    "num": "GATE 07 · BUILD LOG",
+    "name": "BUILD LOG — /build-log",
+    "plain": "The build diary, in order — what was built, when, and what proved it.",
+    "what": "The build log is live with 10 entries, newest first. Every entry is a measured result or an explicit zero.",
+    "why": "The track is how any visual is traced from beginning to end and re-checked, again and again.",
+    "state": "running",
+    "evidence": "10 entries in src/routes/build-log.tsx, newest first.",
+    "date": "2026-11-18",
+    "owner": "ledger",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "att13",
+      "chat",
+      "d5",
+      "g007",
+      "g008",
+      "h1",
+      "leadeng",
+      "ledger",
+      "m6h",
+      "m7h",
+      "mapgate",
+      "promise",
+      "sfteval",
+      "term",
+      "widget"
+    ]
+  },
+  {
+    "id": "a6keys",
+    "region": "led",
+    "num": "GATE 07 · A6-KEYS",
+    "name": "A6-KEYS",
+    "plain": "A deep scan found no private keys in the project's history — but the audit is tested, not clean, until the remaining candidates are triaged.",
+    "what": "A full-history scan of 14,064 blobs (2,148,503,946 bytes) found zero private-key headers for the specified marker set.",
+    "why": "Secrets in history are a leak that never heals. The scan proves the markers are absent — and is honest that it is not the whole story.",
+    "state": "running",
+    "evidence": "0 matches in 14,064 blobs. A6 stays TESTED, NOT CLEAN: 103 Gitleaks and 129 TruffleHog candidates still need triage.",
+    "date": "2026-11-18",
+    "owner": "audit",
+    "next": "Triage all 232 candidates.",
+    "sub": [],
+    "links": [
+      "ledger",
+      "promise",
+      "pv-secret"
+    ]
+  },
+  {
+    "id": "gatespage",
+    "region": "net",
+    "num": "GATE 08 · MAP OF WORK",
+    "name": "AI ENGINEERING GATES PAGE",
+    "plain": "The map of work: every gate, its outcome, and the new work it opens.",
+    "what": "Live on Knee Rose + Hami site, commit f97637c. GATE (situation) → SUBGATE (outcome) → LEAD (new work), 10 helper gates, TIP GATE, SUBJECTED GATE, running-water garden, 4 live gates.",
+    "why": "The map is the coordination language: the Lead never loses track, and neither do the agents.",
+    "state": "running",
+    "evidence": "ai-engineering-gates.html (40,006 B, 764 lines), commit f97637c.",
+    "date": "2026-11-18",
+    "owner": "builder",
+    "next": "Keep the map growing — every new gate adds itself here.",
+    "sub": [],
+    "links": [
+      "applygates",
+      "d4",
+      "h10",
+      "homelinks",
+      "leadeng",
+      "mapgate",
+      "promise",
+      "subgate",
+      "tipgate",
+      "wsp"
+    ]
+  },
+  {
+    "id": "tipgate",
+    "region": "net",
+    "num": "TIP GATE · MANDATORY",
+    "name": "TIP GATE",
+    "plain": "The gate that never lets anyone stop: it always sits in the future, so the work never ends.",
+    "what": "The progress-demanding gate, mandatory. Always set to the FUTURE, so it is NEVER MET. It always asks for all gates and changes with every new outcome.",
+    "why": "CHECK work against the gate → TRIGGER the next step → UPDATE the gate → repeat. The gate is never met, so the loop never ends.",
+    "state": "running",
+    "evidence": "In place, 18 Nov 2026. The loop: CHECK → TRIGGER → UPDATE → repeat.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "It never ends — that is the point.",
+    "sub": [],
+    "links": [
+      "applygates",
+      "gatespage",
+      "h3",
+      "leadeng",
+      "neverstop",
+      "promise"
+    ]
+  },
+  {
+    "id": "subgate",
+    "region": "net",
+    "num": "SUBJECTED GATE · MUSE",
+    "name": "SUBJECTED GATE — MUSE",
+    "plain": "While doing everything else, Muse also keeps making everything better.",
+    "what": "Muse's gate: improve everything whilst doing everything. Every solution is not perfect; everything has space for upgrades.",
+    "why": "A finished thing that is never improved is a thing left behind. The improving runs alongside all other work, not instead of it.",
+    "state": "running",
+    "evidence": "In place, 18 Nov 2026. Owner: Muse (Lead).",
+    "date": "2026-11-18",
+    "owner": "Muse (Lead)",
+    "next": "Always — alongside every other task.",
+    "sub": [],
+    "links": [
+      "gatespage",
+      "improve",
+      "leadeng",
+      "neverstop",
+      "promise"
+    ]
+  },
+  {
+    "id": "pacer",
+    "region": "net",
+    "num": "PACER + REVISION + LOOP",
+    "name": "PACER + REVISION + LOOP GATES",
+    "plain": "The gates that set the pace, revise the work, and loop forever — now built and live.",
+    "what": "Built 18 Nov 2026: advancement-gates.html (39,008 B, 732 lines), linked from both home sites. Pacer gate with a live pace meter, Revision gate with 3 live revisions, Loop gates with a loop ring that walks itself and never closes.",
+    "why": "Pace keeps the work moving, revision keeps it honest, and the loop means it never stops. They are one engine.",
+    "state": "running",
+    "evidence": "advancement-gates.html (39,008 B, 732 lines). Smoke test 67 passed, 0 failed. Commits: Knee Rose 324621a, ForgeOS 2bf8fc6a.",
+    "date": "2026-11-18",
+    "owner": "builder",
+    "next": "Live verification of the pace meter and loop ring.",
+    "sub": [
+      {
+        "t": "Pacer gate",
+        "s": "running",
+        "e": "Live pace meter: pulsing heartbeat + ms counter + multiplier that grows"
+      },
+      {
+        "t": "Revision gate",
+        "s": "running",
+        "e": "3 live revisions with real evidence"
+      },
+      {
+        "t": "Loop gates",
+        "s": "running",
+        "e": "Loop ring walks itself every 2 s, never closes"
+      }
+    ],
+    "links": [
+      "applygates",
+      "h6",
+      "leadeng",
+      "neverstop",
+      "promise"
+    ]
+  },
+  {
+    "id": "prime",
+    "region": "net",
+    "num": "THE PRIME GATE",
+    "name": "THE PRIME GATE — NEVER REPLICATE OR COPY ANYTHING",
+    "plain": "The first and highest rule: nothing copied, ever. Everything is made from within.",
+    "what": "NEVER REPLICATE OR COPY ANYTHING. Everything Hami makes is generated from within — from the gate, from first principles, from nothingness and inner power.",
+    "why": "A gate that moves is not a gate. This one does not move for convenience, for speed, or for anyone.",
+    "state": "running",
+    "evidence": "Unchangeable, unshakable. From the methodology: the prime gate, first.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "It never changes.",
+    "sub": [],
+    "links": [
+      "applygates",
+      "d1",
+      "h9",
+      "improve",
+      "leadeng",
+      "promise"
+    ]
+  },
+  {
+    "id": "decision",
+    "region": "priv",
+    "num": "PRIVATE GATE 01",
+    "name": "THE DECISION GATE",
+    "plain": "Before Hami does anything, it checks the action against its rules — and only then acts.",
+    "what": "Every action is checked against the rules before Hami acts.",
+    "why": "Nothing happens without a check, so Hami never does something it was not allowed to do.",
+    "state": "running",
+    "evidence": "Verified. From the visual map: the Decision Gate.",
+    "date": "2026-11-18",
+    "owner": "engine",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "outbox",
+      "promise"
+    ]
+  },
+  {
+    "id": "outbox",
+    "region": "priv",
+    "num": "PRIVATE GATE 02",
+    "name": "THE OUTBOX",
+    "plain": "Every message Hami sends waits in one queue and leaves through one door.",
+    "what": "One queue, one door — every message leaves through the same door.",
+    "why": "One door means no message can slip out by a side path, and every send is recorded.",
+    "state": "running",
+    "evidence": "Verified. From the visual map: the Outbox.",
+    "date": "2026-11-18",
+    "owner": "engine",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "decision",
+      "engine",
+      "promise"
+    ]
+  },
+  {
+    "id": "engine",
+    "region": "priv",
+    "num": "PRIVATE GATE 03",
+    "name": "THE ENGINE",
+    "plain": "Hami thinks with its own engine, running on its own machine.",
+    "what": "Hami thinks with its own engine, on its own machine.",
+    "why": "The thinking stays ours — it does not depend on someone else's service.",
+    "state": "running",
+    "evidence": "Verified. From the visual map: the Engine.",
+    "date": "2026-11-18",
+    "owner": "engine",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "evid",
+      "outbox",
+      "promise"
+    ]
+  },
+  {
+    "id": "evid",
+    "region": "priv",
+    "num": "PRIVATE GATE 04",
+    "name": "THE EVIDENCE LEDGER",
+    "plain": "Every claim carries its proof. What you see is what was measured.",
+    "what": "Every claim Hami makes carries its proof with it.",
+    "why": "A claim without proof does not show. What you see is what was measured.",
+    "state": "running",
+    "evidence": "Verified. 6 real claims, each with state + evidence.",
+    "date": "2026-11-18",
+    "owner": "engine",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "engine",
+      "h7",
+      "ledger",
+      "livevid",
+      "promise"
+    ]
+  },
+  {
+    "id": "livevid",
+    "region": "priv",
+    "num": "PRIVATE GATE 05",
+    "name": "THE LIVE VIDEO ENGINE",
+    "plain": "Hami carries live video itself — no borrowed video system.",
+    "what": "Hami carries live video itself, publisher to viewer, without borrowing another company's video system.",
+    "why": "Measured: 1,000 publishers and 2,000 viewers passed (p95 0.34 ms, p99 17.8 ms).",
+    "state": "running",
+    "evidence": "Measured: 1,000 publishers, 2,000 viewers, p95 0.34 ms, p99 17.8 ms.",
+    "date": "2026-11-18",
+    "owner": "engine",
+    "next": "M7-H: chase the p99 tail.",
+    "sub": [],
+    "links": [
+      "evid",
+      "locks",
+      "m6h",
+      "m7h",
+      "promise"
+    ]
+  },
+  {
+    "id": "locks",
+    "region": "priv",
+    "num": "PRIVATE GATE 06",
+    "name": "THE LOCKS",
+    "plain": "Only the owner holds the key.",
+    "what": "Hami's doors are locked. Only the owner holds the key.",
+    "why": "Private work stays private. Public work is public by a written reason, never by accident.",
+    "state": "running",
+    "evidence": "Verified. From the visual map: the Locks.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "livevid",
+      "promise",
+      "pv-backup",
+      "pv-cf",
+      "pv-gwkey",
+      "pv-identity",
+      "pv-secret"
+    ]
+  },
+  {
+    "id": "pv-secret",
+    "region": "vault",
+    "num": "PRIVATE · NAME ONLY",
+    "name": "PREVIEW CLIENT SECRET",
+    "private": true,
+    "plain": "What it is: the secret one preview login uses. Why private: anyone with it could pretend to be that login.",
+    "what": "A shared OAuth client secret used by a live preview login.",
+    "why": "A secret that identifies a login must never be shown. Its rotation is under owner review.",
+    "state": "running",
+    "evidence": "State: rotation under owner review (approvals/003). The value is never in this page.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "Owner reviews rotation.",
+    "sub": [],
+    "links": [
+      "a6keys",
+      "locks",
+      "promise"
+    ]
+  },
+  {
+    "id": "pv-gwkey",
+    "region": "vault",
+    "num": "PRIVATE · NAME ONLY",
+    "name": "HAMI GATEWAY KEY",
+    "private": true,
+    "plain": "What it is: the key that lets the website's chat reach the Mac. Why private: it opens the door to the gateway.",
+    "what": "The key the chat backend uses to reach the Mac gateway.",
+    "why": "Whoever holds it can reach the gateway. It is named here; its value is never here.",
+    "state": "running",
+    "evidence": "State: in use by the chat backend, server-side only. The value is never in this page.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "locks",
+      "promise"
+    ]
+  },
+  {
+    "id": "pv-identity",
+    "region": "vault",
+    "num": "PRIVATE · NAME ONLY",
+    "name": "OWNER IDENTITY DETAILS",
+    "private": true,
+    "plain": "What it is: the owner's personal details. Why private: they identify a real person. Values never appear in this field.",
+    "what": "Name, email, phone, citizenship — the owner's own identity details.",
+    "why": "Personal details belong to the owner alone. This field names the category and shows nothing else.",
+    "state": "running",
+    "evidence": "State: never shown, never written here. The values are never in this page.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "locks",
+      "promise"
+    ]
+  },
+  {
+    "id": "pv-backup",
+    "region": "vault",
+    "num": "PRIVATE · NAME ONLY",
+    "name": "BACKUP CODES",
+    "private": true,
+    "plain": "What it is: spare codes kept in a loose file. Why private: anyone with them could get in. The file needs securing.",
+    "what": "A loose file in Downloads that needs securing.",
+    "why": "Spare codes are a second door. A loose file is a door left open.",
+    "state": "running",
+    "evidence": "State: needs securing. Its content was never read and is never shown here.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "Secure the file.",
+    "sub": [],
+    "links": [
+      "locks",
+      "promise"
+    ]
+  },
+  {
+    "id": "pv-cf",
+    "region": "vault",
+    "num": "PRIVATE · NAME ONLY",
+    "name": "CLOUDFACTORY APPLICATION FACTS",
+    "private": true,
+    "plain": "What it is: personal facts from a job application. Why private: they identify the owner. They were never recorded here.",
+    "what": "Date of birth, phone, citizenship — facts from the CloudFactory application.",
+    "why": "Application facts identify a real person. They are named as a category and never recorded here.",
+    "state": "running",
+    "evidence": "State: never recorded, never shown. The values are never in this page.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "cf",
+      "locks",
+      "promise"
+    ]
+  },
+  {
+    "id": "h1",
+    "region": "help",
+    "num": "HELPER GATE 01",
+    "name": "LOG EVERYTHING",
+    "plain": "Write it the moment it happens, with its evidence — or it is lost, and nothing is lost.",
+    "what": "Every gate, every subgate, every lead is written down the moment it happens, with its evidence: a file path, a number, a log line.",
+    "why": "Nothing is carried in memory alone.",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "buildlog",
+      "leadeng",
+      "mapgate",
+      "promise"
+    ]
+  },
+  {
+    "id": "h2",
+    "region": "help",
+    "num": "HELPER GATE 02",
+    "name": "SUMMARIZE AND FINALIZE THE NEXT MOVE",
+    "plain": "After every outcome, write the summary and name the next move.",
+    "what": "A subgate without a lead is a door left open with nothing behind it. The summary says what happened; the next move says what happens now.",
+    "why": "No outcome is left without a next step.",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "promise"
+    ]
+  },
+  {
+    "id": "h3",
+    "region": "help",
+    "num": "HELPER GATE 03",
+    "name": "ADVANCE EVERY TIME",
+    "plain": "Every step moves the work forward. A step that does not advance is not a step.",
+    "what": "Every gate, every subgate, every lead moves the work forward. No step is a holding pattern.",
+    "why": "Progress is always, and forever, on all projects.",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "neverstop",
+      "promise",
+      "tipgate"
+    ]
+  },
+  {
+    "id": "h4",
+    "region": "help",
+    "num": "HELPER GATE 04",
+    "name": "SPEED AT PEAK",
+    "plain": "Zero gap between a finished step and the next order.",
+    "what": "Work at the fastest honest speed. The moment a worker finishes or stalls, the next order goes in the same moment.",
+    "why": "A finished worker with no next order is work lost — and nothing is lost.",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "neverstop",
+      "promise"
+    ]
+  },
+  {
+    "id": "h5",
+    "region": "help",
+    "num": "HELPER GATE 05",
+    "name": "NEVER START FROM SQUARE ONE",
+    "plain": "Every new gate starts from what is already known.",
+    "what": "Every new gate starts from what is already known and built. The work accumulates; it is never thrown away.",
+    "why": "Knowledge increases everything. Starting from square one is starting from nothing — and nothingness is for generating, not for forgetting.",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "promise"
+    ]
+  },
+  {
+    "id": "h6",
+    "region": "help",
+    "num": "HELPER GATE 06 · KEY RULE",
+    "name": "ADVANCEMENT MULTIPLIES WITH TIME",
+    "plain": "The key rule, a law: the rate of advancement multiplies as time passes. Never flat, never decreasing. ×1, then ×2, then ×3.",
+    "what": "The rate is a multiplier that grows with time, because knowledge increases everything and we never start from square one.",
+    "why": "The longer the water runs, the faster the garden grows.",
+    "state": "running",
+    "evidence": "The law. In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "pacer",
+      "promise"
+    ]
+  },
+  {
+    "id": "h7",
+    "region": "help",
+    "num": "HELPER GATE 07",
+    "name": "VERIFY FROM EVIDENCE",
+    "plain": "No claim without proof: a file path or a command output, or it is not said.",
+    "what": "Trust the code and the log over the document. Evidence outranks assumption, every time. A failed check is reported as failed, never as zero.",
+    "why": "Without proof, a claim is a wish.",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "evid",
+      "improve",
+      "ledger",
+      "promise",
+      "wsp"
+    ]
+  },
+  {
+    "id": "h8",
+    "region": "help",
+    "num": "HELPER GATE 08",
+    "name": "NOTHING DORMANT",
+    "plain": "Not a single line dormant, unused, or dead.",
+    "what": "Every line utilized, every interactive path through a gate. A built thing that is not linked and not deployed is dormant, and dormant is not allowed.",
+    "why": "Everything must be accessible from the public home site.",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "homelinks",
+      "promise"
+    ]
+  },
+  {
+    "id": "h9",
+    "region": "help",
+    "num": "HELPER GATE 09 · PRIME",
+    "name": "NEVER COPY",
+    "plain": "The prime gate: everything generated from within.",
+    "what": "The web, other frameworks, other methodologies are for seeing, never for following or copying.",
+    "why": "This gate does not move for convenience, for speed, or for anyone.",
+    "state": "running",
+    "evidence": "NEVER REPLICATE OR COPY ANYTHING. Unchangeable, unshakable.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "It never changes.",
+    "sub": [],
+    "links": [
+      "applygates",
+      "d1",
+      "improve",
+      "prime",
+      "promise",
+      "wsp"
+    ]
+  },
+  {
+    "id": "h10",
+    "region": "help",
+    "num": "HELPER GATE 10",
+    "name": "NEVER LOSE TRACK",
+    "plain": "Missing is not an option. The map is how nothing is lost.",
+    "what": "Never lose track of any work, gate, subgate, minigate, or even tiny gate. The gate itself advances the work on its own.",
+    "why": "Treat everything as Hami (one).",
+    "state": "running",
+    "evidence": "In place on every gate, 18 Nov 2026.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "gatespage",
+      "mapgate",
+      "neverstop",
+      "promise"
+    ]
+  },
+  {
+    "id": "d1",
+    "region": "meth",
+    "num": "DIMENSION 01",
+    "name": "THE GATE",
+    "plain": "One gate. Every visual, word and design passes through it.",
+    "what": "The gate asks one question: did this come from within? If any part was taken from elsewhere, it does not pass.",
+    "why": "A gate that moves is not a gate.",
+    "state": "running",
+    "evidence": "From the methodology: the prime, first.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "applygates",
+      "h9",
+      "prime",
+      "promise"
+    ]
+  },
+  {
+    "id": "d2",
+    "region": "meth",
+    "num": "DIMENSION 02",
+    "name": "NOTHINGNESS / INNER POWER",
+    "plain": "Start from zero and generate from inside, from first principles, from our own measurements.",
+    "what": "Nothingness is starting from zero and generating from inside. Inner power is the same thing from the other side: the power is already inside the gate.",
+    "why": "The web, ChatGPT, LiveKit, Ollama are for SEEING. They are never for following or copying.",
+    "state": "running",
+    "evidence": "From the methodology: dimension 02.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "endstate",
+      "promise",
+      "wsp"
+    ]
+  },
+  {
+    "id": "d3",
+    "region": "meth",
+    "num": "DIMENSION 03",
+    "name": "THE VISUAL",
+    "plain": "Amber on black. Monospace. The look IS the gate made visible.",
+    "what": "Every piece of work prints a gate line first, and a 2px amber gate bar sweeps when a gate opens. The terminal. Devanagari-first headings.",
+    "why": "When you see amber on black, a gate line, and a terminal prompt, you are looking at the gate itself.",
+    "state": "running",
+    "evidence": "From the methodology: dimension 03. This field carries the same tokens.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "promise",
+      "term"
+    ]
+  },
+  {
+    "id": "d4",
+    "region": "meth",
+    "num": "DIMENSION 04",
+    "name": "THE NETWORK",
+    "plain": "Every gate connected to every other gate. Nothing is lost.",
+    "what": "Hami networks all gates. A gate is never alone, and a visual is never alone: each one is a node in the network, and the network holds it.",
+    "why": "The network remembers every gate, every subgate, every minigate, every tiny gate.",
+    "state": "running",
+    "evidence": "From the methodology: dimension 04. This field is the network, drawn.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "gatespage",
+      "mapgate",
+      "promise"
+    ]
+  },
+  {
+    "id": "d5",
+    "region": "meth",
+    "num": "DIMENSION 05",
+    "name": "THE TRACK",
+    "plain": "Beginning to end, checkable again and again.",
+    "what": "Every visual has a track: from its first idea, through its build, through its verification, to its live state — and back again.",
+    "why": "A track that stops is a visual that can no longer be checked, and a visual that cannot be checked cannot be trusted.",
+    "state": "running",
+    "evidence": "From the methodology: dimension 05. The ledger and build log are the live track.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "buildlog",
+      "leadeng",
+      "ledger",
+      "mapgate",
+      "promise"
+    ]
+  },
+  {
+    "id": "d6",
+    "region": "meth",
+    "num": "DIMENSION 06",
+    "name": "THE SPIRITUAL",
+    "plain": "The design serves the people: the Nepali people first, and the globe through them.",
+    "what": "The gate is not decoration; it is the philosophy made visible. A visual that carries no meaning carries nothing.",
+    "why": "Every visual is asked: who does this serve? If it serves no one, it does not pass the gate.",
+    "state": "running",
+    "evidence": "From the methodology: dimension 06.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "UNKNOWN",
+    "sub": [],
+    "links": [
+      "promise"
+    ]
+  },
+  {
+    "id": "neverstop",
+    "region": "help",
+    "num": "NEVER-STOPPING GATE",
+    "name": "NEVER-STOPPING GATE — THE WORK ITSELF CONTINUES",
+    "plain": "No AI working for Hami stops working — each advances instead, to the point the work itself continues.",
+    "what": "The work continues on its own: workers move, code is built, progress fills — never still. The work outlives any single worker.",
+    "why": "Real engineering, not hypothesis and quick works. We are all engineering Hami and all of Hami.",
+    "state": "running",
+    "evidence": "The owner's order, 18 Nov 2026: no AI working for Hami stops working — each advances instead, to the point the work itself continues. Real engineering, not hypothesis.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "The work continuing — the next advance.",
+    "sub": [
+      {
+        "t": "Each advances",
+        "s": "running",
+        "e": "No AI stops; each advances instead."
+      },
+      {
+        "t": "The work itself continues",
+        "s": "running",
+        "e": "The work outlives any single worker."
+      },
+      {
+        "t": "Real engineering",
+        "s": "running",
+        "e": "Not hypothesis and quick works — real engineering."
+      }
+    ],
+    "links": [
+      "h10",
+      "h3",
+      "h4",
+      "pacer",
+      "promise",
+      "subgate",
+      "tipgate"
+    ]
+  },
+  {
+    "id": "improve",
+    "region": "help",
+    "num": "IMPROVEMENT GATE",
+    "name": "IMPROVEMENT GATE — IMPROVE EVERYTHING",
+    "plain": "Improve everything that exists in Hami — every page, every gate, every file, every system, no matter how small.",
+    "what": "Existing things are upgraded: a gate gets brighter and sharper, a page refines itself. An upgrade shimmer passes over the gates and pages, each one brightening, sharpening, refining.",
+    "why": "Nothing is finished; everything has space for upgrades. What exists gets better instead of being left as it is.",
+    "state": "running",
+    "evidence": "The owner's order, 18 Nov 2026: improve everything that exists in Hami — every page, every gate, every file, every system, no matter how small.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "The next upgrade — everything has space for more.",
+    "sub": [
+      {
+        "t": "Every page",
+        "s": "running",
+        "e": "Every page gets upgraded."
+      },
+      {
+        "t": "Every gate",
+        "s": "running",
+        "e": "Every gate gets upgraded."
+      },
+      {
+        "t": "Every file, every system",
+        "s": "running",
+        "e": "Every file and every system, no matter how small, gets upgraded."
+      }
+    ],
+    "links": [
+      "h7",
+      "h9",
+      "prime",
+      "promise",
+      "subgate"
+    ]
+  },
+  {
+    "id": "mapgate",
+    "region": "net",
+    "num": "MAP GATE",
+    "name": "MAP GATE — LISTS AND LINKS EVERYTHING",
+    "plain": "A gate that lists everything and links everything in Hami — every file, page, gate, workstream, claim, route — so all of Hami works for each other as one well-built engine.",
+    "what": "The map is a living web of links between all the field's parts. The connections pulse and update, always being upgraded at insane speed, so the map never loses touch with the real state.",
+    "why": "One well-built engine where every part works for every other part. The field's own map of itself.",
+    "state": "running",
+    "evidence": "The owner's order, 18 Nov 2026: a gate that lists everything and links everything in Hami — every file, page, gate, workstream, claim, route.",
+    "date": "2026-11-18",
+    "owner": "all",
+    "next": "The next update — the map is updated constantly.",
+    "sub": [
+      {
+        "t": "Lists everything",
+        "s": "running",
+        "e": "Every file, page, gate, workstream, claim, route is listed."
+      },
+      {
+        "t": "Links everything",
+        "s": "running",
+        "e": "Every part linked, so all of Hami works for each other."
+      },
+      {
+        "t": "Updated constantly",
+        "s": "running",
+        "e": "Always being upgraded, so the map never loses touch with the real state."
+      }
+    ],
+    "links": [
+      "buildlog",
+      "d4",
+      "d5",
+      "gatespage",
+      "h1",
+      "h10",
+      "homelinks",
+      "ledger",
+      "promise"
+    ]
+  },
+  {
+    "id": "applygates",
+    "region": "net",
+    "num": "APPLY ALL GATES",
+    "name": "APPLY ALL GATES TO HAMI",
+    "plain": "The gates are not just displayed — they are applied to Hami itself: the system, the work, the workers.",
+    "what": "The field is the gates governing the real work: the RUNNING pulse on every gate, the pace rising, the loop walking, the work flowing, the upgrades landing. This picture is the government of the real work, not a poster.",
+    "why": "A gate that is only displayed changes nothing. Applied, the gates govern the system, the work and the workers.",
+    "state": "running",
+    "evidence": "The owner's order, 18 Nov 2026: apply all gates to Hami — the gates govern Hami itself.",
+    "date": "2026-11-18",
+    "owner": "owner",
+    "next": "The government continues — the gates keep governing.",
+    "sub": [
+      {
+        "t": "The system",
+        "s": "running",
+        "e": "The gates govern Hami itself — the system."
+      },
+      {
+        "t": "The work",
+        "s": "running",
+        "e": "The gates govern the work."
+      },
+      {
+        "t": "The workers",
+        "s": "running",
+        "e": "The gates govern the workers."
+      }
+    ],
+    "links": [
+      "d1",
+      "g007",
+      "g008",
+      "gatespage",
+      "h9",
+      "pacer",
+      "prime",
+      "promise",
+      "tipgate"
+    ]
+  },
+  {
+    "id": "leadeng",
+    "region": "nep",
+    "num": "LEAD ENGINEER — DESTINATION",
+    "name": "HAMI AI BECOMES LEAD ENGINEER",
+    "plain": "Hami AI is being built now so it later takes the Lead Engineer position — the succession, and the destination.",
+    "what": "Muse, the current Lead, builds Hami AI from the gates and from all the data: reports, chronicle, knowledge, code, decisions, Nepali data — everything. Hami AI later steps into the Lead seat and takes up the work.",
+    "why": "The end state: Hami AI itself becomes the Lead Engineer — it coordinates the workers, places the gates, makes the decisions, does what Muse does now. Stage 3 is hami builds: Hami builds itself.",
+    "state": "running",
+    "evidence": "The owner's order, 18 Nov 2026: Hami AI becomes Lead Engineer — the succession. The advancement gates page names the destination: 'HAMI ITSELF BECOMES AN LLM — A NEED'. Stages: (1) teambuild, (2) hami build, (3) hami builds.",
+    "date": "2026-11-18",
+    "owner": "Muse (Lead)",
+    "next": "The building continues — the gates + data feeding Hami AI, the handover approaching.",
+    "sub": [
+      {
+        "t": "Stage 1 — teambuild",
+        "s": "running",
+        "e": "The AI team working together."
+      },
+      {
+        "t": "Stage 2 — hami build",
+        "s": "running",
+        "e": "Building now: Muse builds Hami AI from the gates + all data."
+      },
+      {
+        "t": "Stage 3 — hami builds",
+        "s": "running",
+        "e": "Hami builds itself — Hami AI as Lead Engineer."
+      }
+    ],
+    "links": [
+      "buildlog",
+      "d5",
+      "endstate",
+      "gatespage",
+      "h1",
+      "lamsal",
+      "ledger",
+      "pacer",
+      "prime",
+      "promise",
+      "rights",
+      "sfteval",
+      "subgate",
+      "tipgate",
+      "wsp"
+    ],
+    "pin": {
+      "x": 1030,
+      "y": 0,
+      "w": 560,
+      "h": 150,
+      "bottom": true
+    }
+  },
+  {
+    "id": "wsp",
+    "region": "nep",
+    "num": "WEIGHT SPACE PROGRAMMING",
+    "name": "WEIGHT SPACE PROGRAMMING GATE",
+    "plain": "The model's weights are the space where Hami AI lives — the gates are the program, the weights are where it runs.",
+    "what": "Weight Space Programming is Hami's own gated way of programming that space: every weight update passes through a gate — evidence first, authorization, no copying, nothingness, generated from within, from Hami's own knowledge and data, never by copying an external model's weights.",
+    "why": "The gates shape the weights, and the weights carry Hami. The end state: Hami AI's weights ARE Hami — the model is the Lead Engineer, programmed in weight space by the gates and by all the data.",
+    "state": "running",
+    "evidence": "The stepping stone is measured: the MLX LoRA of Qwen3-4B adds low-rank weight updates trained on Nepali data + the gates. Held-out eval: base 73/120 vs adapter 58/120 — the adapter loses, data quality is the blocker. That honest result is the evidence, and the gate keeps running on it.",
+    "date": "2026-11-18",
+    "owner": "Hami AI",
+    "next": "Fix the data, then the next weight update — the gates keep programming the weight space.",
+    "sub": [
+      {
+        "t": "Stepping stone: MLX LoRA",
+        "s": "running",
+        "e": "Low-rank weight updates on Qwen3-4B, trained on Nepali data + the gates."
+      },
+      {
+        "t": "Honest result",
+        "s": "running",
+        "e": "Base 73/120 vs adapter 58/120 — the adapter loses; data quality is the blocker."
+      },
+      {
+        "t": "End state: weights ARE Hami",
+        "s": "running",
+        "e": "Hami AI's weights ARE Hami — the model is the Lead Engineer."
+      }
+    ],
+    "links": [
+      "d2",
+      "endstate",
+      "gatespage",
+      "h7",
+      "h9",
+      "lamsal",
+      "leadeng",
+      "promise",
+      "sfteval"
+    ]
+  }
+];
+
+  /* The guided tour — the widget's 6-slide deck, folded into the field.
+     Each stop names the LIVE nodes it highlights in the picture. Stop 1 is
+     the HAMI core node itself; stop 3 is the 8 public gates. */
+  var TOUR = [
+  {
+    "title": "Hami",
+    "text": "Hami — one living system for understanding and acting on Nepal's economy. One gate, one Hami, serving the globe.",
+    "targets": [
+      "hami"
+    ]
+  },
+  {
+    "title": "The prime gate",
+    "text": "The prime gate — never replicate or copy anything. Everything is generated from within.",
+    "targets": [
+      "prime",
+      "h9",
+      "d1"
+    ]
+  },
+  {
+    "title": "The 8 gates",
+    "text": "The 8 gates — every gate is a pillar that stands. Nothing is lost.",
+    "targets": [
+      "m6h",
+      "sfteval",
+      "chat",
+      "rs0",
+      "g007",
+      "term",
+      "ledger",
+      "gatespage"
+    ]
+  },
+  {
+    "title": "The private gates",
+    "text": "The private gates — the engine underneath, in plain words.",
+    "targets": [
+      "decision",
+      "outbox",
+      "engine",
+      "evid",
+      "livevid",
+      "locks"
+    ]
+  },
+  {
+    "title": "The map and the methodology",
+    "text": "The map and the methodology — checkable again and again, from beginning to end.",
+    "targets": [
+      "gatespage",
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6"
+    ]
+  },
+  {
+    "title": "Ask Hami",
+    "text": "Ask Hami anything — focus the owner command input. Enter as owner first (your key, above), then command the gates from the field.",
+    "targets": [],
+    "focusOwner": true
+  }
+];
+
+  var HAMI_URL = "https://hami-sigma.vercel.app/api/hami/chat";
+  var MAX_HISTORY = 10;
+  var NODE_W = 386, NODE_H = 100, NODE_GAP_X = 16, NODE_GAP_Y = 12, REGION_HEAD = 96;
+  var CORE = { id: "hami", x: 1030, y: 92, w: 560, h: 76 };
+  var SVG_NS = "http://www.w3.org/2000/svg";
+
+  /* ---- helpers ---- */
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) { n.className = cls; }
+    if (text !== undefined && text !== null) { n.textContent = text; }
+    return n;
+  }
+  function svgEl(tag, attrs) {
+    var n = document.createElementNS(SVG_NS, tag);
+    if (attrs) { for (var k in attrs) { n.setAttribute(k, attrs[k]); } }
+    return n;
+  }
+  function svgText(x, y, cls, text, anchor) {
+    var t = svgEl("text", { x: x, y: y, "class": cls });
+    if (anchor) { t.setAttribute("text-anchor", anchor); }
+    t.textContent = text;
+    return t;
+  }
+  function byId(id) {
+    for (var i = 0; i < FIELD.length; i++) { if (FIELD[i].id === id) { return FIELD[i]; } }
+    return null;
+  }
+  function regionById(id) {
+    for (var i = 0; i < REGIONS.length; i++) { if (REGIONS[i].id === id) { return REGIONS[i]; } }
+    return null;
+  }
+  /* RUNNING is the only state. There is no mapping from old states to
+     colours or words — the old branches are gone. Progress lives in
+     evidence, next, and sub, never in a state word. */
+  function wrapText(str, maxChars) {
+    var words = String(str).split(/\s+/), lines = [""], li = 0;
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (lines[li] && (lines[li] + " " + w).length > maxChars) { li++; lines[li] = ""; }
+      lines[li] = lines[li] ? lines[li] + " " + w : w;
+    }
+    return lines;
+  }
+  /* Connected gates: the entry's own links plus every entry that links to it. */
+  function connected(id) {
+    var out = [], seen = {};
+    var g = byId(id);
+    if (g && g.links) {
+      for (var i = 0; i < g.links.length; i++) {
+        if (!seen[g.links[i]] && byId(g.links[i])) { seen[g.links[i]] = 1; out.push(g.links[i]); }
+      }
+    }
+    for (var j = 0; j < FIELD.length; j++) {
+      var o = FIELD[j];
+      if (o.id !== id && o.links && o.links.indexOf(id) !== -1 && !seen[o.id]) { seen[o.id] = 1; out.push(o.id); }
+    }
+    return out;
+  }
+  function nodeCentre(g) { return { x: g.gx + (g.nw || NODE_W) / 2, y: g.gy + (g.nh || NODE_H) / 2 }; }
+  function coreCentre() { return { x: CORE.x + CORE.w / 2, y: CORE.y + CORE.h / 2 }; }
+
+  /* ---- render: the SVG picture, from FIELD ---- */
+  var svg = $("fieldSvg");
+  var world = $("world");
+  var viewport = $("viewport");
+  var gateEls = {};
+  var edgeEls = [];
+
+  function renderField() {
+    var i, r, g, regionGates, rows, h;
+    for (i = 0; i < REGIONS.length; i++) {
+      r = REGIONS[i];
+      regionGates = [];
+      for (var j = 0; j < FIELD.length; j++) {
+        /* Pinned gates (the Promise Gate) stand outside the grid, at the top. */
+        if (FIELD[j].region === r.id && !FIELD[j].hidden && !FIELD[j].pin) { regionGates.push(FIELD[j]); }
+      }
+      rows = Math.ceil(regionGates.length / 2);
+      h = REGION_HEAD + rows * (NODE_H + NODE_GAP_Y) + 16;
+      r.h = h;
+      r.count = regionGates.length;
+      for (var k = 0; k < regionGates.length; k++) {
+        g = regionGates[k];
+        var col = k % 2, row = Math.floor(k / 2);
+        g.gx = r.x + 16 + col * (NODE_W + NODE_GAP_X);
+        g.gy = r.y + REGION_HEAD + 8 + row * (NODE_H + NODE_GAP_Y);
+        g.nw = NODE_W; g.nh = NODE_H;
+      }
+      /* Pinned gates take their pinned place, not a grid slot. Bottom-pinned
+         gates (the destination) are placed after maxBottom is known. */
+      for (var m = 0; m < FIELD.length; m++) {
+        if (FIELD[m].region === r.id && FIELD[m].pin && !FIELD[m].pin.bottom && !FIELD[m].hidden) {
+          FIELD[m].gx = FIELD[m].pin.x; FIELD[m].gy = FIELD[m].pin.y;
+          FIELD[m].nw = FIELD[m].pin.w; FIELD[m].nh = FIELD[m].pin.h;
+        }
+      }
+    }
+    var maxBottom = 0;
+    for (i = 0; i < REGIONS.length; i++) { maxBottom = Math.max(maxBottom, REGIONS[i].y + REGIONS[i].h); }
+    /* The destination gate stands below every region: the place the whole
+       picture leads to. */
+    for (i = 0; i < FIELD.length; i++) {
+      if (FIELD[i].pin && FIELD[i].pin.bottom && !FIELD[i].hidden) {
+        FIELD[i].gx = FIELD[i].pin.x;
+        FIELD[i].gy = maxBottom + 24;
+        FIELD[i].nw = FIELD[i].pin.w; FIELD[i].nh = FIELD[i].pin.h;
+        maxBottom = Math.max(maxBottom, FIELD[i].gy + FIELD[i].nh);
+      }
+    }
+    var worldH = maxBottom + 40;
+    world.style.width = "2620px";
+    world.style.height = worldH + "px";
+    svg.setAttribute("width", "2620");
+    svg.setAttribute("height", String(worldH));
+    svg.setAttribute("viewBox", "0 0 2620 " + worldH);
+
+    renderCore();
+    renderPanels();
+    for (i = 0; i < REGIONS.length; i++) { renderZone(REGIONS[i]); }
+    renderEdges();
+    for (i = 0; i < FIELD.length; i++) {
+      if (!FIELD[i].hidden) { renderNode(FIELD[i], i); }
+    }
+    renderLoopRing();
+    renderPackets();
+  }
+
+  /* ---- the living panels: pacer heartbeat + loop ring counter ----
+     Both count this page's own live run: the pace meter counts milliseconds
+     since this page loaded (multiplier growing with time, as on the
+     advancement-gates page); the loop counter counts the loops this page
+     has walked. Both are real counts of the animation itself. */
+  var paceMs = 121, paceMult = 1.00, loopCount = 0, loopIdx = -1;
+  var paceMsEl = null, paceMultEl = null, loopCountEl = null, loopGateEl = null, loopRingEl = null;
+  function tickPace() {
+    paceMs += 7;
+    paceMult = 1 + (paceMs - 121) / 60000;
+    if (paceMsEl) { paceMsEl.textContent = paceMs.toLocaleString("en-US") + " ms"; }
+    if (paceMultEl) { paceMultEl.textContent = "×" + paceMult.toFixed(2); }
+  }
+  function renderPanels() {
+    var p = svgEl("g", { "class": "panel", "aria-label": "Pacer — the pace of the work, counting since this page loaded" });
+    p.appendChild(svgEl("rect", { x: 40, y: 24, width: 420, height: 120, rx: 6, "class": "panel-box" }));
+    p.appendChild(svgText(56, 52, "panel-title", "PACER — THE PACE OF THE WORK"));
+    p.appendChild(svgEl("polyline", { points: "56,82 76,82 86,66 96,94 106,74 116,82 200,82 210,66 220,94 230,74 240,82 320,82", "class": "heartbeat-line" }));
+    paceMsEl = svgText(56, 116, "panel-big", "121 ms");
+    paceMultEl = svgText(300, 116, "panel-mult", "×1.00");
+    p.appendChild(paceMsEl);
+    p.appendChild(paceMultEl);
+    p.appendChild(svgText(56, 136, "panel-small", "counting since this page loaded — the pace only rises"));
+    svg.appendChild(p);
+
+    var l = svgEl("g", { "class": "panel", "aria-label": "Loop — the ring walks gate to gate and never closes" });
+    l.appendChild(svgEl("rect", { x: 2160, y: 24, width: 420, height: 120, rx: 6, "class": "panel-box" }));
+    l.appendChild(svgText(2176, 52, "panel-title", "LOOP — THE RING WALKS"));
+    loopCountEl = svgText(2176, 84, "panel-big", "loop 0");
+    loopGateEl = svgText(2176, 108, "panel-small", "at: —");
+    l.appendChild(loopCountEl);
+    l.appendChild(loopGateEl);
+    l.appendChild(svgText(2176, 130, "panel-small", "gate to gate — it never closes · dots on the lines = work flowing"));
+    svg.appendChild(l);
+  }
+  function visibleNodes() {
+    var out = [];
+    for (var i = 0; i < FIELD.length; i++) { if (!FIELD[i].hidden) { out.push(FIELD[i]); } }
+    return out;
+  }
+  function renderLoopRing() {
+    loopRingEl = svgEl("rect", { x: -100, y: -100, width: 10, height: 10, rx: 8, "class": "loop-ring", "id": "loopRing" });
+    svg.appendChild(loopRingEl);
+    stepLoop();
+  }
+  function stepLoop() {
+    var nodes = visibleNodes();
+    if (!nodes.length || !loopRingEl) { return; }
+    loopIdx = (loopIdx + 1) % nodes.length;
+    var g = nodes[loopIdx];
+    loopCount++;
+    loopRingEl.setAttribute("x", g.gx - 12);
+    loopRingEl.setAttribute("y", g.gy - 12);
+    loopRingEl.setAttribute("width", (g.nw || NODE_W) + 24);
+    loopRingEl.setAttribute("height", (g.nh || NODE_H) + 24);
+    if (loopCountEl) { loopCountEl.textContent = "loop " + loopCount; }
+    if (loopGateEl) { loopGateEl.textContent = "at: " + g.name; }
+  }
+  /* Work flowing: small shapes travelling along the real connections. */
+  var packets = [];
+  function renderPackets() {
+    var edges = [];
+    for (var i = 0; i < edgeEls.length; i++) {
+      var e = edgeEls[i];
+      edges.push({
+        x1: +e.getAttribute("x1"), y1: +e.getAttribute("y1"),
+        x2: +e.getAttribute("x2"), y2: +e.getAttribute("y2")
+      });
+    }
+    if (!edges.length) { return; }
+    for (var k = 0; k < 12; k++) {
+      var c = svgEl("circle", { r: 4, "class": "packet" });
+      svg.appendChild(c);
+      packets.push({ el: c, edge: (k * 7) % edges.length, t: (k % 10) / 10, speed: 0.004 + (k % 5) * 0.0015, edges: edges });
+    }
+    stepPackets();
+  }
+  function stepPackets() {
+    for (var i = 0; i < packets.length; i++) {
+      var p = packets[i];
+      p.t += p.speed;
+      if (p.t > 1) { p.t = 0; p.edge = (p.edge + 3) % p.edges.length; }
+      var e = p.edges[p.edge];
+      p.el.setAttribute("cx", e.x1 + (e.x2 - e.x1) * p.t);
+      p.el.setAttribute("cy", e.y1 + (e.y2 - e.y1) * p.t);
+    }
+  }
+
+  function renderCore() {
+    var g = svgEl("g", { "id": "coreNode", "class": "node", tabindex: "0", role: "button", "aria-label": "Hami — the network of gates is Hami. Activate to reset the view." });
+    g.appendChild(svgEl("rect", { x: CORE.x, y: CORE.y, width: CORE.w, height: CORE.h, rx: 8, "class": "core-box" }));
+    g.appendChild(svgText(CORE.x + CORE.w / 2, CORE.y + 34, "core-name", "HAMI — हामी", "middle"));
+    g.appendChild(svgText(CORE.x + CORE.w / 2, CORE.y + 58, "core-sub", "the network of gates IS Hami", "middle"));
+    g.addEventListener("click", function () { if (suppressClick) { return; } resetView(); });
+    g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); resetView(); } });
+    svg.appendChild(g);
+    gateEls.hami = g;
+    svg.appendChild(svgText(1310, 196, "prime-text", "NEVER REPLICATE OR COPY ANYTHING", "middle"));
+    svg.appendChild(svgText(1310, 218, "prime-sub", "the prime gate — everything generated from within", "middle"));
+  }
+
+  function renderZone(r) {
+    var g = svgEl("g", { "class": "zone", "aria-label": r.title });
+    g.appendChild(svgEl("rect", { x: r.x, y: r.y, width: r.w, height: r.h, rx: 6, "class": "zone-box" }));
+    g.appendChild(svgEl("rect", { x: r.x, y: r.y, width: r.w, height: 4, "class": "zone-top" }));
+    g.appendChild(svgText(r.x + 16, r.y + 30, "zone-title", r.title));
+    var subLines = wrapText(r.sub, 96).slice(0, 2);
+    for (var i = 0; i < subLines.length; i++) {
+      g.appendChild(svgText(r.x + 16, r.y + 52 + i * 18, "zone-sub", subLines[i]));
+    }
+    g.appendChild(svgText(r.x + r.w - 16, r.y + 30, "zone-count", r.count + " pillar" + (r.count === 1 ? "" : "s"), "end"));
+    svg.appendChild(g);
+  }
+
+  function edgeKey(a, b) { return a < b ? a + "|" + b : b + "|" + a; }
+  function renderEdges() {
+    var seen = {}, pairs = [];
+    var i, j, a, b;
+    function addPair(x, y) {
+      if (!x || !y || x === y) { return; }
+      var k = edgeKey(x, y);
+      if (seen[k]) { return; }
+      seen[k] = 1;
+      pairs.push([x, y]);
+    }
+    /* The 8 public gates link to the HAMI core node. */
+    var core8 = ["m6h", "sfteval", "chat", "rs0", "g007", "term", "ledger", "gatespage"];
+    for (i = 0; i < core8.length; i++) { addPair("hami", core8[i]); }
+    for (i = 0; i < FIELD.length; i++) {
+      var g = FIELD[i];
+      if (g.hidden || !g.links) { continue; }
+      for (j = 0; j < g.links.length; j++) { addPair(g.id, g.links[j]); }
+    }
+    for (i = 0; i < pairs.length; i++) {
+      a = pairs[i][0]; b = pairs[i][1];
+      var pa = a === "hami" ? coreCentre() : nodeCentre(byId(a));
+      var pb = b === "hami" ? coreCentre() : nodeCentre(byId(b));
+      if (!pa || !pb || !byId(b) && b !== "hami") { continue; }
+      if (a !== "hami" && !byId(a)) { continue; }
+      var line = svgEl("line", {
+        x1: pa.x, y1: pa.y, x2: pb.x, y2: pb.y,
+        "class": "edge" + ((a === "promise" || b === "promise") ? " edge-promise" : "") + ((a === "mapgate" || b === "mapgate") ? " edge-map" : ""), "data-a": a, "data-b": b
+      });
+      line.setAttribute("aria-label", "connection between " + a + " and " + b);
+      (function (aa, bb, ln) {
+        ln.addEventListener("click", function () {
+          if (suppressClick) { return; }
+          highlightEdge(aa, bb);
+          openDetail(bb);
+        });
+      })(a, b, line);
+      svg.appendChild(line);
+      edgeEls.push(line);
+    }
+  }
+
+  function renderNode(g, idx) {
+    var nw = g.nw || NODE_W, nh = g.nh || NODE_H;
+    var grp = svgEl("g", {
+      "id": "gate-" + g.id, "class": "node running" + (g.private ? " private" : ""),
+      tabindex: "0", role: "button", "data-gate-id": g.id,
+      "aria-label": g.name + " — RUNNING"
+    });
+    grp.appendChild(svgEl("rect", { x: g.gx, y: g.gy, width: nw, height: nh, rx: 6, "class": "node-box" }));
+    grp.appendChild(svgEl("rect", { x: g.gx, y: g.gy, width: nw, height: nh, rx: 6, "class": "node-box-pulse" }));
+    grp.appendChild(svgEl("rect", { x: g.gx, y: g.gy + 6, width: 5, height: nh - 12, "class": "node-bar" }));
+    grp.appendChild(svgText(g.gx + 16, g.gy + 20, "node-num node-label", g.num));
+    /* The gate's door: it opens and closes as work passes through —
+       the gate cycle GATE → SUBGATE → LEAD, lived, not written. */
+    var doorH = Math.min(40, nh - 16);
+    var door = svgEl("rect", {
+      x: g.gx + nw - 16, y: g.gy + (nh - doorH) / 2, width: 8, height: doorH, rx: 2, "class": "gate-door"
+    });
+    door.style.animationDelay = ((idx * 137) % 1200) + "ms";
+    grp.appendChild(door);
+    /* The Improvement Gate's upgrade shimmer rises over its own gate. */
+    if (g.id === "improve") {
+      grp.appendChild(svgEl("rect", { x: g.gx + 16, y: g.gy + nh - 24, width: nw - 32, height: 4, rx: 2, "class": "upgrade-shimmer" }));
+    }
+    /* The Weight Space Programming Gate: the weights lighting up as Hami —
+       the gates programming the weight space, block by block. */
+    if (g.id === "wsp") {
+      for (var wb = 0; wb < 6; wb++) {
+        var block = svgEl("rect", {
+          x: g.gx + nw - 16 - (6 - wb) * 12, y: g.gy + nh - 18, width: 8, height: 8, rx: 1, "class": "weight-block"
+        });
+        block.style.animationDelay = (wb * 200) + "ms";
+        grp.appendChild(block);
+      }
+    }
+    /* The succession, inside the destination gate: Muse (Lead now) hands
+       the seat to Hami AI (Lead next); the gates + all data flow into it.
+       Hami AI is being built now — the Lead seat is the destination it
+       steps into, not a seat it already holds. */
+    if (g.id === "leadeng") {
+      var flowX = g.gx + (nw - 454) / 2;
+      var chipY = g.gy + 54;
+      var leftChip = svgEl("rect", { x: flowX, y: chipY, width: 170, height: 30, rx: 6, "class": "succession-chip" });
+      grp.appendChild(leftChip);
+      grp.appendChild(svgText(flowX + 85, chipY + 20, "succession-label", "Muse — Lead now", "middle"));
+      grp.appendChild(svgText(flowX + 202, chipY + 22, "succession-arrow", "→", "middle"));
+      var rightChip = svgEl("rect", { x: flowX + 234, y: chipY, width: 220, height: 30, rx: 6, "class": "succession-chip succession-next" });
+      grp.appendChild(rightChip);
+      grp.appendChild(svgText(flowX + 344, chipY + 20, "succession-label", "Hami AI — Lead next", "middle"));
+      grp.appendChild(svgEl("circle", { cx: flowX + 180, cy: chipY + 15, r: 4, "class": "handover-dot" }));
+      grp.appendChild(svgText(g.gx + nw / 2, g.gy + 106, "succession-sub", "gates + all data → Hami AI", "middle"));
+      grp.appendChild(svgText(g.gx + nw / 2, g.gy + 124, "succession-sub", "stage 2 building now · stage 3 hami builds", "middle"));
+    }
+    var maxChars = Math.max(18, Math.floor((nw - 48) / 7.5));
+    var nameLines = wrapText(g.name, maxChars).slice(0, 2);
+    for (var i = 0; i < nameLines.length; i++) {
+      grp.appendChild(svgText(g.gx + 16, g.gy + 42 + i * 20, "node-name node-label", nameLines[i]));
+    }
+    grp.appendChild(svgEl("circle", { cx: g.gx + 22, cy: g.gy + nh - 18, r: 5, "class": "run-dot" }));
+    grp.appendChild(svgText(g.gx + 34, g.gy + nh - 14, "run-label", "RUNNING"));
+    if (g.progress) {
+      var barW = nw - 32, fillW = Math.round(barW * g.progress.done / g.progress.total);
+      grp.appendChild(svgEl("rect", { x: g.gx + 16, y: g.gy + nh - 9, width: barW, height: 5, rx: 2.5, "class": "node-progress-bg" }));
+      grp.appendChild(svgEl("rect", { x: g.gx + 16, y: g.gy + nh - 9, width: fillW, height: 5, rx: 2.5, "class": "node-progress-fill" }));
+      var pl = svgText(g.gx + nw - 16, g.gy + nh - 13, "node-progress-label", g.progress.done + "/" + g.progress.total, "end");
+      pl.setAttribute("aria-label", g.progress.label + ": " + g.progress.done + " of " + g.progress.total);
+      grp.appendChild(pl);
+    }
+    if (g.private) {
+      var lock = svgEl("g", { "class": "node-lock" });
+      lock.appendChild(svgEl("rect", { x: g.gx + nw - 34, y: g.gy + nh - 26, width: 18, height: 14, rx: 2, "class": "node-lock-mark" }));
+      lock.appendChild(svgEl("path", { d: "M " + (g.gx + nw - 30) + " " + (g.gy + nh - 26) + " v -4 a 5 5 0 0 1 10 0 v 4", fill: "none", stroke: "#f2a33a", "stroke-width": 2, "class": "node-lock-mark" }));
+      lock.appendChild(svgText(g.gx + nw - 40, g.gy + nh - 32, "node-lock-text", "LOCKED", "end"));
+      grp.appendChild(lock);
+    }
+    grp.addEventListener("click", function () {
+      if (suppressClick) { return; }
+      openDetail(g.id);
+    });
+    grp.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(g.id); }
+    });
+    svg.appendChild(grp);
+    gateEls[g.id] = grp;
+  }
+
+  /* ---- pan + zoom ---- */
+  var view = { x: 0, y: 0, k: 1 };
+  var suppressClick = false;
+
+  function applyView() {
+    world.style.transform = "translate(" + view.x + "px," + view.y + "px) scale(" + view.k + ")";
+  }
+  function vpSize() {
+    var w = viewport.clientWidth || 800, h = viewport.clientHeight || 600;
+    return { w: w, h: h };
+  }
+  function zoomAt(cx, cy, factor) {
+    var k2 = Math.min(3, Math.max(0.25, view.k * factor));
+    var f = k2 / view.k;
+    view.x = cx - (cx - view.x) * f;
+    view.y = cy - (cy - view.y) * f;
+    view.k = k2;
+    applyView();
+  }
+  function zoomCenter(factor) {
+    var s = vpSize();
+    zoomAt(s.w / 2, s.h / 2, factor);
+  }
+  function panTo(wx, wy, k) {
+    var s = vpSize();
+    view.k = k || view.k;
+    view.x = s.w / 2 - wx * view.k;
+    view.y = s.h / 2 - wy * view.k;
+    applyView();
+  }
+  function panToGate(id, k) {
+    if (id === "hami") { panTo(coreCentre().x, coreCentre().y, k || 1); return; }
+    var g = byId(id);
+    if (!g) { return; }
+    var c = nodeCentre(g);
+    panTo(c.x, c.y, k || 1);
+  }
+  function panToRegion(id) {
+    var r = regionById(id);
+    if (!r) { return; }
+    panTo(r.x + r.w / 2, r.y + (r.h || 300) / 2, 0.8);
+  }
+  function resetView() {
+    /* Mutate, never reassign: window.__hamiField.view holds this object. */
+    view.x = 0; view.y = 0; view.k = 1;
+    applyView();
+  }
+
+  var pointers = {};
+  var drag = null;
+  viewport.addEventListener("pointerdown", function (e) {
+    pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+    if (Object.keys(pointers).length === 2) { drag = null; return; }
+    drag = { sx: e.clientX, sy: e.clientY, vx: view.x, vy: view.y, moved: false, pid: e.pointerId };
+    viewport.classList.add("dragging");
+    if (viewport.setPointerCapture) { try { viewport.setPointerCapture(e.pointerId); } catch (err) { /* no capture */ } }
+  });
+  viewport.addEventListener("pointermove", function (e) {
+    if (!pointers[e.pointerId]) { return; }
+    var prev = pointers[e.pointerId];
+    pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(pointers);
+    if (ids.length === 2) {
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      var d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (viewport._pinchD && d > 0) { zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / viewport._pinchD); }
+      viewport._pinchD = d;
+      return;
+    }
+    if (!drag || drag.pid !== e.pointerId) { return; }
+    var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (Math.abs(dx) + Math.abs(dy) > 6) { drag.moved = true; }
+    view.x = drag.vx + dx;
+    view.y = drag.vy + dy;
+    applyView();
+    void prev;
+  });
+  function endPointer(e) {
+    delete pointers[e.pointerId];
+    viewport._pinchD = null;
+    if (drag && drag.pid === e.pointerId) {
+      viewport.classList.remove("dragging");
+      if (drag.moved) {
+        suppressClick = true;
+        setTimeout(function () { suppressClick = false; }, 50);
+      }
+      drag = null;
+    }
+  }
+  viewport.addEventListener("pointerup", endPointer);
+  viewport.addEventListener("pointercancel", endPointer);
+  viewport.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    var rect = viewport.getBoundingClientRect();
+    zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY < 0 ? 1.12 : 1 / 1.12);
+  }, { passive: false });
+
+  /* ---- highlights: a gate's connections light up with it ---- */
+  function clearHighlights() {
+    var lit = svg.querySelectorAll(".edge.lit");
+    for (var i = 0; i < lit.length; i++) { lit[i].classList.remove("lit"); }
+    var linked = svg.querySelectorAll(".node.linked, .node.selected");
+    for (var j = 0; j < linked.length; j++) { linked[j].classList.remove("linked"); linked[j].classList.remove("selected"); }
+  }
+  function highlightGate(id) {
+    clearHighlights();
+    var me = gateEls[id];
+    if (me) { me.classList.add("selected"); }
+    var conns = connected(id);
+    for (var i = 0; i < edgeEls.length; i++) {
+      var e = edgeEls[i];
+      if (e.getAttribute("data-a") === id || e.getAttribute("data-b") === id) { e.classList.add("lit"); }
+    }
+    for (var j = 0; j < conns.length; j++) {
+      var n = gateEls[conns[j]];
+      if (n) { n.classList.add("linked"); }
+    }
+  }
+  function highlightEdge(a, b) {
+    clearHighlights();
+    for (var i = 0; i < edgeEls.length; i++) {
+      var e = edgeEls[i];
+      if ((e.getAttribute("data-a") === a && e.getAttribute("data-b") === b) ||
+          (e.getAttribute("data-a") === b && e.getAttribute("data-b") === a)) { e.classList.add("lit"); }
+    }
+    if (gateEls[a]) { gateEls[a].classList.add("linked"); }
+    if (gateEls[b]) { gateEls[b].classList.add("linked"); }
+  }
+
+  /* ---- detail drawer ----
+     PUBLIC: plain-words name + one plain-words line + connected gates only.
+     OWNER: everything — what, why, evidence, subgates, the next step the
+     result opened, date, owner. */
+  var detail = $("detail");
+  var currentGate = null;
+  function openDetail(id) {
+    var g = byId(id);
+    if (!g) { return; }
+    currentGate = id;
+    $("detailNum").textContent = g.num + " · " + g.region.toUpperCase();
+    var nameEl = $("detailName");
+    nameEl.textContent = g.name;
+    nameEl.classList.toggle("blur-zone", !!g.private && !ownerKey);
+    var plainEl = $("detailPlain");
+    plainEl.textContent = g.plain;
+    plainEl.classList.toggle("blur-zone", !!g.private && !ownerKey);
+    if (ownerKey) {
+      $("detailFull").removeAttribute("hidden");
+      $("detailWhat").textContent = g.what;
+      $("detailWhy").textContent = g.why;
+      $("detailEvidence").textContent = g.evidence;
+      var subs = $("detailSubs");
+      subs.innerHTML = "";
+      if (!g.sub || g.sub.length === 0) {
+        subs.appendChild(el("li", null, "No subgates recorded."));
+      } else {
+        for (var i = 0; i < g.sub.length; i++) {
+          var li = el("li");
+          li.appendChild(el("span", "k", g.sub[i].t + " — RUNNING"));
+          li.appendChild(document.createTextNode(": " + g.sub[i].e));
+          subs.appendChild(li);
+        }
+      }
+      $("detailNext").textContent = g.next || "UNKNOWN";
+      $("detailMeta").textContent = "date: " + g.date + " · owner: " + (g.owner || "UNKNOWN") + (g.private ? " · PRIVATE — name and description only; no value is in this page." : "");
+      $("detailOwnerNote").setAttribute("hidden", "");
+    } else {
+      $("detailFull").setAttribute("hidden", "");
+      $("detailOwnerNote").removeAttribute("hidden");
+    }
+    var linksBox = $("detailLinks");
+    linksBox.innerHTML = "";
+    var conns = connected(id);
+    if (conns.length === 0) {
+      linksBox.appendChild(el("span", "muted", "No connections recorded — UNKNOWN."));
+    } else {
+      for (var j = 0; j < conns.length; j++) {
+        (function (cid) {
+          var cg = byId(cid);
+          var b = el("button", "btn", cg ? cg.name : cid);
+          b.type = "button";
+          b.addEventListener("click", function () {
+            panToGate(cid, 1);
+            openDetail(cid);
+          });
+          linksBox.appendChild(b);
+        })(conns[j]);
+      }
+    }
+    highlightGate(id);
+    detail.removeAttribute("hidden");
+    var bar = detail.querySelector(".detail-bar");
+    if (bar) { bar.style.animation = "none"; void bar.offsetWidth; bar.style.animation = ""; }
+  }
+  function closeDetail() {
+    detail.setAttribute("hidden", "");
+    currentGate = null;
+    clearHighlights();
+  }
+  $("detailClose").addEventListener("click", closeDetail);
+
+  /* ---- toolbar ---- */
+  $("zoomInBtn").addEventListener("click", function () { zoomCenter(1.25); });
+  $("zoomOutBtn").addEventListener("click", function () { zoomCenter(1 / 1.25); });
+  $("zoomResetBtn").addEventListener("click", resetView);
+  var jumpSelect = $("jumpSelect");
+  (function fillJump() {
+    for (var i = 0; i < REGIONS.length; i++) {
+      var o = el("option", null, REGIONS[i].title);
+      o.value = REGIONS[i].id;
+      jumpSelect.appendChild(o);
+    }
+  })();
+  jumpSelect.addEventListener("change", function () {
+    if (jumpSelect.value) { panToRegion(jumpSelect.value); }
+  });
+
+  /* ---- guided tour (the 6-slide deck, folded into the field) ---- */
+  var tour = $("tour");
+  var tourIdx = 0;
+  var tourOpen = false;
+
+  function clearTourTargets() {
+    var marked = svg.querySelectorAll(".node.tour-target");
+    for (var i = 0; i < marked.length; i++) { marked[i].classList.remove("tour-target"); }
+  }
+  function showTourStop(i) {
+    tourIdx = i;
+    var stop = TOUR[i];
+    $("tourCount").textContent = (i + 1) + " / " + TOUR.length;
+    $("tourTitle").textContent = stop.title;
+    $("tourText").textContent = stop.text;
+    $("tourBack").disabled = (i === 0);
+    $("tourNext").textContent = (i === TOUR.length - 1) ? "Finish — ask Hami" : "Next";
+    clearTourTargets();
+    if (stop.targets && stop.targets.length > 0) {
+      var sx = 0, sy = 0, n = 0;
+      for (var j = 0; j < stop.targets.length; j++) {
+        var t = stop.targets[j];
+        var card = gateEls[t];
+        if (card) { card.classList.add("tour-target"); }
+        var c = null;
+        if (t === "hami") { c = coreCentre(); }
+        else { var g = byId(t); if (g) { c = nodeCentre(g); } }
+        if (c) { sx += c.x; sy += c.y; n++; }
+      }
+      if (n > 0) { panTo(sx / n, sy / n, stop.targets.length > 3 ? 0.55 : 1); }
+    }
+    if (stop.focusOwner) {
+      if (ownerKey) { var ci = $("cmdInput"); if (ci && ci.focus) { ci.focus(); } }
+      else { var ki = $("keyInput"); if (ki && ki.focus) { ki.focus(); } }
+    }
+  }
+  function openTour() {
+    tourOpen = true;
+    tour.removeAttribute("hidden");
+    showTourStop(0);
+    $("tourNext").focus();
+  }
+  function closeTour() {
+    tourOpen = false;
+    tour.setAttribute("hidden", "");
+    clearTourTargets();
+  }
+  function nextTour() {
+    if (tourIdx === TOUR.length - 1) {
+      closeTour();
+      if (ownerKey) { var ci = $("cmdInput"); if (ci && ci.focus) { ci.focus(); } }
+    } else { showTourStop(tourIdx + 1); }
+  }
+  function prevTour() { if (tourIdx > 0) { showTourStop(tourIdx - 1); } }
+  $("tourBtn").addEventListener("click", openTour);
+  $("tourClose").addEventListener("click", closeTour);
+  $("tourBack").addEventListener("click", prevTour);
+  $("tourNext").addEventListener("click", nextTour);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closeDetail(); if (tourOpen) { closeTour(); } }
+    else if (tourOpen && e.key === "ArrowRight") { nextTour(); }
+    else if (tourOpen && e.key === "ArrowLeft") { prevTour(); }
+  });
+
+  /* ---- owner mode + owner command ----
+     The key lives ONLY in this variable, in memory. It is never written to
+     localStorage or sessionStorage, never written to any file, never logged.
+     It is sent only as the X-API-Key header on owner command POSTs. */
+  var ownerKey = null;
+  var cmdHistory = [];
+  var keyInput = $("keyInput"), ownerStatus = $("ownerStatus"),
+      cmdSection = $("cmdSection"), cmdInput = $("cmdInput"),
+      cmdLog = $("cmdLog"), cmdSendBtn = $("cmdSendBtn");
+
+  function setOwnerStatus() {
+    if (ownerKey) {
+      ownerStatus.innerHTML = '<span class="on">owner mode: ON — full detail + private names visible for this session. Key held only in memory; leave owner mode or close the page to drop it.</span>';
+    } else {
+      ownerStatus.innerHTML = '<span class="off">owner mode: OFF — public view: plain-words picture only. Full detail + private names unlock with your key.</span>';
+    }
+  }
+  function enterOwner() {
+    var v = keyInput.value;
+    if (!v || !v.trim()) {
+      ownerStatus.innerHTML = '<span class="off">enter your Hami API key first.</span>';
+      return false;
+    }
+    ownerKey = v.trim();
+    keyInput.value = "";
+    document.body.classList.add("owner-on");
+    cmdSection.removeAttribute("hidden");
+    $("enterOwnerBtn").setAttribute("hidden", "");
+    $("leaveOwnerBtn").removeAttribute("hidden");
+    setOwnerStatus();
+    if (currentGate) { openDetail(currentGate); }
+    return true;
+  }
+  function leaveOwner() {
+    ownerKey = null;
+    cmdHistory = [];
+    document.body.classList.remove("owner-on");
+    cmdSection.setAttribute("hidden", "");
+    $("enterOwnerBtn").removeAttribute("hidden");
+    $("leaveOwnerBtn").setAttribute("hidden", "");
+    cmdLog.innerHTML = "";
+    setOwnerStatus();
+    if (currentGate) { openDetail(currentGate); }
+  }
+  $("enterOwnerBtn").addEventListener("click", enterOwner);
+  $("leaveOwnerBtn").addEventListener("click", leaveOwner);
+  keyInput.addEventListener("keydown", function (e) { if (e.key === "Enter") { enterOwner(); } });
+
+  function cmdLine(text, cls) {
+    var p = el("p", cls || "", text);
+    cmdLog.appendChild(p);
+    cmdLog.scrollTop = cmdLog.scrollHeight;
+  }
+  function sendOwnerCommand() {
+    if (!ownerKey) {
+      cmdLine("enter your Hami API key first — the command needs owner mode.", "cmd-muted");
+      return;
+    }
+    var text = cmdInput.value.trim();
+    if (!text) { return; }
+    cmdInput.value = "";
+    cmdSendBtn.disabled = true;
+    cmdInput.disabled = true;
+    cmdLine("[owner command] " + text, "cmd-mark");
+    cmdLine("… hami is thinking (via the Hami engine)", "cmd-muted");
+    var ctrl = null, timer = null;
+    if (typeof AbortController !== "undefined") {
+      ctrl = new AbortController();
+      timer = setTimeout(function () { ctrl.abort(); }, 90000);
+    }
+    if (typeof fetch === "undefined") {
+      if (timer) { clearTimeout(timer); }
+      cmdLine("gate: CLOSED — this page cannot reach the network here.", "cmd-muted");
+      cmdSendBtn.disabled = false; cmdInput.disabled = false;
+      return;
+    }
+    var payload = { message: "[owner command] " + text, history: cmdHistory.slice(-MAX_HISTORY) };
+    fetch(HAMI_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-API-Key": ownerKey },
+      body: JSON.stringify(payload),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (res) { return res.json(); }).then(function (data) {
+      if (timer) { clearTimeout(timer); }
+      var reply = data && (data.reply || data.detail || data.message);
+      if (reply) {
+        cmdLine(String(reply), "cmd-hami");
+        cmdHistory.push({ role: "user", content: text }, { role: "assistant", content: String(reply) });
+        cmdHistory = cmdHistory.slice(-MAX_HISTORY);
+      } else {
+        cmdLine("gate: CLOSED — hami engine returned no reply", "cmd-muted");
+        cmdLine("hami is unreachable — the Mac tunnel may be down. Try again in a moment.", "cmd-muted");
+      }
+    }).catch(function () {
+      if (timer) { clearTimeout(timer); }
+      cmdLine("gate: CLOSED — hami engine unreachable", "cmd-muted");
+      cmdLine("hami is unreachable — the Mac tunnel may be down. Try again in a moment.", "cmd-muted");
+    }).then(function () {
+      cmdSendBtn.disabled = false;
+      cmdInput.disabled = false;
+      cmdInput.focus();
+    });
+  }
+  cmdSendBtn.addEventListener("click", sendOwnerCommand);
+  cmdInput.addEventListener("keydown", function (e) { if (e.key === "Enter") { sendOwnerCommand(); } });
+
+  /* ---- init ---- */
+  renderField();
+  applyView();
+  resetView();
+  /* The scene keeps moving: the pace climbs, the loop walks, the work flows. */
+  if (typeof setInterval !== "undefined") {
+    setInterval(tickPace, 100);
+    setInterval(stepLoop, 2000);
+    setInterval(stepPackets, 50);
+  }
+
+  /* Test handle: the smoke test drives the field through this. Not a UI
+     feature — it only exposes the same functions the buttons call. */
+  window.__hamiField = {
+    FIELD: FIELD, REGIONS: REGIONS, TOUR: TOUR,
+    view: view, gateEls: gateEls, edgeEls: edgeEls,
+    openDetail: openDetail, closeDetail: closeDetail,
+    showTourStop: showTourStop, openTour: openTour, closeTour: closeTour,
+    nextTour: nextTour, prevTour: prevTour,
+    enterOwner: enterOwner, leaveOwner: leaveOwner,
+    sendOwnerCommand: sendOwnerCommand,
+    panToGate: panToGate, panToRegion: panToRegion, resetView: resetView,
+    zoomCenter: zoomCenter, connected: connected,
+    tickPace: tickPace, stepLoop: stepLoop, stepPackets: stepPackets,
+    paceMs: function () { return paceMs; },
+    paceMult: function () { return paceMult; },
+    loopCount: function () { return loopCount; },
+    packetCount: function () { return packets.length; },
+    ownerOn: function () { return !!ownerKey; },
+    currentGate: function () { return currentGate; },
+    tourIndex: function () { return tourIdx; },
+    tourIsOpen: function () { return tourOpen; },
+    cmdHistoryLength: function () { return cmdHistory.length; }
+  };
+})();
+</script>
+</body>
+</html>

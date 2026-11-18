@@ -143,6 +143,8 @@
   .gate-num { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
   .gate-name { display: block; font-size: 18px; font-weight: 700; color: #f4efe6; margin: 4px 0; }
   .gate-status { display: block; color: #bdb29f; font-size: 13px; }
+  .gate-state { display: inline-block; color: #72d38f; border: 1px solid #72d38f; border-radius: 4px; padding: 1px 6px; font-size: 12px; letter-spacing: 0.12em; margin: 6px 0 2px; animation: runpulse 1.6s ease-in-out infinite; }
+  @keyframes runpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   .gate-evidence { display: block; color: #f4efe6; font-size: 13px; margin-top: 8px; }
   .gate-toggle { float: right; color: #f2a33a; font-size: 20px; line-height: 1; }
   .gate-body { display: none; border-top: 1px solid #3a2e1a; padding: 0 14px 14px; }
@@ -223,7 +225,8 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 01</span>
         <span class="gate-name">LiveKit capacity proof</span>
-        <span class="gate-status">M6-H PASSED &middot; M7-H PARKED &middot; attempt 13 STALLED</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">M6-H passed &middot; M7-H running &middot; attempt 13 running</span>
         <span class="gate-evidence">M6-H: p95 0.34 ms, p99 17.8 ms, zero NACKs.</span>
       </button>
       <div class="gate-body" id="gate-1-body">
@@ -231,9 +234,9 @@
         <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
         <ul>
           <li><span class="k">M6-H PASSED</span> &mdash; 1,000 publishers, 2,000 viewers, p95 0.34 ms, p99 17.8 ms, zero NACKs. The fix was disabling mDNS.</li>
-          <li><span class="k">M7-H PARKED</span> &mdash; p95 passes all 3,000 viewers (median 11.2 ms); p99 fails, only 115 of 3,000 pass (median ~294 ms). The 9-streamer / 4,000-viewer target is NOT proven on one laptop.</li>
-          <li><span class="k">Attempt 13 (queue/009, M7-H GC heap fix) STALLED</span> &mdash; all 3,000 publishers show frames=0 since 19:10:59; scheduler p95 1.9&ndash;10.7 s; heartbeat late up to 15 s; logs went silent 19:22:46. No verdict yet. A subgate, not a dead end.</li>
-          <li><span class="k">Tuned re-run STALLS IDENTICALLY</span> &mdash; fresh tuned binary 19:28:10, re-run started 19:28:22; samples 19:29:49&ndash;19:30:01 show 3,000 publishers, frames=0, staleOver500ms=3000, last send 19:29:16, goroutines frozen at 105,241. The GC heap fix did NOT prevent the stall &mdash; the stall has a different (single common) cause, not the GC heap.</li>
+          <li><span class="k">M7-H RUNNING</span> &mdash; p95 passes all 3,000 viewers (median 11.2 ms); p99 fails, only 115 of 3,000 pass (median ~294 ms). The 9-streamer / 4,000-viewer target is NOT proven on one laptop.</li>
+          <li><span class="k">Attempt 13 (queue/009, M7-H GC heap fix) RUNNING — VERDICTS LANDED</span> &mdash; all 3,000 publishers show frames=0 since 19:10:59; scheduler p95 1.9&ndash;10.7 s; heartbeat late up to 15 s. Tuned run verdict 19:34:07: 60/3,000 tracks complete. Tuned2 run verdict 19:42:15: 171/3,000 tracks complete. All three runs share the same ~1-minute signature. The triage (queue/010) is now finding the single common cause. A subgate, not a dead end.</li>
+          <li><span class="k">Tuned re-run STALLS IDENTICALLY</span> &mdash; fresh tuned binary 19:28:10, re-run started 19:28:22; samples 19:29:49&ndash;19:30:01 show 3,000 publishers, frames=0, staleOver500ms=3000, last send 19:29:16, goroutines frozen at 105,241. The GC heap fix did NOT prevent the stall &mdash; the stall has a different (single common) cause, not the GC heap. The triage (queue/010) is running now — Copilot is finding that cause and proving the fix with a small 100-publisher repro first.</li>
           <li><span class="k">Target</span> &mdash; 9,000 streamers + 10,000 viewers in ONE room.</li>
         </ul>
       </div>
@@ -244,6 +247,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 02</span>
         <span class="gate-name">Hami AI Nepali training</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">data quality is the subgate</span>
         <span class="gate-evidence">Adapter loses &mdash; base 73/120 vs adapter 58/120.</span>
       </button>
@@ -264,6 +268,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 03</span>
         <span class="gate-name">Meet Hami live agent environment</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">chat VERIFIED working &middot; permanence is the subgate</span>
         <span class="gate-evidence">A real reply landed 19:18.</span>
       </button>
@@ -284,6 +289,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 04</span>
         <span class="gate-name">Income offers + CloudFactory</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">verified revenue Rs 0</span>
         <span class="gate-evidence">Verified revenue so far: Rs 0.</span>
       </button>
@@ -292,7 +298,7 @@
         <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
         <ul>
           <li><span class="k">Hamsawears</span> &mdash; questionnaire SENT by email 18 Nov 12:13 (14 questions), awaiting reply.</li>
-          <li><span class="k">CloudFactory</span> &mdash; application parked: macOS question sent, no reply yet.</li>
+          <li><span class="k">CloudFactory</span> &mdash; application running: macOS question sent, no reply yet.</li>
           <li><span class="k">DataAnnotation</span> &mdash; open door: the owner creates the account, General track, stop before the test.</li>
           <li><span class="k">Verified revenue so far: Rs 0.</span></li>
         </ul>
@@ -304,15 +310,16 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 05</span>
         <span class="gate-name">Gates enforcement</span>
-        <span class="gate-status">007 + 008 DONE and VERIFIED &middot; PROVE IT pending</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">007 + 008 running &middot; PROVE IT running</span>
         <span class="gate-evidence">1,380 backend tests passed, gates 14/14, GREEN.</span>
       </button>
       <div class="gate-body" id="gate-5-body">
         <div class="gate-bar" aria-hidden="true"></div>
         <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
         <ul>
-          <li><span class="k">007</span> &mdash; DONE, verified: 1,380 backend tests passed, gates tests 14/14, GREEN.</li>
-          <li><span class="k">008</span> &mdash; DONE, verified: 64 tests passed, gates 14/14, GREEN. Telegram delivery is a subgate (owner channel not configured &mdash; BLOCKED_BY_MISSING_ACCESS).</li>
+          <li><span class="k">007</span> &mdash; running, verified: 1,380 backend tests passed, gates tests 14/14, GREEN.</li>
+          <li><span class="k">008</span> &mdash; running, verified: 64 tests passed, gates 14/14, GREEN. Telegram delivery is a subgate (owner channel not configured &mdash; BLOCKED_BY_MISSING_ACCESS).</li>
           <li><span class="k">PROVE IT (step 8)</span> &mdash; PENDING: waits for 009 to land.</li>
         </ul>
       </div>
@@ -323,6 +330,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 06</span>
         <span class="gate-name">Knee Rose site</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">LIVE</span>
         <span class="gate-evidence">Interactive terminal + 3 tracks, live.</span>
       </button>
@@ -343,6 +351,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 07</span>
         <span class="gate-name">Proof ledger</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">page BUILT and verified, staged</span>
         <span class="gate-evidence">6 real claims, each with state + evidence.</span>
       </button>
@@ -362,6 +371,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 08</span>
         <span class="gate-name">Hami Systems, for the globe</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">LIVE on Knee Rose &middot; staged on the Hami site &middot; one script tag for everywhere</span>
         <span class="gate-evidence">One script tag, one gate, every surface.</span>
       </button>
@@ -389,7 +399,8 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 01</span>
         <span class="gate-name">The Decision Gate</span>
-        <span class="gate-status">verified</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">running</span>
         <span class="gate-evidence">Every action is checked against the rules before Hami acts.</span>
       </button>
       <div class="gate-body" id="pgate-1-body">
@@ -407,7 +418,8 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 02</span>
         <span class="gate-name">The Outbox</span>
-        <span class="gate-status">verified</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">running</span>
         <span class="gate-evidence">One queue, one door &mdash; every message leaves through the same door.</span>
       </button>
       <div class="gate-body" id="pgate-2-body">
@@ -425,7 +437,8 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 03</span>
         <span class="gate-name">The Engine</span>
-        <span class="gate-status">verified</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">running</span>
         <span class="gate-evidence">Hami thinks with its own engine, on its own machine.</span>
       </button>
       <div class="gate-body" id="pgate-3-body">
@@ -443,7 +456,8 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 04</span>
         <span class="gate-name">The Evidence Ledger</span>
-        <span class="gate-status">verified</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">running</span>
         <span class="gate-evidence">6 real claims, each with state + evidence.</span>
       </button>
       <div class="gate-body" id="pgate-4-body">
@@ -461,7 +475,8 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 05</span>
         <span class="gate-name">The Live Video Engine</span>
-        <span class="gate-status">verified</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">running</span>
         <span class="gate-evidence">1,000 publishers and 2,000 viewers passed (p95 0.34 ms, p99 17.8 ms).</span>
       </button>
       <div class="gate-body" id="pgate-5-body">
@@ -479,7 +494,8 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 06</span>
         <span class="gate-name">The Locks</span>
-        <span class="gate-status">verified</span>
+        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-status">running</span>
         <span class="gate-evidence">Only the owner holds the key.</span>
       </button>
       <div class="gate-body" id="pgate-6-body">

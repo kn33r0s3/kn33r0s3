@@ -178,6 +178,8 @@
   .gate-num { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
   .gate-name { display: block; font-size: 18px; font-weight: 700; color: #f4efe6; margin: 4px 0; }
   .gate-status { display: block; color: #bdb29f; font-size: 13px; }
+  .gate-state { display: inline-block; color: #72d38f; border: 1px solid #72d38f; border-radius: 4px; padding: 1px 6px; font-size: 12px; letter-spacing: 0.12em; margin: 6px 0 2px; animation: runpulse 1.6s ease-in-out infinite; }
+  @keyframes runpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   .gate-evidence { display: block; color: #f4efe6; font-size: 13px; margin-top: 8px; }
   .gate-toggle { float: right; color: #f2a33a; font-size: 20px; line-height: 1; }
   .gate-body { display: none; border-top: 1px solid #3a2e1a; padding: 0 14px 14px; }
@@ -338,6 +340,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">STEP 01</span>
         <span class="gate-name">The Gate &mdash; the situation</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">the task, the problem, the context you enter</span>
         <span class="gate-evidence">A gate is an order placed on an agent.</span>
       </button>
@@ -358,6 +361,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">STEP 02</span>
         <span class="gate-name">The Subgate &mdash; the outcome</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">whatever blocker or achievement results</span>
         <span class="gate-evidence">A subgate is never an end. It is a record, with evidence.</span>
       </button>
@@ -378,6 +382,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">STEP 03</span>
         <span class="gate-name">The Lead &mdash; the new work</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every subgate opens new work</span>
         <span class="gate-evidence">A blocker is a lead. An achievement is a lead.</span>
       </button>
@@ -408,6 +413,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">TIP GATE &mdash; MANDATORY</span>
         <span class="gate-name">The progress-demanding gate</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">always set to the future &middot; never met &middot; always advancing</span>
         <span class="gate-evidence">The gate is the future. The future is never reached. The work never stops.</span>
       </button>
@@ -467,6 +473,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 01</span>
         <span class="gate-name">Log everything</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">written the moment it happens, with its evidence</span>
       </button>
       <div class="gate-body" id="helper-1-body">
@@ -481,6 +488,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 02</span>
         <span class="gate-name">Summarize and finalize the next move</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">no outcome is left without a next step</span>
       </button>
       <div class="gate-body" id="helper-2-body">
@@ -495,6 +503,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 03</span>
         <span class="gate-name">Advance every time</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every step moves the work forward</span>
       </button>
       <div class="gate-body" id="helper-3-body">
@@ -509,6 +518,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 04</span>
         <span class="gate-name">Speed at peak</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">zero gap between a finished step and the next order</span>
       </button>
       <div class="gate-body" id="helper-4-body">
@@ -523,6 +533,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 05</span>
         <span class="gate-name">Never start from square one</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every new gate starts from what is already known</span>
       </button>
       <div class="gate-body" id="helper-5-body">
@@ -537,6 +548,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 06 &mdash; THE KEY RULE</span>
         <span class="gate-name">Advancement multiplies with time</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">never flat, never decreasing, no matter what</span>
         <span class="gate-evidence">The rate is a multiplier. It grows as time passes and knowledge accumulates.</span>
       </button>
@@ -552,6 +564,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 07</span>
         <span class="gate-name">Verify from evidence</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">no claim without proof</span>
       </button>
       <div class="gate-body" id="helper-7-body">
@@ -566,6 +579,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 08</span>
         <span class="gate-name">Nothing dormant</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">every line used, displayed, doing what it ought to do</span>
       </button>
       <div class="gate-body" id="helper-8-body">
@@ -580,6 +594,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 09 &mdash; THE PRIME GATE</span>
         <span class="gate-name">Never copy</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">unchangeable &middot; unshakable &middot; above all</span>
         <span class="gate-evidence">NEVER REPLICATE OR COPY ANYTHING.</span>
       </button>
@@ -595,6 +610,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 10</span>
         <span class="gate-name">Never lose track</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">missing is not an option</span>
       </button>
       <div class="gate-body" id="helper-10-body">
@@ -617,6 +633,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">SUBJECTED GATE &mdash; MUSE</span>
         <span class="gate-name">Better all projects and all gates, always</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">upgrading all things &middot; whilst doing what it does too</span>
         <span class="gate-evidence">Owner: Muse (Lead). Every solution is not perfect. Everything has space for upgrades.</span>
       </button>
@@ -645,6 +662,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 01 &mdash; GATE 009</span>
         <span class="gate-name">M7-H GC heap fix</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">three identical stalls &middot; one finished verdict</span>
         <span class="gate-evidence">Owner: Copilot. Tuned2 run: 171/3,000 tracks complete; all 6,000 connections died.</span>
       </button>
@@ -664,6 +682,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 02 &mdash; HOME SITE</span>
         <span class="gate-name">Everything accessible from the public home site</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">built + verified &middot; deploy is the lead</span>
         <span class="gate-evidence">Owner: builder. Explore Hami: 49,156 B, 1,306 lines, TSC_OK, Vite build OK.</span>
       </button>
@@ -683,6 +702,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 03 &mdash; THE REBASE</span>
         <span class="gate-name">Deploy the pile</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">push rejected &middot; one conflict &middot; resolve and push</span>
         <span class="gate-evidence">Owner: Muse (Lead). Conflict: docs/CAPABILITY_QUEUE.md. Autostash: d2fd87a0.</span>
       </button>
@@ -702,6 +722,7 @@
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 04 &mdash; THIS PAGE</span>
         <span class="gate-name">The AI engineering gates</span>
+        <span class="gate-state">state: RUNNING</span>
         <span class="gate-status">built from within &middot; the next creation</span>
         <span class="gate-evidence">Owner: builder. This page + the written doc, verified by smoke test.</span>
       </button>
