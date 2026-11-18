@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hami — the methodology of one gate</title>
+<style>
+  * { box-sizing: border-box; }
+  html { background: #0c0b0a; }
+  body {
+    margin: 0;
+    background: #0c0b0a;
+    color: #f4efe6;
+    font-family: ui-monospace, "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  a { color: #f2a33a; }
+  a:visited { color: #f2a33a; }
+  .method { max-width: 1020px; margin: 0 auto; padding: 28px 18px 40px; }
+
+  /* ---- central HAMI node ---- */
+  .core { text-align: center; padding: 10px 0 0; }
+  .core-ne {
+    margin: 0;
+    font-size: 20px;
+    color: #f2a33a;
+    letter-spacing: 0.35em;
+  }
+  .core-name {
+    margin: 2px 0 0;
+    font-family: "UnifrakturCook", "Old English Text MT", "Blackletter", "Times New Roman", serif;
+    font-size: 64px;
+    line-height: 1;
+    color: #f2a33a;
+  }
+  .core-tag { margin: 10px auto 0; max-width: 640px; color: #f4efe6; }
+  .core-gate {
+    display: inline-block;
+    margin: 14px 0 0;
+    padding: 6px 12px;
+    border: 1px solid #f2a33a;
+    border-radius: 6px;
+    color: #f2a33a;
+    font-size: 13px;
+  }
+  .spine { width: 2px; height: 28px; background: #f2a33a; margin: 0 auto; }
+  .bus { height: 2px; background: #f2a33a; margin: 0 auto 26px; }
+
+  /* ---- terminal strip ---- */
+  .term-window {
+    border: 1px solid #3a2e1a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    overflow: hidden;
+    margin: 0 0 22px;
+  }
+  .term-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #3a2e1a;
+    color: #bdb29f;
+    font-size: 13px;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; background: #f2a33a; display: inline-block; }
+  .term-title { flex: 1; }
+  .term-body { padding: 12px 14px; }
+  .term-line { margin: 0 0 4px; }
+  .term-prompt { color: #f2a33a; }
+  .term-cursor {
+    display: inline-block;
+    width: 9px;
+    height: 16px;
+    background: #72d38f;
+    vertical-align: text-bottom;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .term-out { color: #f4efe6; margin: 0; }
+
+  /* ---- prime gate ---- */
+  .prime {
+    border: 2px solid #f2a33a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    padding: 22px 18px;
+    margin: 0 0 26px;
+    text-align: center;
+  }
+  .prime-label {
+    margin: 0;
+    color: #f2a33a;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+  }
+  .prime-statement {
+    margin: 10px 0 0;
+    font-size: 26px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: #f2a33a;
+  }
+  .prime-sub {
+    margin: 12px auto 0;
+    max-width: 680px;
+    color: #f4efe6;
+  }
+  .prime-gate {
+    margin: 14px 0 0;
+    color: #f2a33a;
+    font-size: 13px;
+  }
+
+  /* ---- section headings ---- */
+  .section-head {
+    margin: 30px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f2a33a;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #f2a33a;
+  }
+  .section-head p { margin: 6px 0 0; color: #bdb29f; font-size: 13px; }
+
+  /* ---- controls ---- */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+  }
+  .controls button {
+    font: inherit;
+    font-size: 13px;
+    background: #0c0b0a;
+    color: #f2a33a;
+    border: 1px solid #f2a33a;
+    border-radius: 6px;
+    padding: 7px 12px;
+    cursor: pointer;
+  }
+  .controls button:hover, .controls button:focus-visible {
+    background: #f2a33a;
+    color: #0c0b0a;
+    outline: none;
+  }
+  .controls .count { color: #bdb29f; font-size: 13px; margin-left: auto; }
+
+  /* ---- dimensions ---- */
+  .dims {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 720px) {
+    .dims { grid-template-columns: 1fr; }
+  }
+  .dim {
+    border: 1px solid #3a2e1a;
+    border-top: 2px solid #f2a33a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    overflow: hidden;
+  }
+  .dim-head {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    background: none;
+    border: 0;
+    color: #f4efe6;
+    padding: 14px 14px 12px;
+    cursor: pointer;
+  }
+  .dim-head:hover, .dim-head:focus-visible {
+    background: #1c1812;
+    outline: 2px solid #f2a33a;
+    outline-offset: -2px;
+  }
+  .dim-num { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
+  .dim-name { display: block; font-size: 18px; font-weight: 700; color: #f4efe6; margin: 4px 0; }
+  .dim-status { display: block; color: #bdb29f; font-size: 13px; }
+  .dim-toggle { float: right; color: #f2a33a; font-size: 20px; line-height: 1; }
+  .dim-body { display: none; border-top: 1px solid #3a2e1a; padding: 0 14px 14px; }
+  .dim.open .dim-body { display: block; }
+  .dim-bar { height: 2px; background: #f2a33a; width: 100%; margin: 0 0 10px; }
+  .dim.open .dim-bar { animation: sweep 0.6s linear; }
+  @keyframes sweep { from { width: 0; } to { width: 100%; } }
+  .dim-line { color: #f2a33a; font-size: 13px; margin: 10px 0 8px; }
+  .dim-body p { margin: 0 0 10px; }
+  .dim-body p:last-child { margin-bottom: 0; }
+  .dim-body .k { color: #f2a33a; }
+  .dim-body .check { border-top: 1px solid #3a2e1a; padding-top: 10px; }
+
+  /* ---- network + track lists ---- */
+  .net-list, .track-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .net-list li, .track-list li {
+    border: 1px solid #3a2e1a;
+    border-top: 2px solid #f2a33a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    padding: 12px 14px;
+    margin: 0 0 12px;
+  }
+  .net-list li:last-child, .track-list li:last-child { margin-bottom: 0; }
+  .net-list .k, .track-list .k { color: #f2a33a; }
+  .net-list .to, .track-list .recheck { display: block; color: #bdb29f; font-size: 13px; margin-top: 4px; }
+  .track-list .state { display: block; color: #f4efe6; font-size: 13px; margin-top: 4px; }
+
+  /* ---- footer ---- */
+  footer {
+    margin-top: 30px;
+    border-top: 2px solid #f2a33a;
+    padding-top: 16px;
+    color: #bdb29f;
+    font-size: 13px;
+  }
+  footer p { margin: 0 0 6px; }
+  footer .note { color: #f4efe6; }
+</style>
+</head>
+<body>
+<main class="method">
+
+  <header class="core">
+    <p class="core-ne" lang="ne">हामी</p>
+    <h1 class="core-name">Hami</h1>
+    <p class="core-tag">one methodology &mdash; universal, dimensional, spiritual &mdash; made from the gate</p>
+    <p class="core-gate">gate: OPEN &mdash; one gate &middot; never copied &middot; serving the globe</p>
+  </header>
+  <div class="spine" aria-hidden="true"></div>
+  <div class="bus" aria-hidden="true"></div>
+
+  <section class="term-window" aria-label="Hami methodology terminal">
+    <div class="term-titlebar"><span class="term-dot" aria-hidden="true"></span><span class="term-title">niroj@hami: ~</span></div>
+    <div class="term-body">
+      <p class="term-line"><span class="term-prompt">$</span> hami methodology --all <span class="term-cursor" aria-hidden="true"></span></p>
+      <p class="term-out">one gate &mdash; never copied, always networked, always tracked.</p>
+    </div>
+  </section>
+
+  <section class="prime" aria-label="The prime gate">
+    <p class="prime-label">THE PRIME GATE &mdash; UNCHANGEABLE &middot; UNSHAKABLE</p>
+    <p class="prime-statement">NEVER REPLICATE OR COPY ANYTHING.</p>
+    <p class="prime-sub">Everything Hami makes is generated from within &mdash; from the gate, from first principles, from nothingness and inner power. Nothing is taken from elsewhere. Nothing is reproduced. If it was seen outside, it is seen &mdash; and then it is made again from within, or not made at all. This gate does not move for convenience, for speed, or for anyone.</p>
+    <p class="prime-gate">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+  </section>
+
+  <div class="section-head">
+    <h2>The six dimensions</h2>
+    <p>One methodology, six layers. Each layer is a real layer of how a visual is made and checked. Click a dimension to open it.</p>
+  </div>
+
+  <div class="controls">
+    <button id="expandAll" type="button">expand all</button>
+    <button id="collapseAll" type="button">collapse all</button>
+    <span class="count">6 dimensions &middot; click a dimension to open its meaning and its check</span>
+  </div>
+
+  <section class="dims" aria-label="The six dimensions">
+
+    <article class="dim" id="dim-1">
+      <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-1-body">
+        <span class="dim-toggle" aria-hidden="true">+</span>
+        <span class="dim-num">DIMENSION 01</span>
+        <span class="dim-name">The Gate</span>
+        <span class="dim-status">the prime &middot; one gate &middot; every visual passes through it</span>
+      </button>
+      <div class="dim-body" id="dim-1-body">
+        <div class="dim-bar" aria-hidden="true"></div>
+        <p class="dim-line">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+        <p>One gate. Every visual, every design, every word passes through it. The gate asks one question: did this come from within? If any part was taken from elsewhere &mdash; a design, a style, a framework, a phrase &mdash; it does not pass.</p>
+        <p>The gate is unchangeable and unshakable. It does not move for convenience, for speed, or for anyone. A gate that moves is not a gate.</p>
+        <p class="check"><span class="k">How it is checked:</span> before anything goes live, it is read against the gate. A visual that carries anything copied is sent back through the gate until it is its own.</p>
+      </div>
+    </article>
+
+    <article class="dim" id="dim-2">
+      <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-2-body">
+        <span class="dim-toggle" aria-hidden="true">+</span>
+        <span class="dim-num">DIMENSION 02</span>
+        <span class="dim-name">Nothingness / Inner Power</span>
+        <span class="dim-status">generate from within &middot; from first principles &middot; from our own measurements</span>
+      </button>
+      <div class="dim-body" id="dim-2-body">
+        <div class="dim-bar" aria-hidden="true"></div>
+        <p class="dim-line">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+        <p>Nothingness is starting from zero and generating from inside, from first principles, from our own measurements. Inner power is the same thing from the other side: the power is already inside the gate; it is not borrowed from outside.</p>
+        <p>The web, ChatGPT, LiveKit, Ollama, and every other system are for SEEING. They show us what exists, so we can measure against it. They are never for following or copying.</p>
+        <p class="check"><span class="k">How it is checked:</span> the work begins with nothing and with the gate&rsquo;s own measurements. If the first line of a design came from outside, it is not nothingness; it is started again from within.</p>
+      </div>
+    </article>
+
+    <article class="dim" id="dim-3">
+      <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-3-body">
+        <span class="dim-toggle" aria-hidden="true">+</span>
+        <span class="dim-num">DIMENSION 03</span>
+        <span class="dim-name">The Visual</span>
+        <span class="dim-status">the look IS the gate made visible</span>
+      </button>
+      <div class="dim-body" id="dim-3-body">
+        <div class="dim-bar" aria-hidden="true"></div>
+        <p class="dim-line">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+        <p>Amber #f2a33a on black #0c0b0a. Monospace. The gated design: every piece of work prints a gate line first, and a 2px amber gate bar sweeps when a gate opens. The terminal. Devanagari-first headings. The blackletter wordmark.</p>
+        <p>The look is not decoration on top of the gate. The look IS the gate, in a form the eye can read. When you see amber on black, a gate line, and a terminal prompt, you are looking at the gate itself.</p>
+        <p class="check"><span class="k">How it is checked:</span> every visual carries the same tokens. A visual that does not carry them is not a Hami visual, and it is brought back to the gate.</p>
+      </div>
+    </article>
+
+    <article class="dim" id="dim-4">
+      <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-4-body">
+        <span class="dim-toggle" aria-hidden="true">+</span>
+        <span class="dim-num">DIMENSION 04</span>
+        <span class="dim-name">The Network</span>
+        <span class="dim-status">Hami networks all gates &middot; nothing is lost</span>
+      </button>
+      <div class="dim-body" id="dim-4-body">
+        <div class="dim-bar" aria-hidden="true"></div>
+        <p class="dim-line">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+        <p>Hami networks all gates. Every gate is connected to every other gate. A gate is never alone, and a visual is never alone: each one is a node in the network, and the network holds it.</p>
+        <p>Nothing is lost, because the network remembers every gate, every subgate, every minigate, every tiny gate. Missing is not an option.</p>
+        <p class="check"><span class="k">How it is checked:</span> every gate names its connections. A gate with no connection is a lost gate &mdash; and a lost gate is not left; it is reconnected.</p>
+      </div>
+    </article>
+
+    <article class="dim" id="dim-5">
+      <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-5-body">
+        <span class="dim-toggle" aria-hidden="true">+</span>
+        <span class="dim-num">DIMENSION 05</span>
+        <span class="dim-name">The Track</span>
+        <span class="dim-status">beginning to end &middot; checkable again and again</span>
+      </button>
+      <div class="dim-body" id="dim-5-body">
+        <div class="dim-bar" aria-hidden="true"></div>
+        <p class="dim-line">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+        <p>Every visual has a track: from its first idea, through its build, through its verification, to its live state &mdash; and back again, because the track is re-run whenever the visual is touched.</p>
+        <p>The work keeps going and the track keeps going with it. A track that stops is a visual that can no longer be checked, and a visual that cannot be checked cannot be trusted.</p>
+        <p class="check"><span class="k">How it is checked:</span> any visual can be traced from beginning to end at any time, and re-checked. The map, the ledger, the terminal, Hami Systems &mdash; each one has a live state and a way to check it again. The track below is the real one.</p>
+      </div>
+    </article>
+
+    <article class="dim" id="dim-6">
+      <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-6-body">
+        <span class="dim-toggle" aria-hidden="true">+</span>
+        <span class="dim-num">DIMENSION 06</span>
+        <span class="dim-name">The Spiritual</span>
+        <span class="dim-status">the meaning &middot; the design serves the people</span>
+      </button>
+      <div class="dim-body" id="dim-6-body">
+        <div class="dim-bar" aria-hidden="true"></div>
+        <p class="dim-line">gate: OPEN &mdash; evidence: from within &middot; authorization: public</p>
+        <p>The design serves the people: the Nepali people first, and the globe through them. One Hami, serving all.</p>
+        <p>The gate is not decoration; it is the philosophy made visible. A visual that carries no meaning carries nothing. The amber is not a colour choice; it is the gate, lit. The terminal is not a style; it is the work, speaking plainly.</p>
+        <p class="check"><span class="k">How it is checked:</span> every visual is asked &ldquo;who does this serve?&rdquo; If it serves no one, it does not pass the gate.</p>
+      </div>
+    </article>
+
+  </section>
+
+  <div class="section-head">
+    <h2>The network &mdash; all gates connected</h2>
+    <p>Every gate names its connections. Nothing is lost. The methodology itself connects to all of them &mdash; it is the way they are all made.</p>
+  </div>
+
+  <ul class="net-list" aria-label="How all gates connect">
+    <li><span class="k">Gate 01 &mdash; LiveKit capacity proof</span> connects to the ledger (its numbers are claims), the map (it is a gate on the map), and the track (M6-H, M7-H, attempt 13).<span class="to">to: ledger &middot; map &middot; track</span></li>
+    <li><span class="k">Gate 02 &mdash; Hami AI Nepali training</span> connects to the ledger (the SFT-EVAL claim), the map, and the track.<span class="to">to: ledger &middot; map &middot; track</span></li>
+    <li><span class="k">Gate 03 &mdash; Meet Hami live agent environment</span> connects to Hami Systems (the pop-up is the surface), the terminal (the hami command), and the map.<span class="to">to: Hami Systems &middot; terminal &middot; map</span></li>
+    <li><span class="k">Gate 04 &mdash; Income offers + CloudFactory</span> connects to the ledger (the RS-0 claim) and the map.<span class="to">to: ledger &middot; map</span></li>
+    <li><span class="k">Gate 05 &mdash; Gates enforcement</span> connects to every gate (it guards them all), the ledger, and the map.<span class="to">to: all gates &middot; ledger &middot; map</span></li>
+    <li><span class="k">Gate 06 &mdash; Knee Rose site</span> connects to the terminal, Hami Systems, the map, and this methodology (this page lives here).<span class="to">to: terminal &middot; Hami Systems &middot; map &middot; methodology</span></li>
+    <li><span class="k">Gate 07 &mdash; Proof ledger</span> connects to every gate (it holds their claims), the map, and the track.<span class="to">to: all gates &middot; map &middot; track</span></li>
+    <li><span class="k">Gate 08 &mdash; Hami Systems, for the globe</span> connects to every gate (it delivers them all), the map, and the terminal.<span class="to">to: all gates &middot; map &middot; terminal</span></li>
+    <li><span class="k">This methodology</span> connects to all of them &mdash; it is the way they are all made, and the way they are all checked.<span class="to">to: all gates &middot; map &middot; ledger &middot; terminal &middot; Hami Systems</span></li>
+  </ul>
+
+  <div class="section-head">
+    <h2>The track &mdash; beginning to end, checkable again and again</h2>
+    <p>The real track. Each entry has a live state and a way to check it again. The work keeps going and the track keeps going with it.</p>
+  </div>
+
+  <ul class="track-list" aria-label="The real track, beginning to end">
+    <li><span class="k">The map &mdash; hami-systems-map.html</span><span class="state">Live on Knee Rose, verified live 18 Nov 2026. One Hami, 8 gates, every subgate a path.</span><span class="recheck">Re-check: open the live page, click a gate, read its gate line.</span></li>
+    <li><span class="k">The ledger &mdash; src/routes/ledger.tsx</span><span class="state">Built and verified (6,658 B, 185 lines, typecheck OK, Vite build OK), staged, deploys with the next ForgeOS push.</span><span class="recheck">Re-check: typecheck + Vite build, then open /ledger live.</span></li>
+    <li><span class="k">The terminal &mdash; kn33r0s3.vercel.app</span><span class="state">Live, verified live. A real terminal with 3 music tracks and a cursor that follows the text.</span><span class="recheck">Re-check: open the site, type help, play a track.</span></li>
+    <li><span class="k">Hami Systems &mdash; hami-systems.js</span><span class="state">Live on Knee Rose, staged on the Hami site. One script tag, one gate, every surface.</span><span class="recheck">Re-check: open the pop-up, ask a question, read the gate line.</span></li>
+    <li><span class="k">The methodology &mdash; this page</span><span class="state">Live on Knee Rose, staged on the Hami site. The prime gate, the six dimensions, the network, the track.</span><span class="recheck">Re-check: open the live page, expand a dimension, read its gate line.</span></li>
+  </ul>
+
+  <footer>
+    <p>last updated 18 Nov 2026</p>
+    <p class="note">Generated from within. Nothing replicated, nothing copied.</p>
+    <p>homes: <a href="https://kn33r0s3.vercel.app">kn33r0s3.vercel.app</a> &middot; <a href="https://hami-sigma.vercel.app">hami-sigma.vercel.app</a></p>
+  </footer>
+
+</main>
+<script>
+(function () {
+  var dims = document.querySelectorAll(".dim");
+  function setDim(dim, open) {
+    var head = dim.querySelector(".dim-head");
+    var mark = dim.querySelector(".dim-toggle");
+    if (open) {
+      dim.classList.add("open");
+      head.setAttribute("aria-expanded", "true");
+      mark.textContent = "\u2212";
+    } else {
+      dim.classList.remove("open");
+      head.setAttribute("aria-expanded", "false");
+      mark.textContent = "+";
+    }
+  }
+  function eachDim(fn) {
+    Array.prototype.forEach.call(dims, fn);
+  }
+  eachDim(function (dim) {
+    dim.querySelector(".dim-head").addEventListener("click", function () {
+      setDim(dim, !dim.classList.contains("open"));
+    });
+  });
+  document.getElementById("expandAll").addEventListener("click", function () {
+    eachDim(function (dim) { setDim(dim, true); });
+  });
+  document.getElementById("collapseAll").addEventListener("click", function () {
+    eachDim(function (dim) { setDim(dim, false); });
+  });
+})();
+</script>
+</body>
+</html>
