@@ -3008,7 +3008,9 @@
     if (Object.keys(pointers).length === 2) { drag = null; return; }
     drag = { sx: e.clientX, sy: e.clientY, vx: view.x, vy: view.y, moved: false, pid: e.pointerId };
     viewport.classList.add("dragging");
-    if (viewport.setPointerCapture) { try { viewport.setPointerCapture(e.pointerId); } catch (err) { /* no capture */ } }
+    /* No pointer capture here: capturing on pointerdown retargets the
+       click to the viewport, so a gate's click handler never fires.
+       Capture is set only once a real drag starts (see pointermove). */
   });
   viewport.addEventListener("pointermove", function (e) {
     if (!pointers[e.pointerId]) { return; }
@@ -3024,7 +3026,14 @@
     }
     if (!drag || drag.pid !== e.pointerId) { return; }
     var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
-    if (Math.abs(dx) + Math.abs(dy) > 6) { drag.moved = true; }
+    if (Math.abs(dx) + Math.abs(dy) > 10) {
+      if (!drag.moved) {
+        drag.moved = true;
+        /* Real drag started: capture now so panning stays smooth. A tap
+           or click never reaches here, so its click still fires on the gate. */
+        if (viewport.setPointerCapture) { try { viewport.setPointerCapture(e.pointerId); } catch (err) { /* no capture */ } }
+      }
+    }
     view.x = drag.vx + dx;
     view.y = drag.vy + dy;
     viewIsFit = false;
