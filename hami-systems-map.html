@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hami Systems — the map of one Hami</title>
+<style>
+  * { box-sizing: border-box; }
+  html { background: #0c0b0a; }
+  body {
+    margin: 0;
+    background: #0c0b0a;
+    color: #f4efe6;
+    font-family: ui-monospace, "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  a { color: #f2a33a; }
+  a:visited { color: #f2a33a; }
+  .map { max-width: 1020px; margin: 0 auto; padding: 28px 18px 40px; }
+
+  /* ---- central HAMI node ---- */
+  .core { text-align: center; padding: 10px 0 0; }
+  .core-ne {
+    margin: 0;
+    font-size: 20px;
+    color: #f2a33a;
+    letter-spacing: 0.35em;
+  }
+  .core-name {
+    margin: 2px 0 0;
+    font-family: "UnifrakturCook", "Old English Text MT", "Blackletter", "Times New Roman", serif;
+    font-size: 64px;
+    line-height: 1;
+    color: #f2a33a;
+  }
+  .core-tag { margin: 10px auto 0; max-width: 640px; color: #f4efe6; }
+  .core-gate {
+    display: inline-block;
+    margin: 14px 0 0;
+    padding: 6px 12px;
+    border: 1px solid #f2a33a;
+    border-radius: 6px;
+    color: #f2a33a;
+    font-size: 13px;
+  }
+  .spine { width: 2px; height: 28px; background: #f2a33a; margin: 0 auto; }
+  .bus { height: 2px; background: #f2a33a; margin: 0 auto 26px; }
+
+  /* ---- terminal strip ---- */
+  .term-window {
+    border: 1px solid #3a2e1a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    overflow: hidden;
+    margin: 0 0 22px;
+  }
+  .term-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #3a2e1a;
+    color: #bdb29f;
+    font-size: 13px;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; background: #f2a33a; display: inline-block; }
+  .term-title { flex: 1; }
+  .term-body { padding: 12px 14px; }
+  .term-line { margin: 0 0 4px; }
+  .term-prompt { color: #f2a33a; }
+  .term-cursor {
+    display: inline-block;
+    width: 9px;
+    height: 16px;
+    background: #72d38f;
+    vertical-align: text-bottom;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .term-out { color: #f4efe6; margin: 0; }
+
+  /* ---- controls ---- */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+  }
+  .controls button {
+    font: inherit;
+    font-size: 13px;
+    background: #0c0b0a;
+    color: #f2a33a;
+    border: 1px solid #f2a33a;
+    border-radius: 6px;
+    padding: 7px 12px;
+    cursor: pointer;
+  }
+  .controls button:hover, .controls button:focus-visible {
+    background: #f2a33a;
+    color: #0c0b0a;
+    outline: none;
+  }
+  .controls .count { color: #bdb29f; font-size: 13px; margin-left: auto; }
+
+  /* ---- gates ---- */
+  .gates {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 720px) {
+    .gates { grid-template-columns: 1fr; }
+  }
+  .gate {
+    border: 1px solid #3a2e1a;
+    border-top: 2px solid #f2a33a;
+    border-radius: 6px;
+    background: #15130f;
+    box-shadow: 4px 4px 0 #000;
+    overflow: hidden;
+  }
+  .gate-head {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    background: none;
+    border: 0;
+    color: #f4efe6;
+    padding: 14px 14px 12px;
+    cursor: pointer;
+  }
+  .gate-head:hover, .gate-head:focus-visible {
+    background: #1c1812;
+    outline: 2px solid #f2a33a;
+    outline-offset: -2px;
+  }
+  .gate-num { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
+  .gate-name { display: block; font-size: 18px; font-weight: 700; color: #f4efe6; margin: 4px 0; }
+  .gate-status { display: block; color: #bdb29f; font-size: 13px; }
+  .gate-evidence { display: block; color: #f4efe6; font-size: 13px; margin-top: 8px; }
+  .gate-toggle { float: right; color: #f2a33a; font-size: 20px; line-height: 1; }
+  .gate-body { display: none; border-top: 1px solid #3a2e1a; padding: 0 14px 14px; }
+  .gate.open .gate-body { display: block; }
+  .gate-bar { height: 2px; background: #f2a33a; width: 100%; margin: 0 0 10px; }
+  .gate.open .gate-bar { animation: sweep 0.6s linear; }
+  @keyframes sweep { from { width: 0; } to { width: 100%; } }
+  .gate-line { color: #f2a33a; font-size: 13px; margin: 10px 0 8px; }
+  .gate-body ul { margin: 0; padding-left: 18px; }
+  .gate-body li { margin: 0 0 8px; }
+  .gate-body li:last-child { margin-bottom: 0; }
+  .gate-body .k { color: #f2a33a; }
+
+  /* ---- footer ---- */
+  footer {
+    margin-top: 30px;
+    border-top: 2px solid #f2a33a;
+    padding-top: 16px;
+    color: #bdb29f;
+    font-size: 13px;
+  }
+  footer p { margin: 0 0 6px; }
+  footer .note { color: #f4efe6; }
+</style>
+</head>
+<body>
+<main class="map">
+
+  <header class="core">
+    <p class="core-ne" lang="ne">हामी</p>
+    <h1 class="core-name">Hami</h1>
+    <p class="core-tag">one living system for understanding and acting on Nepal&rsquo;s economy</p>
+    <p class="core-gate">gate: OPEN &mdash; one gate &middot; one Hami &middot; serving the globe</p>
+  </header>
+  <div class="spine" aria-hidden="true"></div>
+  <div class="bus" aria-hidden="true"></div>
+
+  <section class="term-window" aria-label="Hami map terminal">
+    <div class="term-titlebar"><span class="term-dot" aria-hidden="true"></span><span class="term-title">niroj@hami: ~</span></div>
+    <div class="term-body">
+      <p class="term-line"><span class="term-prompt">$</span> hami map --all <span class="term-cursor" aria-hidden="true"></span></p>
+      <p class="term-out">one Hami &mdash; 8 gates, every subgate a path.</p>
+    </div>
+  </section>
+
+  <div class="controls">
+    <button id="expandAll" type="button">expand all</button>
+    <button id="collapseAll" type="button">collapse all</button>
+    <span class="count">8 gates &middot; click a gate to open its subgates</span>
+  </div>
+
+  <section class="gates" aria-label="Hami gates">
+
+    <article class="gate" id="gate-1">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-1-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 01</span>
+        <span class="gate-name">LiveKit capacity proof</span>
+        <span class="gate-status">M6-H PASSED &middot; M7-H PARKED &middot; attempt 13 STALLED</span>
+        <span class="gate-evidence">M6-H: p95 0.34 ms, p99 17.8 ms, zero NACKs.</span>
+      </button>
+      <div class="gate-body" id="gate-1-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">M6-H PASSED</span> &mdash; 1,000 publishers, 2,000 viewers, p95 0.34 ms, p99 17.8 ms, zero NACKs. The fix was disabling mDNS.</li>
+          <li><span class="k">M7-H PARKED</span> &mdash; p95 passes all 3,000 viewers (median 11.2 ms); p99 fails, only 115 of 3,000 pass (median ~294 ms). The 9-streamer / 4,000-viewer target is NOT proven on one laptop.</li>
+          <li><span class="k">Attempt 13 (queue/009, M7-H GC heap fix) STALLED</span> &mdash; all 3,000 publishers show frames=0 since 19:10:59; scheduler p95 1.9&ndash;10.7 s; heartbeat late up to 15 s; logs went silent 19:22:46. No verdict yet. A subgate, not a dead end.</li>
+          <li><span class="k">Tuned re-run STALLS IDENTICALLY</span> &mdash; fresh tuned binary 19:28:10, re-run started 19:28:22; samples 19:29:49&ndash;19:30:01 show 3,000 publishers, frames=0, staleOver500ms=3000, last send 19:29:16, goroutines frozen at 105,241. The GC heap fix did NOT prevent the stall &mdash; the stall has a different (single common) cause, not the GC heap.</li>
+          <li><span class="k">Target</span> &mdash; 9,000 streamers + 10,000 viewers in ONE room.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="gate-2">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-2-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 02</span>
+        <span class="gate-name">Hami AI Nepali training</span>
+        <span class="gate-status">data quality is the subgate</span>
+        <span class="gate-evidence">Adapter loses &mdash; base 73/120 vs adapter 58/120.</span>
+      </button>
+      <div class="gate-body" id="gate-2-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">Dataset</span> &mdash; alpaca-nepali-sft, 52,005 rows. Rights resolved: CC BY-NC 4.0, research-only, no commercial use.</li>
+          <li><span class="k">Smoke test</span> &mdash; 500-example MLX LoRA on Qwen3-4B, loss 1.265 &rarr; 0.810.</li>
+          <li><span class="k">Held-out eval</span> &mdash; adapter LOSES: base 73/120 vs adapter 58/120 (20 rows). Data quality is the blocker.</li>
+          <li><span class="k">Lamsal corpus</span> &mdash; BLOCKED on IEEE login (the owner creates a free IEEE account).</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="gate-3">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-3-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 03</span>
+        <span class="gate-name">Meet Hami live agent environment</span>
+        <span class="gate-status">chat VERIFIED working &middot; permanence is the subgate</span>
+        <span class="gate-evidence">A real reply landed 19:18.</span>
+      </button>
+      <div class="gate-body" id="gate-3-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">Hami Systems pop-up</span> &mdash; LIVE on Knee Rose; staged on the Hami site (script tag in the shared layout, deploys with the next ForgeOS push).</li>
+          <li><span class="k">Chat</span> &mdash; VERIFIED: a real reply landed 19:18 (the six primitives, North Star, Purpose). The full path works (Vercel &rarr; tunnel &rarr; gateway &rarr; Ollama).</li>
+          <li><span class="k">Tunnel</span> &mdash; UP and stable. The earlier failure was latency/timeout, not a dead tunnel (fixed: widget waits 90 s, route retries transient 502s).</li>
+          <li><span class="k">Permanence</span> &mdash; BLOCKED on approvals/001: needs the owner&rsquo;s Cloudflare account + zone/hostname for a named tunnel.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="gate-4">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-4-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 04</span>
+        <span class="gate-name">Income offers + CloudFactory</span>
+        <span class="gate-status">verified revenue Rs 0</span>
+        <span class="gate-evidence">Verified revenue so far: Rs 0.</span>
+      </button>
+      <div class="gate-body" id="gate-4-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">Hamsawears</span> &mdash; questionnaire SENT by email 18 Nov 12:13 (14 questions), awaiting reply.</li>
+          <li><span class="k">CloudFactory</span> &mdash; application parked: macOS question sent, no reply yet.</li>
+          <li><span class="k">DataAnnotation</span> &mdash; open door: the owner creates the account, General track, stop before the test.</li>
+          <li><span class="k">Verified revenue so far: Rs 0.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="gate-5">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-5-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 05</span>
+        <span class="gate-name">Gates enforcement</span>
+        <span class="gate-status">007 + 008 DONE and VERIFIED &middot; PROVE IT pending</span>
+        <span class="gate-evidence">1,380 backend tests passed, gates 14/14, GREEN.</span>
+      </button>
+      <div class="gate-body" id="gate-5-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">007</span> &mdash; DONE, verified: 1,380 backend tests passed, gates tests 14/14, GREEN.</li>
+          <li><span class="k">008</span> &mdash; DONE, verified: 64 tests passed, gates 14/14, GREEN. Telegram delivery is a subgate (owner channel not configured &mdash; BLOCKED_BY_MISSING_ACCESS).</li>
+          <li><span class="k">PROVE IT (step 8)</span> &mdash; PENDING: waits for 009 to land.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="gate-6">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-6-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 06</span>
+        <span class="gate-name">Knee Rose site</span>
+        <span class="gate-status">LIVE</span>
+        <span class="gate-evidence">Interactive terminal + 3 tracks, live.</span>
+      </button>
+      <div class="gate-body" id="gate-6-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">Interactive terminal</span> &mdash; LIVE (help, whoami, projects, music, play, hami, about, contact, clear, exit).</li>
+          <li><span class="k">Music</span> &mdash; 3 tracks (Summit, Kanai Huncha Mast, Pilkington Dr 37).</li>
+          <li><span class="k">Cursor</span> &mdash; fixed: green blink sits right after &ldquo;$&rdquo;.</li>
+          <li><span class="k">Hami Systems pop-up</span> &mdash; LIVE on Knee Rose (90 s timeout).</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="gate-7">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-7-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 07</span>
+        <span class="gate-name">Proof ledger</span>
+        <span class="gate-status">page BUILT and verified, staged</span>
+        <span class="gate-evidence">6 real claims, each with state + evidence.</span>
+      </button>
+      <div class="gate-body" id="gate-7-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">Ledger page</span> &mdash; src/routes/ledger.tsx built (6,658 B, 185 lines, typecheck OK, Vite build OK), staged uncommitted, deploys with the next ForgeOS push.</li>
+          <li><span class="k">6 real claims</span> &mdash; EXP-1 proposed, M6-H completed, M7-H-TARGET contradicted, SFT-EVAL completed, A6-KEYS completed, RS-0 completed.</li>
+          <li><span class="k">A claim renders only with state + evidence. Contradicted claims are shown, never hidden.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="gate-8">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-8-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">GATE 08</span>
+        <span class="gate-name">Hami Systems, for the globe</span>
+        <span class="gate-status">LIVE on Knee Rose &middot; staged on the Hami site &middot; one script tag for everywhere</span>
+        <span class="gate-evidence">One script tag, one gate, every surface.</span>
+      </button>
+      <div class="gate-body" id="gate-8-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">One script tag puts the gated Hami pop-up on any site. One Hami backend, one gate, every surface.</span></li>
+          <li><span class="k">The engine is Hami AI (gpt-oss:20b via the gateway + tunnel). The pop-up is what delivers it to the world.</span></li>
+        </ul>
+      </div>
+    </article>
+
+  </section>
+
+  <footer>
+    <p>last updated 18 Nov 2026</p>
+    <p class="note">Every fact on this map is a measured result or an explicit zero. Nothing is invented.</p>
+    <p>homes: <a href="https://kn33r0s3.vercel.app">kn33r0s3.vercel.app</a> &middot; <a href="https://hami-sigma.vercel.app">hami-sigma.vercel.app</a></p>
+  </footer>
+
+</main>
+<script>
+(function () {
+  var gates = document.querySelectorAll(".gate");
+  function setGate(gate, open) {
+    var head = gate.querySelector(".gate-head");
+    var mark = gate.querySelector(".gate-toggle");
+    if (open) {
+      gate.classList.add("open");
+      head.setAttribute("aria-expanded", "true");
+      mark.textContent = "-";
+    } else {
+      gate.classList.remove("open");
+      head.setAttribute("aria-expanded", "false");
+      mark.textContent = "+";
+    }
+  }
+  function forEachGate(fn) {
+    Array.prototype.forEach.call(gates, fn);
+  }
+  forEachGate(function (gate) {
+    var head = gate.querySelector(".gate-head");
+    head.addEventListener("click", function () {
+      setGate(gate, !gate.classList.contains("open"));
+    });
+  });
+  document.getElementById("expandAll").addEventListener("click", function () {
+    forEachGate(function (gate) { setGate(gate, true); });
+  });
+  document.getElementById("collapseAll").addEventListener("click", function () {
+    forEachGate(function (gate) { setGate(gate, false); });
+  });
+})();
+</script>
+</body>
+</html>
