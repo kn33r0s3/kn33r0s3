@@ -414,10 +414,7 @@
           <span class="effort-live">RUNNING &mdash; effort never stops</span>
         </div>
         <p class="effort-rule">Effort is <strong>infinitely increasing</strong>. The endpoint of the effort gate is <strong>infinity</strong>. The effort rate only ever grows &mdash; so <strong>any effort fails this gate</strong>, because no effort can ever match the increasing rate to infinity. The gate is never met. It always demands more. So the work never stops: we keep working, increasing counts of work on all the same works, all over again, plus advancements. And all.</p>
-        <div class="effort-number"><span id="effortNum">129</span> <small>effort units &mdash; and counting, live</small></div>
-        <div class="effort-pace">pace <span id="effortPace">&times;1.00</span> &mdash; it only ever grows</div>
-        <div class="effort-bar" aria-hidden="true"><div class="effort-fill" id="effortFill"></div></div>
-        <p class="effort-counts"><b>129</b> things built and counting &mdash; <b>112</b> gates across the Hami pages (65 field &middot; 14 advancement &middot; 19 AI engineering &middot; 14 map) &middot; <b>3</b> tracks &middot; <b>14</b> terminal commands. The number above starts there and grows with the work: every gate worked on, every command you run, every track you play &mdash; the same works, worked on all over again, plus advancements.</p>
+        <p class="effort-counts"><b>112</b> gates across the Hami pages (65 field &middot; 14 advancement &middot; 19 AI engineering &middot; 14 map) &middot; <b>3</b> tracks &middot; <b>14</b> terminal commands. No number here is a score — the work keeps growing: every gate worked on, every command you run, every track you play &mdash; the same works, worked on all over again, plus advancements.</p>
         <p class="effort-now"><span id="effortNow">65 gates running on the Hami Field.</span></p>
         <div class="effort-river" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       </section>
@@ -887,14 +884,8 @@
 <script>
 (function () {
   "use strict";
-  var num = document.getElementById("effortNum");
-  var pace = document.getElementById("effortPace");
-  var fill = document.getElementById("effortFill");
   var now = document.getElementById("effortNow");
-  if (!num || !pace || !fill || !now) return;
-  var BASE = 129; /* 112 gates + 3 tracks + 14 terminal commands, counted from the pages */
-  var live = 0;
-  var start = Date.now();
+  if (!now) return;
   var NOWS = [
     "65 gates running on the Hami Field.",
     "M6-H measured: p95 0.34 ms, 2,000 viewers, zero NACKs.",
@@ -904,25 +895,7 @@
     "19 gates on the AI engineering page, all RUNNING."
   ];
   var ni = 0;
-  function render() {
-    var total = BASE + live;
-    num.textContent = String(total);
-    var elapsed = (Date.now() - start) / 1000;
-    pace.textContent = "×" + (1 + elapsed / 600).toFixed(2);
-    fill.style.width = (total % 100) + "%";
-  }
-  function addLive(n) { live += (n || 1); render(); }
-  render();
-  setInterval(function () { live += 1; render(); }, 2000);
   setInterval(function () { ni = (ni + 1) % NOWS.length; now.textContent = NOWS[ni]; }, 4000);
-  var bumpSel = "#chips .chip, .track[data-track], .player-btn, .hami-card";
-  var bumpers = document.querySelectorAll(bumpSel);
-  for (var i = 0; i < bumpers.length; i++) {
-    bumpers[i].addEventListener("click", function () { addLive(1); });
-  }
-  var termInput = document.getElementById("termInput");
-  if (termInput) termInput.addEventListener("keydown", function (e) { if (e.key === "Enter") addLive(1); });
-  window.__hamiEffort = { add: addLive, total: function () { return BASE + live; } };
 })();
 </script>
 <script src="https://kn33r0s3.vercel.app/hami-systems.js"></script>
