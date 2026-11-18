@@ -10,10 +10,11 @@
     --bg: #0c0b0a;
     --surface: #15130f;
     --surface-elevated: #1e1a14;
-    --ink: #f4efe6;
+    --ink: #e9e1d2;
     --muted: #bdb29f;
     --border: #3a2e1a;
     --amber: #f2a33a;
+    --amber-soft: #f7c873;
     --green: #72d38f;
     --red: #ff6f6f;
     --wheat: #f5deb3;
@@ -26,12 +27,13 @@
     background: var(--bg);
     color: var(--ink);
     font-family: "Roboto Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    font-size: 0.95rem;
-    line-height: 1.65;
+    font-size: 1rem;
+    line-height: 1.75;
     -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--amber); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  a { color: var(--amber); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--amber-soft); text-decoration-thickness: 2px; }
+  a:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
   .wrap { max-width: 76rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
   .term-window {
     border: 1px solid var(--border);
@@ -73,7 +75,7 @@
   }
   h1 .accent { color: var(--amber); }
   h2 {
-    margin: 2rem 0 0.5rem;
+    margin: 2.75rem 0 0.75rem;
     font-size: 1rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -99,6 +101,46 @@
   }
   .status--live { color: var(--green); border-color: var(--green); }
   .status--wip { color: var(--amber); border-color: var(--amber); }
+  /* --- Hami pages: card grid, unmistakably clickable --- */
+  .hami-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 0.75rem 0 0.5rem;
+  }
+  @media (max-width: 640px) {
+    .hami-cards { grid-template-columns: 1fr; }
+  }
+  .hami-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    background: var(--surface);
+    padding: 0.85rem 1rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .hami-card:hover, .hami-card:focus-visible {
+    border-color: var(--amber);
+    background: var(--surface-elevated);
+    text-decoration: none;
+    outline: none;
+  }
+  .hami-card:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  .hami-card-title {
+    display: block;
+    color: var(--amber);
+    font-weight: 700;
+  }
+  .hami-card:hover .hami-card-title { color: var(--amber-soft); }
+  .hami-card-desc {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
   @media (max-width: 640px) {
     body { font-size: 0.88rem; }
     .term-body { padding: 0.75rem; }
@@ -282,12 +324,14 @@
         <li><a href="https://hami-sigma.vercel.app">Live site</a> — hami-sigma.vercel.app</li>
         <li><a href="https://github.com/kn33r0s3/ForgeOS">Repository</a> — kn33r0s3/ForgeOS</li>
         <li><a href="case-studies/hami-engineering.md">Engineering case study</a> — concrete implementation work, test history, current verification limits</li>
-        <li><a href="hami-systems-map.html">Visual map</a> — one Hami, 14 gates, every subgate, on one map</li>
-        <li><a href="hami-methodology.html">Methodology</a> — the universal, dimensional, spiritual methodology</li>
-        <li><a href="ai-engineering-gates.html">AI engineering gates</a> — the map of work: gate, subgate, lead, nothing lost</li>
-        <li><a href="advancement-gates.html">Advancement gates</a> — pacer, revision, loop: the engine that never stops, and Hami becoming its own LLM</li>
-        <li><a href="hami-field.html">The Hami Field</a> — every gate, live and animated, on one picture: the map you can walk through</li>
       </ul>
+      <div class="hami-cards">
+        <a class="hami-card" href="hami-systems-map.html"><span class="hami-card-title">Visual map &rarr;</span><span class="hami-card-desc">One Hami, 14 gates, every subgate, on one map</span></a>
+        <a class="hami-card" href="hami-methodology.html"><span class="hami-card-title">Methodology &rarr;</span><span class="hami-card-desc">The universal, dimensional, spiritual methodology</span></a>
+        <a class="hami-card" href="ai-engineering-gates.html"><span class="hami-card-title">AI engineering gates &rarr;</span><span class="hami-card-desc">The map of work: gate, subgate, lead, nothing lost</span></a>
+        <a class="hami-card" href="advancement-gates.html"><span class="hami-card-title">Advancement gates &rarr;</span><span class="hami-card-desc">Pacer, revision, loop: the engine that never stops, and Hami becoming its own LLM</span></a>
+        <a class="hami-card" href="hami-field.html"><span class="hami-card-title">The Hami Field &rarr;</span><span class="hami-card-desc">Every gate, live and animated, on one picture: the map you can walk through</span></a>
+      </div>
       <p class="muted"><strong>Status and evidence:</strong> Hami is a work in progress. I do not claim verified customers, revenue, production reliability, or business impact without evidence for those specific outcomes. Deployment status, passing tests, and implemented code are not substitutes for real-world results.</p>
 
       <h3>Hami media — own real-time engine <span class="tag">— inside Hami</span> <span class="status status--live">measured</span></h3>

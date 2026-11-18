@@ -87,11 +87,14 @@
   * { box-sizing: border-box; }
   html { background: #0c0b0a; }
   body {
-    margin: 0; background: #0c0b0a; color: #f4efe6;
+    margin: 0; background: #0c0b0a; color: #e9e1d2;
     font-family: ui-monospace, "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
-    font-size: 15px; line-height: 1.55;
+    font-size: 16px; line-height: 1.7;
   }
-  a { color: #f2a33a; } a:visited { color: #f2a33a; }
+  a { color: #f2a33a; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:visited { color: #f2a33a; }
+  a:hover { color: #f7c873; text-decoration-thickness: 2px; }
+  a:focus-visible { outline: 2px solid #f2a33a; outline-offset: 2px; }
   button { font: inherit; }
   .field { max-width: 1240px; margin: 0 auto; padding: 20px 18px 40px; }
 
@@ -103,10 +106,10 @@
     font-size: 56px; line-height: 1; color: #f2a33a;
   }
   .topbar .gate-line { margin: 10px 0 0; color: #f2a33a; font-size: 13px; }
-  .topbar .gate-line b { color: #f4efe6; font-weight: 400; }
+  .topbar .gate-line b { color: #e9e1d2; font-weight: 400; }
   .owner-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin: 14px auto 0; max-width: 720px; }
   .owner-row input[type="password"] {
-    flex: 1; min-width: 200px; background: #15130f; color: #f4efe6;
+    flex: 1; min-width: 200px; background: #15130f; color: #e9e1d2;
     border: 1px solid #3a2e1a; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 14px;
   }
   .owner-row input:focus { outline: 2px solid #f2a33a; outline-offset: 1px; }
@@ -243,7 +246,7 @@
   .cmd-section p { margin: 0 0 10px; color: #bdb29f; font-size: 13px; }
   .cmd-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .cmd-row input[type="text"] {
-    flex: 1; min-width: 200px; background: #0c0b0a; color: #f4efe6;
+    flex: 1; min-width: 200px; background: #0c0b0a; color: #e9e1d2;
     border: 1px solid #3a2e1a; border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 14px;
   }
   .cmd-row input:focus { outline: 2px solid #f2a33a; outline-offset: 1px; }
@@ -251,9 +254,9 @@
     margin-top: 12px; border-top: 1px solid #3a2e1a; padding-top: 10px;
     max-height: 220px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
   }
-  .cmd-log p { margin: 0 0 8px; color: #f4efe6; font-size: 14px; }
+  .cmd-log p { margin: 0 0 8px; color: #e9e1d2; font-size: 14px; }
   .cmd-log .cmd-mark { color: #f2a33a; }
-  .cmd-log .cmd-hami { color: #f4efe6; }
+  .cmd-log .cmd-hami { color: #e9e1d2; }
   .cmd-log .cmd-hami::before { content: "hami: "; color: #72d38f; }
   .cmd-log .cmd-muted { color: #bdb29f; }
 
@@ -266,7 +269,7 @@
   .detail[hidden] { display: none; }
   .detail .detail-bar { height: 2px; background: #f2a33a; width: 100%; margin: 0 0 12px; animation: sweep 0.6s linear; }
   @keyframes sweep { from { width: 0; } to { width: 100%; } }
-  .detail h2 { margin: 0 0 4px; font-size: 19px; color: #f4efe6; }
+  .detail h2 { margin: 0 0 4px; font-size: 19px; color: #e9e1d2; }
   .detail .detail-num { color: #f2a33a; font-size: 12px; letter-spacing: 0.18em; }
   .detail .detail-run { color: #72d38f; font-size: 13px; letter-spacing: 0.12em; margin: 8px 0; }
   .detail .detail-run .run-dot-inline { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #72d38f; animation: runpulse 1.6s ease-in-out infinite; margin-right: 6px; }
@@ -299,7 +302,7 @@
   /* ---- footer ---- */
   footer { margin-top: 30px; border-top: 2px solid #f2a33a; padding-top: 16px; color: #bdb29f; font-size: 13px; }
   footer p { margin: 0 0 6px; }
-  footer .note { color: #f4efe6; }
+  footer .note { color: #e9e1d2; }
   footer b { color: #f2a33a; }
   @media (max-width: 720px) {
     .topbar h1 { font-size: 44px; }
@@ -355,7 +358,7 @@
     <p><b>EVERY GATE RUNS:</b> a gate never ends — a result only opens the next step. Every node carries one badge in one colour and one word: RUNNING. Progress is shown by what the gate is doing and what opens next — the evidence, the next step, the subgates. The picture moves: the pace climbs, the loop walks gate to gate, the work flows along the lines, every gate's door opens and closes. Private items are blurred by default; your key unlocks them for this session only — what unlocks is a name and a description, never a secret value, because no value is in this page. Your key lives only in memory while this page is open: never saved, never written to a file, never logged.</p>
     <p class="note">Every fact in this picture is a measured result, a verified zero, or an explicit UNKNOWN. Nothing is invented.</p>
     <p>last updated 18 Nov 2026</p>
-    <p>maps: <a href="hami-systems-map.html">Visual map</a> · <a href="hami-methodology.html">Methodology</a> · <a href="ai-engineering-gates.html">AI engineering gates</a> · <a href="advancement-gates.html">Advancement gates</a></p>
+    <p>maps: <a href="index.html">Home</a> &middot; <a href="hami-systems-map.html">Visual map</a> · <a href="hami-methodology.html">Methodology</a> · <a href="ai-engineering-gates.html">AI engineering gates</a> · <a href="advancement-gates.html">Advancement gates</a></p>
     <p>homes: <a href="https://kn33r0s3.vercel.app">kn33r0s3.vercel.app</a> · <a href="https://hami-sigma.vercel.app">hami-sigma.vercel.app</a></p>
   </footer>
 
@@ -2573,6 +2576,18 @@
 
   function renderNode(g, idx) {
     var nw = g.nw || NODE_W, nh = g.nh || NODE_H;
+    /* Title + badge layout, computed first: the RUNNING badge sits on its
+       own row below the title, never on it. It used to anchor to the
+       node's bottom (nh - 14), which collided with the title on short
+       nodes — the Promise Gate (64 tall) had its badge drawn across its
+       one-line title. Now the badge is placed at least 18px below the
+       title's last line, and a node too short to hold both grows just
+       enough to fit them. Normal 100-tall nodes are unaffected. */
+    var maxChars = Math.max(18, Math.floor((nw - 48) / 7.5));
+    var nameLines = wrapText(g.name, maxChars).slice(0, 2);
+    var titleLast = g.gy + 42 + (nameLines.length - 1) * 20;
+    var badgeY = Math.max(g.gy + nh - 14, titleLast + 18);
+    if (badgeY > g.gy + nh - 8) { nh = badgeY + 10 - g.gy; g.nh = nh; }
     var grp = svgEl("g", {
       "id": "gate-" + g.id, "class": "node running" + (g.private ? " private" : ""),
       tabindex: "0", role: "button", "data-gate-id": g.id,
@@ -2623,13 +2638,11 @@
       grp.appendChild(svgText(g.gx + nw / 2, g.gy + 106, "succession-sub", "gates + all data → Hami AI", "middle"));
       grp.appendChild(svgText(g.gx + nw / 2, g.gy + 124, "succession-sub", "stage 2 building now · stage 3 hami builds", "middle"));
     }
-    var maxChars = Math.max(18, Math.floor((nw - 48) / 7.5));
-    var nameLines = wrapText(g.name, maxChars).slice(0, 2);
     for (var i = 0; i < nameLines.length; i++) {
       grp.appendChild(svgText(g.gx + 16, g.gy + 42 + i * 20, "node-name node-label", nameLines[i]));
     }
-    grp.appendChild(svgEl("circle", { cx: g.gx + 22, cy: g.gy + nh - 18, r: 5, "class": "run-dot" }));
-    grp.appendChild(svgText(g.gx + 34, g.gy + nh - 14, "run-label", "RUNNING"));
+    grp.appendChild(svgEl("circle", { cx: g.gx + 22, cy: badgeY - 4, r: 5, "class": "run-dot" }));
+    grp.appendChild(svgText(g.gx + 34, badgeY, "run-label", "RUNNING"));
     if (g.progress) {
       var barW = nw - 32, fillW = Math.round(barW * g.progress.done / g.progress.total);
       grp.appendChild(svgEl("rect", { x: g.gx + 16, y: g.gy + nh - 9, width: barW, height: 5, rx: 2.5, "class": "node-progress-bg" }));
@@ -2667,12 +2680,32 @@
     var w = viewport.clientWidth || 800, h = viewport.clientHeight || 600;
     return { w: w, h: h };
   }
+  /* Whether the view is the default fit (nothing panned/zoomed by hand).
+     Resize re-fits only while this is true, so it never yanks the user
+     back after they have moved the picture themselves. */
+  var viewIsFit = true;
+  function fitView() {
+    /* Fit the whole 2620px-wide world into the viewport, top-aligned.
+       The old default (k=1, x=0, y=0) showed only the left half at 1920px:
+       the Promise Gate, the prime gate, Nepali Training and the End State
+       were cut off on the right. Fit-to-width shows the full width on load;
+       the user drags down for the height. Never upscale past 1:1. */
+    var s = vpSize();
+    var ww = world.clientWidth || 2620;
+    var k = Math.min(1, s.w / ww);
+    view.k = k;
+    view.x = (s.w - ww * k) / 2;
+    view.y = 0;
+    viewIsFit = true;
+    applyView();
+  }
   function zoomAt(cx, cy, factor) {
     var k2 = Math.min(3, Math.max(0.25, view.k * factor));
     var f = k2 / view.k;
     view.x = cx - (cx - view.x) * f;
     view.y = cy - (cy - view.y) * f;
     view.k = k2;
+    viewIsFit = false;
     applyView();
   }
   function zoomCenter(factor) {
@@ -2684,6 +2717,7 @@
     view.k = k || view.k;
     view.x = s.w / 2 - wx * view.k;
     view.y = s.h / 2 - wy * view.k;
+    viewIsFit = false;
     applyView();
   }
   function panToGate(id, k) {
@@ -2699,9 +2733,11 @@
     panTo(r.x + r.w / 2, r.y + (r.h || 300) / 2, 0.8);
   }
   function resetView() {
+    /* Reset means fit: the whole width visible, top of the field.
+       The old reset (k=1, x=0, y=0) showed only the left half, so
+       "reset view" did not fix the cut-off right side. */
     /* Mutate, never reassign: window.__hamiField.view holds this object. */
-    view.x = 0; view.y = 0; view.k = 1;
-    applyView();
+    fitView();
   }
 
   var pointers = {};
@@ -2730,6 +2766,7 @@
     if (Math.abs(dx) + Math.abs(dy) > 6) { drag.moved = true; }
     view.x = drag.vx + dx;
     view.y = drag.vy + dy;
+    viewIsFit = false;
     applyView();
     void prev;
   });
@@ -2752,6 +2789,7 @@
     var rect = viewport.getBoundingClientRect();
     zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY < 0 ? 1.12 : 1 / 1.12);
   }, { passive: false });
+  window.addEventListener("resize", function () { if (viewIsFit) { fitView(); } });
 
   /* ---- highlights: a gate's connections light up with it ---- */
   function clearHighlights() {
@@ -3064,7 +3102,7 @@
     nextTour: nextTour, prevTour: prevTour,
     enterOwner: enterOwner, leaveOwner: leaveOwner,
     sendOwnerCommand: sendOwnerCommand,
-    panToGate: panToGate, panToRegion: panToRegion, resetView: resetView,
+    panToGate: panToGate, panToRegion: panToRegion, resetView: resetView, fitView: fitView,
     zoomCenter: zoomCenter, connected: connected,
     tickPace: tickPace, stepLoop: stepLoop, stepPackets: stepPackets,
     paceMs: function () { return paceMs; },
