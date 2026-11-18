@@ -117,7 +117,8 @@
   }
   .gate {
     border: 1px solid #3a2e1a;
-    border-top: 2px solid #f2a33a;
+    border-top: 4px solid #f2a33a;
+    border-bottom: 4px solid #f2a33a;
     border-radius: 6px;
     background: #15130f;
     box-shadow: 4px 4px 0 #000;
@@ -155,6 +156,28 @@
   .gate-body li:last-child { margin-bottom: 0; }
   .gate-body .k { color: #f2a33a; }
 
+  /* ---- section headings ---- */
+  .section-head {
+    margin: 30px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f2a33a;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #f2a33a;
+  }
+  .section-head p { margin: 6px 0 0; color: #bdb29f; font-size: 13px; }
+
+  /* ---- pillars line ---- */
+  .pillars-line {
+    margin: 26px auto 0;
+    max-width: 640px;
+    text-align: center;
+    color: #f2a33a;
+    font-size: 14px;
+  }
+
   /* ---- footer ---- */
   footer {
     margin-top: 30px;
@@ -183,14 +206,14 @@
     <div class="term-titlebar"><span class="term-dot" aria-hidden="true"></span><span class="term-title">niroj@hami: ~</span></div>
     <div class="term-body">
       <p class="term-line"><span class="term-prompt">$</span> hami map --all <span class="term-cursor" aria-hidden="true"></span></p>
-      <p class="term-out">one Hami &mdash; 8 gates, every subgate a path.</p>
+      <p class="term-out">one Hami &mdash; 8 public gates + 6 private gates, every subgate a path.</p>
     </div>
   </section>
 
   <div class="controls">
     <button id="expandAll" type="button">expand all</button>
     <button id="collapseAll" type="button">collapse all</button>
-    <span class="count">8 gates &middot; click a gate to open its subgates</span>
+    <span class="count">14 gates &middot; 8 public + 6 private &middot; click a gate to open its subgates</span>
   </div>
 
   <section class="gates" aria-label="Hami gates">
@@ -353,6 +376,125 @@
     </article>
 
   </section>
+
+  <div class="section-head">
+    <h2>Private gates &mdash; the engine underneath</h2>
+    <p>Shown in plain words, so anyone can understand them.</p>
+  </div>
+
+  <section class="gates" aria-label="Private gates — the engine underneath">
+
+    <article class="gate" id="pgate-1">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-1-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">PRIVATE GATE 01</span>
+        <span class="gate-name">The Decision Gate</span>
+        <span class="gate-status">verified</span>
+        <span class="gate-evidence">Every action is checked against the rules before Hami acts.</span>
+      </button>
+      <div class="gate-body" id="pgate-1-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">What it does</span> &mdash; Before Hami does anything, it checks the action against its rules &mdash; and only then does it act.</li>
+          <li><span class="k">Why it matters</span> &mdash; Nothing happens without a check, so Hami never does something it was not allowed to do.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="pgate-2">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-2-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">PRIVATE GATE 02</span>
+        <span class="gate-name">The Outbox</span>
+        <span class="gate-status">verified</span>
+        <span class="gate-evidence">One queue, one door &mdash; every message leaves through the same door.</span>
+      </button>
+      <div class="gate-body" id="pgate-2-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">What it does</span> &mdash; Every message Hami sends waits in one queue and leaves through one door.</li>
+          <li><span class="k">Why it matters</span> &mdash; One door means no message can slip out by a side path, and every send is recorded.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="pgate-3">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-3-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">PRIVATE GATE 03</span>
+        <span class="gate-name">The Engine</span>
+        <span class="gate-status">verified</span>
+        <span class="gate-evidence">Hami thinks with its own engine, on its own machine.</span>
+      </button>
+      <div class="gate-body" id="pgate-3-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">What it does</span> &mdash; Hami thinks with its own engine, running on its own machine.</li>
+          <li><span class="k">Why it matters</span> &mdash; The thinking stays ours &mdash; it does not depend on someone else&rsquo;s service.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="pgate-4">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-4-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">PRIVATE GATE 04</span>
+        <span class="gate-name">The Evidence Ledger</span>
+        <span class="gate-status">verified</span>
+        <span class="gate-evidence">6 real claims, each with state + evidence.</span>
+      </button>
+      <div class="gate-body" id="pgate-4-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">What it does</span> &mdash; Every claim Hami makes carries its proof with it.</li>
+          <li><span class="k">Why it matters</span> &mdash; A claim without proof does not show. What you see is what was measured.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="pgate-5">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-5-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">PRIVATE GATE 05</span>
+        <span class="gate-name">The Live Video Engine</span>
+        <span class="gate-status">verified</span>
+        <span class="gate-evidence">1,000 publishers and 2,000 viewers passed (p95 0.34 ms, p99 17.8 ms).</span>
+      </button>
+      <div class="gate-body" id="pgate-5-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">What it does</span> &mdash; Hami carries live video itself, publisher to viewer, without borrowing another company&rsquo;s video system.</li>
+          <li><span class="k">Why it matters</span> &mdash; Measured: 1,000 publishers and 2,000 viewers passed (p95 0.34 ms, p99 17.8 ms).</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="gate" id="pgate-6">
+      <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-6-body">
+        <span class="gate-toggle" aria-hidden="true">+</span>
+        <span class="gate-num">PRIVATE GATE 06</span>
+        <span class="gate-name">The Locks</span>
+        <span class="gate-status">verified</span>
+        <span class="gate-evidence">Only the owner holds the key.</span>
+      </button>
+      <div class="gate-body" id="pgate-6-body">
+        <div class="gate-bar" aria-hidden="true"></div>
+        <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
+        <ul>
+          <li><span class="k">What it does</span> &mdash; Hami&rsquo;s doors are locked. Only the owner holds the key.</li>
+          <li><span class="k">Why it matters</span> &mdash; Private work stays private. Public work is public by a written reason, never by accident.</li>
+        </ul>
+      </div>
+    </article>
+
+  </section>
+
+  <p class="pillars-line">These gates are pillars. They stand here permanently &mdash; not words that fade. Nothing is lost.</p>
 
   <footer>
     <p>last updated 18 Nov 2026</p>
