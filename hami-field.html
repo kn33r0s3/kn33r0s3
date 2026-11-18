@@ -403,6 +403,44 @@
   @media (prefers-reduced-motion: reduce) {
     .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark { animation: none; }
   }
+  @media (min-width: 1000px) and (min-height: 760px) {
+    main.field {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+      grid-template-rows: auto auto auto auto minmax(280px, 1fr) auto;
+      gap: 4px 8px;
+      overflow: hidden;
+    }
+    .topbar, .fieldbar, .viewbar, .ev-legend, footer { grid-column: 1 / -1; }
+    .topbar .core-ne { font-size: 12px; line-height: 1.1; }
+    .topbar h1 { font-size: 30px; margin: 0; }
+    .field-mascot { margin: 2px 0 0; gap: 5px; }
+    .field-mascot .mascot-svg { width: 26px; height: 26px; }
+    .field-mascot-note { font-size: 10px; line-height: 1.1; }
+    .topbar .gate-line { margin: 2px 0 0; font-size: 9px; line-height: 1.1; }
+    .owner-row { margin: 2px auto 0; gap: 3px; }
+    .owner-row input[type="password"] { padding: 3px 7px; font-size: 11px; }
+    .owner-row .btn { padding: 3px 7px; font-size: 11px; }
+    .owner-status { margin: 1px 0 0; font-size: 9px; line-height: 1.1; }
+    .fieldbar { margin: 0; padding: 3px 0; }
+    .fieldbar .btn { padding: 2px 6px; font-size: 11px; }
+    .fieldbar .hint { font-size: 9px; }
+    .viewbar { margin: 0; gap: 3px; }
+    .view-btn { padding: 2px 7px; font-size: 11px; }
+    .viewbar .view-label { font-size: 11px; }
+    .ev-legend { margin: 0; gap: 2px; font-size: 9px; }
+    .ev-legend .ev-chip { padding: 1px 5px; }
+    .ev-legend .adv-line { font-size: 8px; }
+    .viewport { grid-column: 1; grid-row: 5; height: auto; min-height: 280px; }
+    .dims {
+      grid-column: 2; grid-row: 5; align-self: stretch;
+      margin: 0; max-width: none; padding: 7px 9px;
+    }
+    .dims h2 { margin-bottom: 3px; font-size: 11px; }
+    .dims li { margin-bottom: 2px; font-size: 10px; line-height: 1.15; }
+    footer { grid-row: 6; margin: 0; padding-top: 5px; font-size: 9px; line-height: 1.1; }
+    footer p { margin: 0 0 1px; }
+  }
 </style>
 </head>
 <body>
