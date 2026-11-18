@@ -570,7 +570,7 @@
   },
   {
     "id": "inc",
-    "title": "INCOME + CLOUDFACTORY",
+    "title": "INCOME",
     "sub": "Real money, verified. Rs 0 so far — zero is the measured number.",
     "x": 40,
     "y": 1060,
@@ -679,7 +679,6 @@
       "applygates",
       "att13",
       "buildlog",
-      "cf",
       "chat",
       "cors",
       "d1",
@@ -688,7 +687,6 @@
       "d4",
       "d5",
       "d6",
-      "da",
       "decision",
       "endstate",
       "engine",
@@ -707,7 +705,6 @@
       "h7",
       "h8",
       "h9",
-      "hamsa",
       "homelinks",
       "ig",
       "improve",
@@ -1113,12 +1110,10 @@
     "evidence": "Rs 0 verified. Source: src/lib/ledger.ts (RS-0 claim).",
     "date": "2026-11-18",
     "owner": "income",
-    "next": "First verified payment — Hamsawears is the nearest door.",
+    "next": "First verified payment — a seller pilot is the nearest door.",
     "sub": [],
     "links": [
-      "da",
       "exp1",
-      "hamsa",
       "ledger",
       "promise"
     ]
@@ -1139,69 +1134,7 @@
     "next": "A seller agrees, then one week runs.",
     "sub": [],
     "links": [
-      "hamsa",
       "ledger",
-      "promise",
-      "rs0"
-    ]
-  },
-  {
-    "id": "hamsa",
-    "region": "inc",
-    "num": "GATE 04 · HAMSAWEARS",
-    "name": "HAMSAWEARS",
-    "plain": "A custom-clothing business in Bafal, Kathmandu. We asked 14 questions about their orders. Waiting for their answer.",
-    "what": "Questionnaire SENT by email 18 Nov 12:13 (14 questions), awaiting reply.",
-    "why": "Hamsawears is the nearest real seller. Their answers show whether slow replies are losing them orders.",
-    "state": "running",
-    "ev": "progress",
-    "evidence": "Questionnaire sent by email 18 Nov 12:13 (14 questions). No reply yet.",
-    "date": "2026-11-18",
-    "owner": "income",
-    "next": "Wait for the reply, then follow up.",
-    "sub": [],
-    "links": [
-      "exp1",
-      "promise",
-      "rs0"
-    ]
-  },
-  {
-    "id": "cf",
-    "region": "inc",
-    "num": "GATE 04 · CLOUDFACTORY",
-    "name": "CLOUDFACTORY",
-    "plain": "A job application parked on one question: is macOS accepted for the Nepal Data Specialist role? No answer yet.",
-    "what": "Application parked: the macOS question was sent 16 Nov, and there is NO REPLY as of 18 Nov.",
-    "why": "CloudFactory is a real employer door. Until they answer, the application cannot move.",
-    "state": "running",
-    "ev": "progress",
-    "evidence": "macOS question sent 16 Nov. NO REPLY as of 18 Nov.",
-    "date": "2026-11-18",
-    "owner": "owner",
-    "next": "Wait for the reply; application stays parked.",
-    "sub": [],
-    "links": [
-      "promise",
-      "pv-cf"
-    ]
-  },
-  {
-    "id": "da",
-    "region": "inc",
-    "num": "GATE 04 · DATAANNOTATION",
-    "name": "DATAANNOTATION — THE OPEN DOOR",
-    "plain": "A real door to paid AI work. The plan is ready; whether the account exists is not yet known.",
-    "what": "Signup is name/email only, pays via PayPal, Starter Assessment takes ~1 hour, one attempt. The plan is ready.",
-    "why": "It is the fastest honest route to first paid AI work — if the account is created and the assessment passed.",
-    "state": "running",
-    "ev": "unknown",
-    "evidence": "Plan ready. Whether Niroj created an account is NOT ESTABLISHED.",
-    "date": "2026-11-18",
-    "owner": "owner",
-    "next": "Establish whether the account was created.",
-    "sub": [],
-    "links": [
       "promise",
       "rs0"
     ]
@@ -1810,7 +1743,6 @@
     "next": "UNKNOWN",
     "sub": [],
     "links": [
-      "cf",
       "locks",
       "promise"
     ]
