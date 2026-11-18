@@ -308,6 +308,22 @@
     .topbar h1 { font-size: 44px; }
     .viewport { height: 70vh; min-height: 420px; }
   }
+
+  /* ---- cartoons, art, VFX (Hami approach: drawn with code, SVG + CSS, never copied/stock/external) ---- */
+  .field-mascot { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; }
+  .field-mascot .mascot-svg { width: 56px; height: 56px; flex: 0 0 auto; }
+  .field-mascot-note { color: #bdb29f; font-size: 13px; }
+  .mascot-bob { animation: mascotBob 3.2s ease-in-out infinite; }
+  @keyframes mascotBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .mascot-eyes { transform-box: fill-box; transform-origin: center; animation: mascotBlink 4.5s ease-in-out infinite; }
+  @keyframes mascotBlink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+  .mascot-wave { transform-box: fill-box; transform-origin: bottom left; animation: mascotWave 2.4s ease-in-out infinite; }
+  @keyframes mascotWave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-18deg); } }
+  .mascot-spark { animation: mascotSpark 2.8s ease-in-out infinite; }
+  @keyframes mascotSpark { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -316,6 +332,7 @@
   <header class="topbar">
     <p class="core-ne" lang="ne">हामी</p>
     <h1>Hami — the field</h1>
+    <div class="field-mascot"><svg class="mascot-svg" viewBox="0 0 120 120" width="56" height="56" role="img" aria-label="Hami, the gate - a friendly arch with eyes, drawn with code"><g class="mascot-bob"><path d="M22,112 L22,58 Q22,22 60,22 Q98,22 98,58 L98,112" fill="#15130f" stroke="#f2a33a" stroke-width="4"/><line x1="22" y1="76" x2="98" y2="76" stroke="#f2a33a" stroke-width="3" stroke-dasharray="6 5"/><g class="mascot-eyes"><circle cx="46" cy="56" r="7" fill="#e9e1d2"/><circle cx="46" cy="56" r="3" fill="#0c0b0a"/><circle cx="74" cy="56" r="7" fill="#e9e1d2"/><circle cx="74" cy="56" r="3" fill="#0c0b0a"/></g><path d="M49,88 Q60,97 71,88" fill="none" stroke="#e9e1d2" stroke-width="3" stroke-linecap="round"/><g class="mascot-wave"><line x1="98" y1="86" x2="112" y2="66" stroke="#f2a33a" stroke-width="4" stroke-linecap="round"/><circle cx="113" cy="63" r="4" fill="#f2a33a"/></g><circle class="mascot-spark" cx="14" cy="30" r="3" fill="#f2a33a"/><circle class="mascot-spark" cx="106" cy="34" r="2.5" fill="#72d38f"/></g></svg><span class="field-mascot-note">Hami, the gate — a cartoon drawn with code, not copied.</span></div>
     <p class="gate-line">gate: OPEN &mdash; one gate &middot; one Hami &middot; serving the globe &nbsp;·&nbsp; <b>the picture below IS the map — look, move through it, tap a gate.</b></p>
     <div class="owner-row">
       <input id="keyInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your Hami API key — owner sees all" aria-label="Hami API key">

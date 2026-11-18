@@ -319,6 +319,26 @@
   }
   footer p { margin: 0 0 6px; }
   footer .note { color: #e9e1d2; }
+
+  /* ---- cartoons, art, VFX (Hami approach: drawn with code, SVG + CSS, never copied/stock/external) ---- */
+  .mascot { text-align: center; margin: 2px 0 0; }
+  .mascot .mascot-svg { width: 64px; height: 64px; margin: 0 auto; }
+  .mascot-bob { animation: mascotBob 3.2s ease-in-out infinite; }
+  @keyframes mascotBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .mascot-eyes { transform-box: fill-box; transform-origin: center; animation: mascotBlink 4.5s ease-in-out infinite; }
+  @keyframes mascotBlink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+  .mascot-wave { transform-box: fill-box; transform-origin: bottom left; animation: mascotWave 2.4s ease-in-out infinite; }
+  @keyframes mascotWave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-18deg); } }
+  .mascot-spark { animation: mascotSpark 2.8s ease-in-out infinite; }
+  @keyframes mascotSpark { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+  .art { margin: 4px 0 0; }
+  .art-strip { display: block; width: 100%; height: auto; }
+  .art-caption { text-align: center; color: #bdb29f; font-size: 13px; margin: 2px 0 0; }
+  .art-rise { animation: artRise 2.4s ease-in-out infinite; }
+  @keyframes artRise { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark, .art-path, .art-dot, .art-pillars rect, .art-flow circle, .art-rise { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -335,10 +355,15 @@
 
   <header class="core">
     <p class="core-ne" lang="ne">हामी</p>
+    <div class="mascot"><svg class="mascot-svg" viewBox="0 0 120 120" width="64" height="64" role="img" aria-label="Hami, the gate - a friendly arch with eyes, drawn with code"><g class="mascot-bob"><path d="M22,112 L22,58 Q22,22 60,22 Q98,22 98,58 L98,112" fill="#15130f" stroke="#f2a33a" stroke-width="4"/><line x1="22" y1="76" x2="98" y2="76" stroke="#f2a33a" stroke-width="3" stroke-dasharray="6 5"/><g class="mascot-eyes"><circle cx="46" cy="56" r="7" fill="#e9e1d2"/><circle cx="46" cy="56" r="3" fill="#0c0b0a"/><circle cx="74" cy="56" r="7" fill="#e9e1d2"/><circle cx="74" cy="56" r="3" fill="#0c0b0a"/></g><path d="M49,88 Q60,97 71,88" fill="none" stroke="#e9e1d2" stroke-width="3" stroke-linecap="round"/><g class="mascot-wave"><line x1="98" y1="86" x2="112" y2="66" stroke="#f2a33a" stroke-width="4" stroke-linecap="round"/><circle cx="113" cy="63" r="4" fill="#f2a33a"/></g><circle class="mascot-spark" cx="14" cy="30" r="3" fill="#f2a33a"/><circle class="mascot-spark" cx="106" cy="34" r="2.5" fill="#72d38f"/></g></svg></div>
     <h1 class="core-name">Hami</h1>
     <p class="core-tag">Advancement gates &mdash; the pacer, the revision, the loop. The engine that never stops, and the path to Hami as its own LLM.</p>
     <p class="core-gate">gate: OPEN &mdash; pace &middot; revision &middot; loop &middot; the network is Hami</p>
   </header>
+  <figure class="art">
+    <svg class="art-strip" viewBox="0 0 900 170" role="img" aria-label="Advancement, in a picture: a loop that rises, and the pace never stops"><g fill="none" stroke="#f2a33a" stroke-width="4"><ellipse cx="300" cy="130" rx="90" ry="18"/><ellipse cx="300" cy="95" rx="70" ry="15"/><ellipse cx="300" cy="60" rx="50" ry="12"/></g><path class="art-rise" d="M520,140 L520,40" stroke="#72d38f" stroke-width="4" stroke-linecap="round"/><path d="M505,58 L520,38 L535,58" fill="none" stroke="#72d38f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="660" y="100" text-anchor="middle" font-size="14" fill="#e9e1d2" font-family="ui-monospace, monospace">pace · revision · loop</text><g stroke="#3a2e1a" stroke-width="2"><line x1="600" y1="130" x2="600" y2="150"/><line x1="640" y1="130" x2="640" y2="150"/><line x1="680" y1="130" x2="680" y2="150"/><line x1="720" y1="130" x2="720" y2="150"/></g></svg>
+    <figcaption class="art-caption">advancement, in a picture: a loop that rises, and the pace never stops.</figcaption>
+  </figure>
   <div class="spine" aria-hidden="true"></div>
   <div class="bus" aria-hidden="true"></div>
 

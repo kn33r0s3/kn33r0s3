@@ -226,6 +226,28 @@
   }
   footer p { margin: 0 0 6px; }
   footer .note { color: #e9e1d2; }
+
+  /* ---- cartoons, art, VFX (Hami approach: drawn with code, SVG + CSS, never copied/stock/external) ---- */
+  .mascot { text-align: center; margin: 2px 0 0; }
+  .mascot .mascot-svg { width: 64px; height: 64px; margin: 0 auto; }
+  .mascot-bob { animation: mascotBob 3.2s ease-in-out infinite; }
+  @keyframes mascotBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .mascot-eyes { transform-box: fill-box; transform-origin: center; animation: mascotBlink 4.5s ease-in-out infinite; }
+  @keyframes mascotBlink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+  .mascot-wave { transform-box: fill-box; transform-origin: bottom left; animation: mascotWave 2.4s ease-in-out infinite; }
+  @keyframes mascotWave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-18deg); } }
+  .mascot-spark { animation: mascotSpark 2.8s ease-in-out infinite; }
+  @keyframes mascotSpark { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+  .art { margin: 4px 0 0; }
+  .art-strip { display: block; width: 100%; height: auto; }
+  .art-caption { text-align: center; color: #bdb29f; font-size: 13px; margin: 2px 0 0; }
+  .art-path { animation: artDash 3s linear infinite; }
+  @keyframes artDash { to { stroke-dashoffset: -48; } }
+  .art-dot { animation: artDot 5s ease-in-out infinite; }
+  @keyframes artDot { 0% { transform: translateX(0); opacity: 0.3; } 50% { opacity: 1; } 100% { transform: translateX(590px); opacity: 0.3; } }
+  @media (prefers-reduced-motion: reduce) {
+    .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark, .art-path, .art-dot, .art-pillars rect, .art-flow circle, .art-rise { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -242,10 +264,15 @@
 
   <header class="core">
     <p class="core-ne" lang="ne">हामी</p>
+    <div class="mascot"><svg class="mascot-svg" viewBox="0 0 120 120" width="64" height="64" role="img" aria-label="Hami, the gate - a friendly arch with eyes, drawn with code"><g class="mascot-bob"><path d="M22,112 L22,58 Q22,22 60,22 Q98,22 98,58 L98,112" fill="#15130f" stroke="#f2a33a" stroke-width="4"/><line x1="22" y1="76" x2="98" y2="76" stroke="#f2a33a" stroke-width="3" stroke-dasharray="6 5"/><g class="mascot-eyes"><circle cx="46" cy="56" r="7" fill="#e9e1d2"/><circle cx="46" cy="56" r="3" fill="#0c0b0a"/><circle cx="74" cy="56" r="7" fill="#e9e1d2"/><circle cx="74" cy="56" r="3" fill="#0c0b0a"/></g><path d="M49,88 Q60,97 71,88" fill="none" stroke="#e9e1d2" stroke-width="3" stroke-linecap="round"/><g class="mascot-wave"><line x1="98" y1="86" x2="112" y2="66" stroke="#f2a33a" stroke-width="4" stroke-linecap="round"/><circle cx="113" cy="63" r="4" fill="#f2a33a"/></g><circle class="mascot-spark" cx="14" cy="30" r="3" fill="#f2a33a"/><circle class="mascot-spark" cx="106" cy="34" r="2.5" fill="#72d38f"/></g></svg></div>
     <h1 class="core-name">Hami</h1>
     <p class="core-tag">one living system for understanding and acting on Nepal&rsquo;s economy</p>
     <p class="core-gate">gate: OPEN &mdash; one gate &middot; one Hami &middot; serving the globe</p>
   </header>
+  <figure class="art">
+    <svg class="art-strip" viewBox="0 0 900 170" role="img" aria-label="The map, in a picture: a compass, a dotted path, a gate"><circle cx="120" cy="85" r="52" fill="none" stroke="#f2a33a" stroke-width="3"/><path d="M120,45 L132,85 L120,125 L108,85 Z" fill="#f2a33a"/><circle cx="120" cy="85" r="6" fill="#0c0b0a"/><path class="art-path" d="M190,85 C300,30 420,140 520,85 C620,30 720,110 780,85" fill="none" stroke="#f2a33a" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/><circle class="art-dot" cx="190" cy="85" r="5" fill="#72d38f"/><path d="M800,110 L800,70 Q800,48 828,48 Q856,48 856,70 L856,110" fill="none" stroke="#f2a33a" stroke-width="3"/><line x1="800" y1="86" x2="856" y2="86" stroke="#f2a33a" stroke-width="2" stroke-dasharray="4 4"/><path d="M818,70 L824,76 L834,64" fill="none" stroke="#72d38f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <figcaption class="art-caption">the map, in a picture: a compass, a dotted path, a gate.</figcaption>
+  </figure>
   <div class="spine" aria-hidden="true"></div>
   <div class="bus" aria-hidden="true"></div>
 
