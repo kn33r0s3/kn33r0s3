@@ -99,11 +99,142 @@
   }
   .status--live { color: var(--green); border-color: var(--green); }
   .status--wip { color: var(--amber); border-color: var(--amber); }
-  footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.8rem; }
   @media (max-width: 640px) {
     body { font-size: 0.88rem; }
     .term-body { padding: 0.75rem; }
   }
+  /* --- Live terminal + gated design --- */
+  /* The gate bar: always full-width, 2px, amber, at the top of the output area.
+     It sweeps when a command runs — the gate is the design signature. */
+  .gate-bar {
+    height: 2px;
+    width: 100%;
+    background: var(--border);
+    margin: 0.5rem 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .gate-bar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -30%;
+    width: 30%;
+    height: 100%;
+    background: var(--amber);
+  }
+  .gate-bar--sweep::after { animation: gate-sweep 0.6s linear; }
+  @keyframes gate-sweep { from { left: -30%; } to { left: 100%; } }
+  .gate-line { color: var(--muted); font-size: 0.85rem; }
+  .gate-open { color: var(--green); }
+  .gate-closed { color: var(--amber); }
+  /* Live terminal output + input */
+  .live-term { margin-top: 0.5rem; }
+  .term-out {
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 6rem;
+    max-height: 22rem;
+    overflow-y: auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .term-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.5rem;
+  }
+  .term-input-row .prompt-sign { color: var(--amber); flex: none; }
+  .term-input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding: 0;
+  }
+  .term-input::placeholder { color: var(--muted); }
+  .term-input:disabled { color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+  .chip {
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--amber);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    padding: 0.2rem 0.55rem;
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--amber); color: var(--ink); }
+  /* Music player */
+  .player {
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    background: var(--bg);
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  .player-row { display: flex; align-items: center; gap: 0.75rem; }
+  .player-btn {
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--bg);
+    background: var(--amber);
+    border: none;
+    border-radius: 0.25rem;
+    width: 2rem;
+    height: 2rem;
+    flex: none;
+    cursor: pointer;
+  }
+  .player-btn:hover { background: var(--wheat); }
+  .player-track { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .player-time { color: var(--muted); font-size: 0.8rem; flex: none; }
+  .progress {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 0.6rem;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .progress-fill { height: 100%; width: 0%; background: var(--amber); }
+  .track-list { margin-top: 0.75rem; }
+  .track {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    padding: 0.3rem 0;
+    cursor: pointer;
+  }
+  .track:hover { color: var(--amber); }
+  .track--playing { color: var(--green); }
+  .track .track-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Equalizer: tiny animated bars, shown while a track plays */
+  .eq { display: none; align-items: flex-end; gap: 2px; height: 1em; flex: none; }
+  .eq--on { display: inline-flex; }
+  .eq span { width: 3px; background: var(--green); animation: eq-bounce 0.9s ease-in-out infinite; }
+  .eq span:nth-child(1) { height: 40%; animation-delay: 0s; }
+  .eq span:nth-child(2) { height: 90%; animation-delay: 0.15s; }
+  .eq span:nth-child(3) { height: 60%; animation-delay: 0.3s; }
+  .eq span:nth-child(4) { height: 100%; animation-delay: 0.45s; }
+  @keyframes eq-bounce { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
 </style>
 </head>
 <body>
@@ -149,6 +280,24 @@
 
       <hr class="rule">
 
+      <h2>Music — my own tracks</h2>
+      <p class="muted">Two tracks I made. Click a track or type <code>play summit</code> in the terminal below. No streaming service — the files live here, on this site.</p>
+      <div class="player" id="player">
+        <div class="player-row">
+          <button class="player-btn" id="playBtn" type="button" aria-label="Play or pause">▶</button>
+          <span class="player-track" id="playerTrack">No track playing — pick one below.</span>
+          <span class="player-time" id="playerTime">0:00 / 0:00</span>
+        </div>
+        <div class="progress" id="progress" role="slider" aria-label="Seek" tabindex="0"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="track-list">
+          <button class="track" type="button" data-track="summit"><span class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span class="track-name">Summit — KneeRose</span><span class="muted">play summit</span></button>
+          <button class="track" type="button" data-track="kanai"><span class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span class="track-name">Kanai Huncha Mast (Ears are Blessed)</span><span class="muted">play kanai</span></button>
+        </div>
+      </div>
+      <audio id="audio" preload="metadata"></audio>
+
+      <hr class="rule">
+
       <h2>Technologies</h2>
       <p><span class="green">Languages:</span> Python, JavaScript, C, C++<br>
       <span class="green">Backend:</span> FastAPI, Node.js, Express<br>
@@ -168,12 +317,355 @@
 
       <p class="prompt">contact</p>
       <p>The best way to reach me is through <a href="https://github.com/kn33r0s3">GitHub</a>.</p>
+
+      <hr class="rule">
+
+      <h2>Terminal — try it, it works</h2>
+      <p class="muted">This is a real terminal. Type a command or click one. Every command passes through a gate first — the gate check prints before the output. Try <code>hami</code> to talk to the Hami engine.</p>
+      <div class="live-term" id="liveTerm">
+        <div class="gate-bar" id="gateBar" aria-hidden="true"></div>
+        <div class="term-out" id="termOut" aria-live="polite"></div>
+        <div class="term-input-row">
+          <span class="prompt-sign" aria-hidden="true">$</span>
+          <input class="term-input" id="termInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type a command — try help" aria-label="Terminal command">
+        </div>
+        <div class="chips" id="chips">
+          <button class="chip" type="button" data-cmd="help">help</button>
+          <button class="chip" type="button" data-cmd="whoami">whoami</button>
+          <button class="chip" type="button" data-cmd="projects">projects</button>
+          <button class="chip" type="button" data-cmd="music">music</button>
+          <button class="chip" type="button" data-cmd="play summit">play summit</button>
+          <button class="chip" type="button" data-cmd="hami what is Hami?">hami what is Hami?</button>
+          <button class="chip" type="button" data-cmd="clear">clear</button>
+        </div>
+      </div>
       <p><span class="prompt">exit</span> <span class="cursor" aria-hidden="true"></span></p>
     </div>
   </div>
-  <footer>
-    Built from the profile README and the Hami engineering case study. No claims without evidence.
-  </footer>
 </div>
+<script>
+(function () {
+  "use strict";
+  var out = document.getElementById("termOut");
+  var input = document.getElementById("termInput");
+  var gateBar = document.getElementById("gateBar");
+  var audio = document.getElementById("audio");
+  var playBtn = document.getElementById("playBtn");
+  var playerTrack = document.getElementById("playerTrack");
+  var playerTime = document.getElementById("playerTime");
+  var progress = document.getElementById("progress");
+  var progressFill = document.getElementById("progressFill");
+  var HAMI_URL = "https://hami-sigma.vercel.app/api/hami/chat";
+
+  var TRACKS = {
+    summit: { src: "music/summit.mp3", name: "Summit \u2014 KneeRose" },
+    kanai: { src: "music/kanai-huncha-mast.mp3", name: "Kanai Huncha Mast (Ears are Blessed)" }
+  };
+  var ORDER = ["summit", "kanai"];
+  var current = null;
+  var history = [];
+  var histIdx = -1;
+  var hamiBusy = false;
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined && text !== null) n.textContent = text;
+    return n;
+  }
+  function scrollOut() { out.scrollTop = out.scrollHeight; }
+  function printLine(text, cls) {
+    out.appendChild(el("div", cls || "", text));
+    scrollOut();
+  }
+  function printEcho(cmd) {
+    var row = el("div", "", "");
+    row.appendChild(el("span", "", "$ "));
+    var c = el("span", "", cmd);
+    c.style.color = "var(--ink)";
+    row.firstChild.style.color = "var(--amber)";
+    row.appendChild(c);
+    out.appendChild(row);
+    scrollOut();
+  }
+  function printGate(open, detail) {
+    var row = el("div", "gate-line", "");
+    row.appendChild(document.createTextNode("gate: "));
+    row.appendChild(el("span", open ? "gate-open" : "gate-closed", open ? "OPEN" : "CLOSED"));
+    row.appendChild(document.createTextNode(" \u2014 " + detail));
+    out.appendChild(row);
+    scrollOut();
+  }
+  function sweep() {
+    gateBar.classList.remove("gate-bar--sweep");
+    void gateBar.offsetWidth;
+    gateBar.classList.add("gate-bar--sweep");
+  }
+  function fmtTime(s) {
+    if (!isFinite(s) || s < 0) s = 0;
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ":" + (sec < 10 ? "0" : "") + sec;
+  }
+  function setEq(key, on) {
+    var btns = document.querySelectorAll(".track[data-track]");
+    for (var i = 0; i < btns.length; i++) {
+      var b = btns[i];
+      var eq = b.querySelector(".eq");
+      var isThis = b.getAttribute("data-track") === key;
+      if (eq) eq.classList.toggle("eq--on", on && isThis);
+      b.classList.toggle("track--playing", on && isThis);
+    }
+  }
+  function updateTime() {
+    playerTime.textContent = fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration);
+    if (audio.duration) progressFill.style.width = (audio.currentTime / audio.duration * 100) + "%";
+  }
+  function loadTrack(key) {
+    current = key;
+    audio.src = TRACKS[key].src;
+    playerTrack.textContent = TRACKS[key].name;
+    playBtn.textContent = "\u25B6";
+    progressFill.style.width = "0%";
+    playerTime.textContent = "0:00 / 0:00";
+    setEq(key, false);
+  }
+  function playTrack(key, viaTerminal) {
+    if (!TRACKS[key]) return false;
+    if (current !== key) loadTrack(key);
+    var p = audio.play();
+    if (p && p.catch) p.catch(function () {});
+    playBtn.textContent = "\u23F8";
+    setEq(key, true);
+    if (viaTerminal) printLine("\u25B6 playing: " + TRACKS[key].name);
+    return true;
+  }
+  function pauseTrack(viaTerminal) {
+    audio.pause();
+    playBtn.textContent = "\u25B6";
+    if (current) setEq(current, false);
+    if (viaTerminal) printLine("paused" + (current ? ": " + TRACKS[current].name : ""));
+  }
+  function stopTrack(viaTerminal) {
+    audio.pause();
+    audio.currentTime = 0;
+    playBtn.textContent = "\u25B6";
+    if (current) setEq(current, false);
+    if (viaTerminal) printLine("stopped");
+  }
+  function nextTrack(viaTerminal) {
+    if (!current) { playTrack(ORDER[0], viaTerminal); return; }
+    var i = ORDER.indexOf(current);
+    playTrack(ORDER[(i + 1) % ORDER.length], viaTerminal);
+  }
+  function togglePlay() {
+    if (!current) { playTrack(ORDER[0], false); return; }
+    if (audio.paused) { playTrack(current, false); } else { pauseTrack(false); }
+  }
+
+  audio.addEventListener("timeupdate", updateTime);
+  audio.addEventListener("loadedmetadata", updateTime);
+  audio.addEventListener("ended", function () { nextTrack(false); });
+  audio.addEventListener("play", function () { playBtn.textContent = "\u23F8"; if (current) setEq(current, true); });
+  audio.addEventListener("pause", function () { playBtn.textContent = "\u25B6"; if (current) setEq(current, false); });
+  playBtn.addEventListener("click", function () {
+    sweep();
+    printGate(true, "media: local file \u00B7 authorization: public");
+    var wasPaused = audio.paused;
+    togglePlay();
+    printLine(wasPaused ? "\u25B6 playing: " + (current ? TRACKS[current].name : "") : "paused" + (current ? ": " + TRACKS[current].name : ""));
+  });
+  function seekTo(f) {
+    if (!audio.duration) return;
+    if (f < 0) f = 0; if (f > 1) f = 1;
+    audio.currentTime = f * audio.duration;
+    updateTime();
+  }
+  progress.addEventListener("click", function (e) {
+    if (!audio.duration) return;
+    sweep();
+    printGate(true, "media: local file \u00B7 authorization: public");
+    var r = progress.getBoundingClientRect();
+    seekTo((e.clientX - r.left) / r.width);
+    printLine("seek: " + fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration));
+  });
+  progress.addEventListener("keydown", function (e) {
+    if (!audio.duration) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      sweep();
+      printGate(true, "media: local file \u00B7 authorization: public");
+      var d = e.key === "ArrowLeft" ? -5 : 5;
+      audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + d));
+      updateTime();
+      printLine("seek: " + fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration));
+    }
+  });
+  var trackBtns = document.querySelectorAll(".track[data-track]");
+  for (var ti = 0; ti < trackBtns.length; ti++) {
+    trackBtns[ti].addEventListener("click", function () {
+      sweep();
+      printGate(true, "media: local file \u00B7 authorization: public");
+      playTrack(this.getAttribute("data-track"), true);
+    });
+  }
+
+  function cmdHelp() {
+    printLine("commands:");
+    printLine("  help              list commands");
+    printLine("  whoami            who is Knee Rose");
+    printLine("  ls / ls projects  list projects");
+    printLine("  projects          list projects");
+    printLine("  music             list my tracks");
+    printLine("  play [summit|kanai]  play a track");
+    printLine("  pause | stop | next");
+    printLine("  hami <question>   ask the Hami engine");
+    printLine("  about | contact");
+    printLine("  clear             clear the terminal");
+    printLine("  exit              close the terminal (it stays open)");
+  }
+  function cmdWhoami() {
+    printLine("Knee Rose — Software developer \u00B7 AI systems builder \u00B7 Product tinkerer");
+    printLine("Current focus: Hami — an evidence-led system for understanding economic activity, beginning with Nepal.");
+  }
+  function cmdProjects() {
+    printLine("projects:");
+    printLine("  Hami            evidence-led system for economic activity (work in progress)");
+    printLine("  Hami media      own real-time engine — M6-H measured");
+    printLine("  Hami AI         Nepali language model — research");
+    printLine("  @diojitree      Nepal, Explained — Nepali-first short videos");
+    printLine("  THE HANDS       documentary — brick kilns, child labour, bonded labour");
+  }
+  function cmdMusic() {
+    printLine("my tracks (local files, no streaming service):");
+    for (var i = 0; i < ORDER.length; i++) {
+      var k = ORDER[i];
+      printLine("  " + k + "  — " + TRACKS[k].name + (current === k && !audio.paused ? "  (playing)" : ""));
+    }
+    printLine("type: play summit  |  play kanai  |  pause  |  next");
+  }
+  function cmdAbout() {
+    printLine("I build software that connects data, reasoning, and useful action.");
+    printLine("I prefer improving an existing system over creating parallel ones.");
+    printLine("Clear architecture, traceable evidence, privacy, authorization, honest measurement.");
+  }
+  function cmdContact() {
+    printLine("The best way to reach me is through GitHub: https://github.com/kn33r0s3");
+  }
+  function askHami(question) {
+    hamiBusy = true;
+    input.disabled = true;
+    printLine("\u2026 hami is thinking (via the Hami engine)");
+    var ctrl = null;
+    var timer = null;
+    if (typeof AbortController !== "undefined") {
+      ctrl = new AbortController();
+      timer = setTimeout(function () { ctrl.abort(); }, 30000);
+    }
+    fetch(HAMI_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: question, history: [] }),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (res) { return res.json(); }).then(function (data) {
+      if (timer) clearTimeout(timer);
+      var reply = data && (data.reply || data.detail || data.message);
+      if (reply) { printLine("hami: " + String(reply)); }
+      else { printGate(false, "hami engine returned no reply"); printLine("hami is unreachable \u2014 the Mac tunnel may be down, try again in a moment."); }
+    }).catch(function () {
+      if (timer) clearTimeout(timer);
+      printGate(false, "hami engine unreachable");
+      printLine("hami is unreachable \u2014 the Mac tunnel may be down, try again in a moment.");
+    }).then(function () {
+      hamiBusy = false;
+      input.disabled = false;
+      input.focus();
+    });
+  }
+
+  function runCommand(raw) {
+    var cmd = raw.trim();
+    if (!cmd) return;
+    printEcho(cmd);
+    history.push(cmd);
+    histIdx = history.length;
+    sweep();
+    var parts = cmd.split(/\s+/);
+    var head = parts[0].toLowerCase();
+    var rest = parts.slice(1).join(" ");
+    if (head === "hami") {
+      if (!rest) {
+        printGate(false, "hami needs a question");
+        printLine("usage: hami <question>  — e.g. hami what is Hami?");
+        return;
+      }
+      printGate(true, "evidence: hami engine \u00B7 authorization: public chat");
+      askHami(rest);
+      return;
+    }
+    if (head === "play") {
+      var key = (rest || "").toLowerCase();
+      if (!key) { printGate(true, "media: local file \u00B7 authorization: public"); playTrack(current || ORDER[0], true); return; }
+      if (key === "summit" || key === "kanai") {
+        printGate(true, "media: local file \u00B7 authorization: public");
+        playTrack(key, true);
+        return;
+      }
+      printGate(false, "no such track: " + key);
+      printLine("no such track: " + key + " — try: play summit  |  play kanai");
+      return;
+    }
+    if (head === "clear") {
+      out.textContent = "";
+      printGate(true, "evidence: local \u00B7 authorization: public");
+      printLine("terminal cleared — type help to keep going.");
+      return;
+    }
+    printGate(true, "evidence: local \u00B7 authorization: public");
+    if (head === "help") cmdHelp();
+    else if (head === "whoami") cmdWhoami();
+    else if (head === "ls" || head === "projects") cmdProjects();
+    else if (head === "music") cmdMusic();
+    else if (head === "pause") pauseTrack(true);
+    else if (head === "stop") stopTrack(true);
+    else if (head === "next") nextTrack(true);
+    else if (head === "about") cmdAbout();
+    else if (head === "contact") cmdContact();
+    else if (head === "exit") { printLine("the terminal stays open — type help to keep going."); }
+    else {
+      printGate(false, "unknown command");
+      printLine("command not found: " + head + " \u2014 type help");
+    }
+  }
+
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      if (hamiBusy) return;
+      var v = input.value;
+      input.value = "";
+      runCommand(v);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (history.length && histIdx > 0) { histIdx--; input.value = history[histIdx]; }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (histIdx < history.length - 1) { histIdx++; input.value = history[histIdx]; }
+      else { histIdx = history.length; input.value = ""; }
+    }
+  });
+  var chips = document.querySelectorAll("#chips .chip");
+  for (var ci = 0; ci < chips.length; ci++) {
+    chips[ci].addEventListener("click", function () {
+      if (hamiBusy) return;
+      runCommand(this.getAttribute("data-cmd"));
+      input.focus();
+    });
+  }
+  document.getElementById("liveTerm").addEventListener("click", function (e) {
+    if (e.target !== input) input.focus();
+  });
+  printLine("type help — or click a command below. Every command passes through a gate first.");
+})();
+</script>
 </body>
 </html>
