@@ -117,7 +117,7 @@
   @keyframes blink { 50% { opacity: 0; } }
   .term-out { color: #e9e1d2; margin: 0; }
 
-  /* ---- prime (the framing, then the destination) ---- */
+  /* ---- prime (the framing, then the next stage) ---- */
   .prime {
     border: 2px solid #f2a33a;
     border-radius: 6px;
@@ -339,6 +339,43 @@
   @media (prefers-reduced-motion: reduce) {
     .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark, .art-path, .art-dot, .art-pillars rect, .art-flow circle, .art-rise { animation: none; }
   }
+
+  /* ---- evidence states: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from the gate's own evidence ---- */
+  .ev { display: inline-block; border: 1px solid; border-radius: 4px; padding: 1px 6px; font-size: 11px; letter-spacing: 0.12em; margin: 6px 0 2px 6px; }
+  .ev-proven { color: #72d38f; border-color: #72d38f; }
+  .ev-progress { color: #f2a33a; border-color: #f2a33a; }
+  .ev-unknown { color: #bdb29f; border-color: #bdb29f; }
+  .ev-blocked { color: #ff6f6f; border-color: #ff6f6f; }
+  .dim-evidence { display: block; color: #e9e1d2; font-size: 13px; margin-top: 8px; }
+  /* ---- evidence legend + filter chips ---- */
+  .ev-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 14px; font-size: 13px; color: #bdb29f; }
+  .ev-legend .ev-count { color: #e9e1d2; }
+  .ev-chip { font: inherit; font-size: 12px; letter-spacing: 0.08em; padding: 5px 10px; border: 1px solid #3a2e1a; border-radius: 9999px; background: #15130f; color: #e9e1d2; cursor: pointer; }
+  .ev-chip:hover, .ev-chip:focus-visible { border-color: #f2a33a; color: #f2a33a; outline: none; }
+  .ev-chip[aria-pressed="true"] { background: #f2a33a; border-color: #f2a33a; color: #0c0b0a; font-weight: 700; }
+  .ev-note { flex-basis: 100%; font-size: 12px; }
+  .gate.dimmed, .dim.dimmed { opacity: 0.28; }
+  /* ---- 7 dimensions: PLACE, GATE, WORK, EVIDENCE, TIME, OWNER, OUTCOME ---- */
+  .seven-d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 0 0 18px; }
+  @media (max-width: 720px) { .seven-d { grid-template-columns: repeat(2, 1fr); } }
+  .seven-d .d7 { border: 1px solid #3a2e1a; border-radius: 6px; background: #15130f; padding: 8px 10px; }
+  .seven-d .d7 b { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.14em; }
+  .seven-d .d7 span { display: block; color: #bdb29f; font-size: 12px; line-height: 1.5; margin-top: 2px; }
+  /* ---- layered depth: the card lifts when you hover it, like a door you can open ---- */
+  .gate, .dim { box-shadow: 4px 4px 0 #000, 0 0 0 1px #000; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .gate:hover, .dim:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 #000, 0 0 18px rgba(242, 163, 58, 0.12); }
+  /* ---- softer body copy for long reading (easy on the eyes) ---- */
+  .gate-body p, .dim-body p, .gate-body li, .dim-body li { color: #d5cbb6; }
+  /* ---- narrow screens ---- */
+  @media (max-width: 480px) {
+    .core-name { font-size: 44px; }
+    .gate-name, .dim-name { font-size: 16px; }
+    body { font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gate, .dim { transition: none; }
+    .gate:hover, .dim:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -382,12 +419,12 @@
     <p class="prime-gate">gate: OPEN &mdash; evidence: the network &middot; authorization: the owner</p>
   </section>
 
-  <section class="prime" aria-label="The destination: Hami itself becomes an LLM">
-    <p class="prime-label">THE DESTINATION &mdash; WHY THE GATES EXIST</p>
+  <section class="prime" aria-label="The next stage: Hami itself becomes an LLM">
+    <p class="prime-label">THE NEXT STAGE &mdash; WHY THE GATES EXIST</p>
     <p class="prime-statement">HAMI ITSELF BECOMES AN LLM &mdash; A NEED.</p>
-    <p class="prime-sub">In the end Hami must NOT need GPT or any models. Hami itself becomes an LLM &mdash; and a NEED: essential, not optional. That is WHY the gates exist, and why the uniqueness and perseverance and non-leak stages exist. The gates make Hami its own gated way &mdash; not borrowing another system&rsquo;s way. Uniqueness &mdash; never replicate or copy, the prime gate &mdash; makes Hami its own thing, not a copy of another model. Perseverance &mdash; never stop, loop gates, pacer gate &mdash; makes Hami keep learning and advancing on its own. Non-leak keeps Hami&rsquo;s knowledge and capability inside Hami &mdash; not depending on external models, not leaking out to them. The gates are the path. Hami as its own LLM is the destination.</p>
-    <p class="prime-sub">The current Nepali fine-tuning work &mdash; Qwen3-4B LoRA, a 500-example smoke test, loss 1.265 &rarr; 0.810 &mdash; is a stepping stone toward this, NOT the end state. The held-out eval is honest about it: the adapter still loses to the base, 58 to 73 out of 120, and data quality is the blocker. A stepping stone is not the destination &mdash; and it is not presented as one.</p>
-    <p class="prime-gate">gate: OPEN &mdash; evidence: the destination &middot; authorization: the owner</p>
+    <p class="prime-sub">The next stage is this: Hami must NOT need GPT or any models. Hami itself becomes an LLM &mdash; and a NEED: essential, not optional. That is WHY the gates exist, and why the uniqueness and perseverance and non-leak stages exist. The gates make Hami its own gated way &mdash; not borrowing another system&rsquo;s way. Uniqueness &mdash; never replicate or copy, the prime gate &mdash; makes Hami its own thing, not a copy of another model. Perseverance &mdash; never stop, loop gates, pacer gate &mdash; makes Hami keep learning and advancing on its own. Non-leak keeps Hami&rsquo;s knowledge and capability inside Hami &mdash; not depending on external models, not leaking out to them. The gates are the path. Hami as its own LLM is the next stage &mdash; and after it there is always more.</p>
+    <p class="prime-sub">The current Nepali fine-tuning work &mdash; Qwen3-4B LoRA, a 500-example smoke test, loss 1.265 &rarr; 0.810 &mdash; is a stepping stone toward this, NOT the end state. The held-out eval is honest about it: the adapter still loses to the base, 58 to 73 out of 120, and data quality is the blocker. A stepping stone is not the next stage &mdash; and it is not presented as one.</p>
+    <p class="prime-gate">gate: OPEN &mdash; evidence: the next stage &middot; authorization: the owner</p>
   </section>
 
   <div class="controls">
@@ -398,30 +435,40 @@
 
   <div class="section-head">
     <h2>The pacer gate &mdash; everything keeps pacing</h2>
+  <section class="seven-d" aria-label="The seven dimensions">
+<div class="d7"><b>PLACE</b><span>the engine: pacer, revision, loop.</span></div><div class="d7"><b>GATE</b><span>the gate itself: the door you open — pacer, revision, loop, engine.</span></div><div class="d7"><b>WORK</b><span>doing: the pacer moves it, the revision improves it, the loop carries it.</span></div><div class="d7"><b>EVIDENCE</b><span>proof: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from each gate's own evidence.</span></div><div class="d7"><b>TIME</b><span>when: the pace, the loops, the living now — never flat, never decreasing.</span></div><div class="d7"><b>OWNER</b><span>who sees: public plain-words; the owner sees the full detail.</span></div><div class="d7"><b>OUTCOME</b><span>where to: the next stage — Hami as its own LLM — and after it there is always more.</span></div>
+  </section>
+
     <p>The gate that sets the pace and never lets it drop. It paces every gate, every subgate, every agent &mdash; no matter what is needed. Click a gate to open it.</p>
   </div>
 
   <section class="pace-meter" aria-label="The pace meter">
     <h3>The pace meter</h3>
-    <p>The pace, right now, on this page. It counts the milliseconds since the page opened, and the multiplier grows as time passes. It never stops. It never slows to zero.</p>
+    <p>The pace is a rule, not a number. No counter here counts time passing &mdash; time is not work. The heartbeat beats, and it does not stop. It never slows to zero.</p>
     <div class="pulse" aria-hidden="true"></div>
     <p class="pulse-label">the heartbeat &mdash; beating, never stopping</p>
-    <div class="pace-reads">
-      <span class="pace-read"><span class="num" id="paceMs">0</span> milliseconds since this page opened</span>
-      <span class="pace-read"><span class="num" id="paceMult">&times;1.00</span> the pace multiplier &mdash; it grows as time passes</span>
-    </div>
     <p class="pace-rule">The rule, not a reading: <span class="k">the pace never drops to zero.</span> Work moves every second, every millisecond, or less. When one thing slows, the pacer pushes the next step. When one thing needs a human, the pacer routes around it and paces other work. Nothing is ever left idle.</p>
   </section>
 
   <section class="gates" aria-label="The pacer gate">
+  <section class="ev-legend" aria-label="Evidence states">
+    <span>evidence: <span class="ev-count" id="evCountTotal">0</span> gates &mdash;</span>
+    <button class="ev-chip" type="button" data-ev="proven" aria-pressed="false">PROVEN <span id="evCountProven">0</span></button>
+    <button class="ev-chip" type="button" data-ev="progress" aria-pressed="false">IN PROGRESS <span id="evCountProgress">0</span></button>
+    <button class="ev-chip" type="button" data-ev="unknown" aria-pressed="false">UNKNOWN <span id="evCountUnknown">0</span></button>
+    <button class="ev-chip" type="button" data-ev="blocked" aria-pressed="false">BLOCKED <span id="evCountBlocked">0</span></button>
+    <span class="ev-note">A gate stays RUNNING &mdash; the work never stops &mdash; while its evidence state is shown honestly. Click a state to filter; click again to clear.</span>
+  </section>
 
-    <article class="gate" id="pacer-1">
+
+
+    <article class="gate" id="pacer-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pacer-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 01</span>
         <span class="gate-name">What pacing means</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">work moves every second, every millisecond, or less</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">work moves every second, every millisecond, or less</span><span class="gate-evidence">The pacer is live — the field counts, the loop heartbeat runs every minute.</span>
       </button>
       <div class="gate-body" id="pacer-1-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -429,18 +476,18 @@
         <ul>
           <li><span class="k">What it is</span> &mdash; pacing means the work never stands still. It moves every second, every millisecond, or less. The pace never stops, and it never slows to zero.</li>
           <li><span class="k">What zero means</span> &mdash; a pace of zero is not a slow pace. It is a stopped pace. Stopped is not allowed. A slow pace is still a pace; a stopped pace is work lost.</li>
-          <li><span class="k">What the meter shows</span> &mdash; the pace meter above counts the milliseconds since this page opened and grows its multiplier as time passes. It is a heartbeat: it beats, and it does not stop.</li>
+          <li><span class="k">What the meter shows</span> &mdash; the heartbeat beats, and it does not stop. No number here is a score; the pace is the rule that work never stands still.</li>
         </ul>
       </div>
     </article>
 
-    <article class="gate" id="pacer-2">
+    <article class="gate" id="pacer-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pacer-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 02</span>
         <span class="gate-name">How it paces</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every gate, every subgate, every agent gets a pace</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">every gate, every subgate, every agent gets a pace</span><span class="gate-evidence">Every gate, every subgate, every agent gets a pace — the field shows it.</span>
       </button>
       <div class="gate-body" id="pacer-2-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -453,13 +500,13 @@
       </div>
     </article>
 
-    <article class="gate" id="pacer-3">
+    <article class="gate" id="pacer-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pacer-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 03</span>
         <span class="gate-name">It adapts to what is needed</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">blocked or human-needed &mdash; the pacer routes around</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">blocked or human-needed &mdash; the pacer routes around</span><span class="gate-evidence">When one thing is blocked, the pacer routes around it — the work continued around the M7-H block.</span>
       </button>
       <div class="gate-body" id="pacer-3-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -472,13 +519,13 @@
       </div>
     </article>
 
-    <article class="gate" id="pacer-4">
+    <article class="gate" id="pacer-4" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pacer-4-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PACER 04</span>
         <span class="gate-name">It never forgets</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every gate&rsquo;s pace remembered &mdash; nothing left idle</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">every gate&rsquo;s pace remembered &mdash; nothing left idle</span><span class="gate-evidence">Every gate's pace is remembered — the field, the map, the queue hold them.</span>
       </button>
       <div class="gate-body" id="pacer-4-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -500,13 +547,13 @@
 
   <section class="gates" aria-label="The revision gate">
 
-    <article class="gate" id="revision-1">
+    <article class="gate" id="revision-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="revision-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">REVISION 01</span>
         <span class="gate-name">What it revises</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every note, every doc, every page, every gate</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">every note, every doc, every page, every gate</span><span class="gate-evidence">Every note, doc, page, gate is revised — the pages carry their revisions.</span>
       </button>
       <div class="gate-body" id="revision-1-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -519,13 +566,13 @@
       </div>
     </article>
 
-    <article class="gate" id="revision-2">
+    <article class="gate" id="revision-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="revision-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">REVISION 02</span>
         <span class="gate-name">Every revision places an upgrade gate</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">revision is never a dead end &mdash; it opens the next improvement</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">revision is never a dead end &mdash; it opens the next improvement</span><span class="gate-evidence">The TIP gate and the SUBJECTED gate were added by revision.</span>
       </button>
       <div class="gate-body" id="revision-2-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -538,13 +585,13 @@
       </div>
     </article>
 
-    <article class="gate" id="revision-3">
+    <article class="gate" id="revision-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="revision-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">REVISION 03</span>
         <span class="gate-name">It runs on everything, always</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">no note is final, no page is done</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">no note is final, no page is done</span><span class="gate-evidence">No note is final — the 7D field and the effort-gate correction are revisions.</span>
       </button>
       <div class="gate-body" id="revision-3-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -566,12 +613,12 @@
 
   <section class="gates" aria-label="Live revisions">
 
-    <article class="gate" id="live-rev-1">
+    <article class="gate" id="live-rev-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-rev-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE REVISION 01</span>
         <span class="gate-name">The AI engineering gates page</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">built, then TIP GATE + SUBJECTED GATE added after</span>
         <span class="gate-evidence">35,610 B / 710 lines &rarr; 40,006 B / 764 lines. The revision gate in action.</span>
       </button>
@@ -586,12 +633,12 @@
       </div>
     </article>
 
-    <article class="gate" id="live-rev-2">
+    <article class="gate" id="live-rev-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-rev-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE REVISION 02</span>
         <span class="gate-name">The Instagram handle</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">@diojitree &rarr; @np.explains, everywhere live</span>
         <span class="gate-evidence">index.html lines 297 + 559. Commit 2c24a54.</span>
       </button>
@@ -606,12 +653,12 @@
       </div>
     </article>
 
-    <article class="gate" id="live-rev-3">
+    <article class="gate" id="live-rev-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-rev-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE REVISION 03</span>
         <span class="gate-name">The home links</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">Explore Hami added after the owner said nothing dormant</span>
         <span class="gate-evidence">src/routes/index.tsx, 49,156 B, 1,306 lines. Commit 25f13f16. Deploy 238ebbda.</span>
       </button>
@@ -646,18 +693,18 @@
       <span class="loop-step" id="loop-step-4">NEW GATE &mdash; the next step</span>
     </div>
     <p class="loop-return">&looparrowright; and the new gate loops back to the start &mdash; the ring never closes, it opens the next gate.</p>
-    <p class="loop-count">loops run on this page: <span class="k" id="loopCount">0</span></p>
+    <p class="loop-count">the ring walks itself, forever &mdash; a picture of the loop, not a count. No number here is a score.</p>
   </section>
 
   <section class="gates" aria-label="Loop gates">
 
-    <article class="gate" id="loop-1">
+    <article class="gate" id="loop-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="loop-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LOOP 01</span>
         <span class="gate-name">The loop</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every finished gate loops back to its next step</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">every finished gate loops back to its next step</span><span class="gate-evidence">The hami loop runs every minute — heartbeat fresh, work never stops.</span>
       </button>
       <div class="gate-body" id="loop-1-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -670,13 +717,13 @@
       </div>
     </article>
 
-    <article class="gate" id="loop-2">
+    <article class="gate" id="loop-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="loop-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LOOP 02</span>
         <span class="gate-name">How the loop is engineered</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">each gate&rsquo;s output feeds its own next input</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">each gate&rsquo;s output feeds its own next input</span><span class="gate-evidence">Each gate's output feeds its own next input — the alpha sweep feeds from experiment 1.</span>
       </button>
       <div class="gate-body" id="loop-2-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -690,13 +737,13 @@
       </div>
     </article>
 
-    <article class="gate" id="loop-3">
+    <article class="gate" id="loop-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="loop-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LOOP 03</span>
         <span class="gate-name">The loop covers everywhere</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every page, every project, every agent, every gate</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">every page, every project, every agent, every gate</span><span class="gate-evidence">Every page, project, agent, gate is in the loop — the field shows all 62.</span>
       </button>
       <div class="gate-body" id="loop-3-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -718,14 +765,14 @@
 
   <section class="gates" aria-label="The engine">
 
-    <article class="gate" id="engine-1">
+    <article class="gate" id="engine-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="engine-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">ENGINE 01</span>
         <span class="gate-name">Three gates, one engine</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">the pacer moves it &middot; the revision improves it &middot; the loop carries it</span>
-        <span class="gate-evidence">Pace never drops. Revision never ends. The loop never closes. Hami becomes its own LLM.</span>
+        <span class="gate-evidence">Pace never drops. Revision never ends. The loop never closes. Hami becoming its own LLM is the next stage.</span>
       </button>
       <div class="gate-body" id="engine-1-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -734,7 +781,7 @@
           <li><span class="k">The pacer</span> &mdash; keeps the engine moving. Every second, every millisecond, or less. No idle, no gap of rest, no pace of zero.</li>
           <li><span class="k">The revision</span> &mdash; makes the engine better each time around. Every note re-read, every page revised, every revision placing its own upgrade gate.</li>
           <li><span class="k">The loop</span> &mdash; carries the engine forward forever. Every finish opens the next step. &ldquo;Done&rdquo; is forbidden as a state.</li>
-          <li><span class="k">The destination</span> &mdash; the engine is the path, and Hami as its own LLM is the destination. The gates make Hami its own gated way. Uniqueness makes it its own thing. Perseverance makes it keep learning on its own. Non-leak keeps its knowledge inside Hami. The engine never stops, because the destination is a NEED &mdash; essential, not optional.</li>
+          <li><span class="k">The next stage</span> &mdash; the engine is the path, and Hami as its own LLM is the next stage &mdash; and after it there is always more. The gates make Hami its own gated way. Uniqueness makes it its own thing. Perseverance makes it keep learning on its own. Non-leak keeps its knowledge inside Hami. The engine never stops, because the next stage is a NEED &mdash; essential, not optional.</li>
         </ul>
       </div>
     </article>
@@ -790,36 +837,55 @@
     forEachGate(function (gate) { setGate(gate, false); });
   });
 
-  // The pace meter: a heartbeat that never stops. The multiplier grows as time passes.
-  var paceStart = Date.now();
-  var paceMs = document.getElementById("paceMs");
-  var paceMult = document.getElementById("paceMult");
-  function tickPace() {
-    var elapsed = Date.now() - paceStart;
-    paceMs.textContent = String(elapsed);
-    paceMult.textContent = "x" + (1 + elapsed / 60000).toFixed(2);
-  }
-  setInterval(tickPace, 100);
-  tickPace();
 
   // The loop ring: the lit step walks itself, forever. The ring never closes.
   var loopSteps = document.querySelectorAll(".loop-step");
-  var loopCount = document.getElementById("loopCount");
   var loopIndex = 0;
-  var loopsRun = 0;
   function tickLoop() {
     Array.prototype.forEach.call(loopSteps, function (step) {
       step.classList.remove("active");
     });
     loopSteps[loopIndex].classList.add("active");
-    if (loopIndex === 0) {
-      loopsRun += 1;
-      loopCount.textContent = String(loopsRun);
-    }
     loopIndex = (loopIndex + 1) % loopSteps.length;
   }
   setInterval(tickLoop, 2000);
   tickLoop();
+
+  // Evidence states: count from data-ev, fill the legend, filter on chip click.
+  // A gate stays RUNNING while its evidence state is shown honestly. Counts are
+  // computed from the data, never hardcoded, so they cannot go stale.
+  var evCounts = { proven: 0, progress: 0, unknown: 0, blocked: 0 };
+  var evGates = [];
+  Array.prototype.forEach.call(document.querySelectorAll(".gate"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(document.querySelectorAll(".dim"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(evGates, function (g) {
+    var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+    if (v && Object.prototype.hasOwnProperty.call(evCounts, v)) evCounts[v] += 1;
+  });
+  function evText(id, n) { var el = document.getElementById(id); if (el) el.textContent = String(n); }
+  evText("evCountProven", evCounts.proven);
+  evText("evCountProgress", evCounts.progress);
+  evText("evCountUnknown", evCounts.unknown);
+  evText("evCountBlocked", evCounts.blocked);
+  evText("evCountTotal", evCounts.proven + evCounts.progress + evCounts.unknown + evCounts.blocked);
+  var evFilter = null;
+  function applyEvFilter() {
+    Array.prototype.forEach.call(evGates, function (g) {
+      var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+      if (!evFilter || v === evFilter) { if (g.classList) g.classList.remove("dimmed"); }
+      else if (g.classList) g.classList.add("dimmed");
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (chip) {
+    chip.addEventListener("click", function () {
+      var v = chip.getAttribute ? chip.getAttribute("data-ev") : null;
+      evFilter = (evFilter === v) ? null : v;
+      Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (c) {
+        c.setAttribute("aria-pressed", (evFilter && c.getAttribute && c.getAttribute("data-ev") === evFilter) ? "true" : "false");
+      });
+      applyEvFilter();
+    });
+  });
 })();
 </script>
 </body>

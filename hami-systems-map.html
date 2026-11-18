@@ -248,6 +248,43 @@
   @media (prefers-reduced-motion: reduce) {
     .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark, .art-path, .art-dot, .art-pillars rect, .art-flow circle, .art-rise { animation: none; }
   }
+
+  /* ---- evidence states: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from the gate's own evidence ---- */
+  .ev { display: inline-block; border: 1px solid; border-radius: 4px; padding: 1px 6px; font-size: 11px; letter-spacing: 0.12em; margin: 6px 0 2px 6px; }
+  .ev-proven { color: #72d38f; border-color: #72d38f; }
+  .ev-progress { color: #f2a33a; border-color: #f2a33a; }
+  .ev-unknown { color: #bdb29f; border-color: #bdb29f; }
+  .ev-blocked { color: #ff6f6f; border-color: #ff6f6f; }
+  .dim-evidence { display: block; color: #e9e1d2; font-size: 13px; margin-top: 8px; }
+  /* ---- evidence legend + filter chips ---- */
+  .ev-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 14px; font-size: 13px; color: #bdb29f; }
+  .ev-legend .ev-count { color: #e9e1d2; }
+  .ev-chip { font: inherit; font-size: 12px; letter-spacing: 0.08em; padding: 5px 10px; border: 1px solid #3a2e1a; border-radius: 9999px; background: #15130f; color: #e9e1d2; cursor: pointer; }
+  .ev-chip:hover, .ev-chip:focus-visible { border-color: #f2a33a; color: #f2a33a; outline: none; }
+  .ev-chip[aria-pressed="true"] { background: #f2a33a; border-color: #f2a33a; color: #0c0b0a; font-weight: 700; }
+  .ev-note { flex-basis: 100%; font-size: 12px; }
+  .gate.dimmed, .dim.dimmed { opacity: 0.28; }
+  /* ---- 7 dimensions: PLACE, GATE, WORK, EVIDENCE, TIME, OWNER, OUTCOME ---- */
+  .seven-d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 0 0 18px; }
+  @media (max-width: 720px) { .seven-d { grid-template-columns: repeat(2, 1fr); } }
+  .seven-d .d7 { border: 1px solid #3a2e1a; border-radius: 6px; background: #15130f; padding: 8px 10px; }
+  .seven-d .d7 b { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.14em; }
+  .seven-d .d7 span { display: block; color: #bdb29f; font-size: 12px; line-height: 1.5; margin-top: 2px; }
+  /* ---- layered depth: the card lifts when you hover it, like a door you can open ---- */
+  .gate, .dim { box-shadow: 4px 4px 0 #000, 0 0 0 1px #000; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .gate:hover, .dim:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 #000, 0 0 18px rgba(242, 163, 58, 0.12); }
+  /* ---- softer body copy for long reading (easy on the eyes) ---- */
+  .gate-body p, .dim-body p, .gate-body li, .dim-body li { color: #d5cbb6; }
+  /* ---- narrow screens ---- */
+  @media (max-width: 480px) {
+    .core-name { font-size: 44px; }
+    .gate-name, .dim-name { font-size: 16px; }
+    body { font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gate, .dim { transition: none; }
+    .gate:hover, .dim:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -274,6 +311,10 @@
     <figcaption class="art-caption">the map, in a picture: a compass, a dotted path, a gate.</figcaption>
   </figure>
   <div class="spine" aria-hidden="true"></div>
+  <section class="seven-d" aria-label="The seven dimensions">
+<div class="d7"><b>PLACE</b><span>the geography: 8 public gates + 6 private gates, one Hami.</span></div><div class="d7"><b>GATE</b><span>the gate itself: the door you open, public or private.</span></div><div class="d7"><b>WORK</b><span>doing: the subgates, the action, the connections that carry work.</span></div><div class="d7"><b>EVIDENCE</b><span>proof: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from each gate's own evidence.</span></div><div class="d7"><b>TIME</b><span>when: the pace, the loops, the living now.</span></div><div class="d7"><b>OWNER</b><span>who sees: public plain-words; the owner sees the full detail.</span></div><div class="d7"><b>OUTCOME</b><span>where to: the next stage — and after it there is always more.</span></div>
+  </section>
+
   <div class="bus" aria-hidden="true"></div>
 
   <section class="term-window" aria-label="Hami map terminal">
@@ -291,13 +332,23 @@
   </div>
 
   <section class="gates" aria-label="Hami gates">
+  <section class="ev-legend" aria-label="Evidence states">
+    <span>evidence: <span class="ev-count" id="evCountTotal">0</span> gates &mdash;</span>
+    <button class="ev-chip" type="button" data-ev="proven" aria-pressed="false">PROVEN <span id="evCountProven">0</span></button>
+    <button class="ev-chip" type="button" data-ev="progress" aria-pressed="false">IN PROGRESS <span id="evCountProgress">0</span></button>
+    <button class="ev-chip" type="button" data-ev="unknown" aria-pressed="false">UNKNOWN <span id="evCountUnknown">0</span></button>
+    <button class="ev-chip" type="button" data-ev="blocked" aria-pressed="false">BLOCKED <span id="evCountBlocked">0</span></button>
+    <span class="ev-note">A gate stays RUNNING &mdash; the work never stops &mdash; while its evidence state is shown honestly. Click a state to filter; click again to clear.</span>
+  </section>
 
-    <article class="gate" id="gate-1">
+
+
+    <article class="gate" id="gate-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 01</span>
         <span class="gate-name">LiveKit capacity proof</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">M6-H passed &middot; M7-H running &middot; attempt 13 running</span>
         <span class="gate-evidence">M6-H: p95 0.34 ms, p99 17.8 ms, zero NACKs.</span>
       </button>
@@ -314,12 +365,12 @@
       </div>
     </article>
 
-    <article class="gate" id="gate-2">
+    <article class="gate" id="gate-2" data-ev="progress">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 02</span>
         <span class="gate-name">Hami AI Nepali training</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-progress">evidence: IN PROGRESS</span>
         <span class="gate-status">data quality is the subgate</span>
         <span class="gate-evidence">Adapter loses &mdash; base 73/120 vs adapter 58/120.</span>
       </button>
@@ -335,12 +386,12 @@
       </div>
     </article>
 
-    <article class="gate" id="gate-3">
+    <article class="gate" id="gate-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 03</span>
         <span class="gate-name">Meet Hami live agent environment</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">chat VERIFIED working &middot; permanence is the subgate</span>
         <span class="gate-evidence">A real reply landed 19:18.</span>
       </button>
@@ -356,12 +407,12 @@
       </div>
     </article>
 
-    <article class="gate" id="gate-4">
+    <article class="gate" id="gate-4" data-ev="progress">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-4-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 04</span>
-        <span class="gate-name">Income offers + CloudFactory</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-name">Income offers</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-progress">evidence: IN PROGRESS</span>
         <span class="gate-status">verified revenue Rs 0</span>
         <span class="gate-evidence">Verified revenue so far: Rs 0.</span>
       </button>
@@ -369,20 +420,20 @@
         <div class="gate-bar" aria-hidden="true"></div>
         <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
         <ul>
-          <li><span class="k">Hamsawears</span> &mdash; questionnaire SENT by email 18 Nov 12:13 (14 questions), awaiting reply.</li>
-          <li><span class="k">CloudFactory</span> &mdash; application running: macOS question sent, no reply yet.</li>
-          <li><span class="k">DataAnnotation</span> &mdash; open door: the owner creates the account, General track, stop before the test.</li>
+          <li><span class="k">Two offers prepared</span> &mdash; enquiry organiser and data clean-up; no seller has agreed yet.</li>
+          <li><span class="k">The slow-reply experiment</span> &mdash; waits for its first seller; faster replies may win back lost sales.</li>
+          <li><span class="k">Research materials</span> &mdash; seller prospects, job applications, micro-task doors &mdash; serve the income work from the supporting layer, not as gates.</li>
           <li><span class="k">Verified revenue so far: Rs 0.</span></li>
         </ul>
       </div>
     </article>
 
-    <article class="gate" id="gate-5">
+    <article class="gate" id="gate-5" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-5-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 05</span>
         <span class="gate-name">Gates enforcement</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">007 + 008 running &middot; PROVE IT running</span>
         <span class="gate-evidence">1,380 backend tests passed, gates 14/14, GREEN.</span>
       </button>
@@ -397,12 +448,12 @@
       </div>
     </article>
 
-    <article class="gate" id="gate-6">
+    <article class="gate" id="gate-6" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-6-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 06</span>
         <span class="gate-name">Knee Rose site</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">LIVE</span>
         <span class="gate-evidence">Interactive terminal + 3 tracks, live.</span>
       </button>
@@ -418,12 +469,12 @@
       </div>
     </article>
 
-    <article class="gate" id="gate-7">
+    <article class="gate" id="gate-7" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-7-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 07</span>
         <span class="gate-name">Proof ledger</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">page BUILT and verified, staged</span>
         <span class="gate-evidence">6 real claims, each with state + evidence.</span>
       </button>
@@ -438,12 +489,12 @@
       </div>
     </article>
 
-    <article class="gate" id="gate-8">
+    <article class="gate" id="gate-8" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="gate-8-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">GATE 08</span>
         <span class="gate-name">Hami Systems, for the globe</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">LIVE on Knee Rose &middot; staged on the Hami site &middot; one script tag for everywhere</span>
         <span class="gate-evidence">One script tag, one gate, every surface.</span>
       </button>
@@ -466,12 +517,12 @@
 
   <section class="gates" aria-label="Private gates — the engine underneath">
 
-    <article class="gate" id="pgate-1">
+    <article class="gate" id="pgate-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 01</span>
         <span class="gate-name">The Decision Gate</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">running</span>
         <span class="gate-evidence">Every action is checked against the rules before Hami acts.</span>
       </button>
@@ -485,12 +536,12 @@
       </div>
     </article>
 
-    <article class="gate" id="pgate-2">
+    <article class="gate" id="pgate-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 02</span>
         <span class="gate-name">The Outbox</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">running</span>
         <span class="gate-evidence">One queue, one door &mdash; every message leaves through the same door.</span>
       </button>
@@ -504,12 +555,12 @@
       </div>
     </article>
 
-    <article class="gate" id="pgate-3">
+    <article class="gate" id="pgate-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 03</span>
         <span class="gate-name">The Engine</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">running</span>
         <span class="gate-evidence">Hami thinks with its own engine, on its own machine.</span>
       </button>
@@ -523,12 +574,12 @@
       </div>
     </article>
 
-    <article class="gate" id="pgate-4">
+    <article class="gate" id="pgate-4" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-4-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 04</span>
         <span class="gate-name">The Evidence Ledger</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">running</span>
         <span class="gate-evidence">6 real claims, each with state + evidence.</span>
       </button>
@@ -542,12 +593,12 @@
       </div>
     </article>
 
-    <article class="gate" id="pgate-5">
+    <article class="gate" id="pgate-5" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-5-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 05</span>
         <span class="gate-name">The Live Video Engine</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">running</span>
         <span class="gate-evidence">1,000 publishers and 2,000 viewers passed (p95 0.34 ms, p99 17.8 ms).</span>
       </button>
@@ -561,12 +612,12 @@
       </div>
     </article>
 
-    <article class="gate" id="pgate-6">
+    <article class="gate" id="pgate-6" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="pgate-6-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">PRIVATE GATE 06</span>
         <span class="gate-name">The Locks</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">running</span>
         <span class="gate-evidence">Only the owner holds the key.</span>
       </button>
@@ -629,6 +680,42 @@
   });
   document.getElementById("collapseAll").addEventListener("click", function () {
     forEachGate(function (gate) { setGate(gate, false); });
+  });
+
+  // Evidence states: count from data-ev, fill the legend, filter on chip click.
+  // A gate stays RUNNING while its evidence state is shown honestly. Counts are
+  // computed from the data, never hardcoded, so they cannot go stale.
+  var evCounts = { proven: 0, progress: 0, unknown: 0, blocked: 0 };
+  var evGates = [];
+  Array.prototype.forEach.call(document.querySelectorAll(".gate"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(document.querySelectorAll(".dim"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(evGates, function (g) {
+    var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+    if (v && Object.prototype.hasOwnProperty.call(evCounts, v)) evCounts[v] += 1;
+  });
+  function evText(id, n) { var el = document.getElementById(id); if (el) el.textContent = String(n); }
+  evText("evCountProven", evCounts.proven);
+  evText("evCountProgress", evCounts.progress);
+  evText("evCountUnknown", evCounts.unknown);
+  evText("evCountBlocked", evCounts.blocked);
+  evText("evCountTotal", evCounts.proven + evCounts.progress + evCounts.unknown + evCounts.blocked);
+  var evFilter = null;
+  function applyEvFilter() {
+    Array.prototype.forEach.call(evGates, function (g) {
+      var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+      if (!evFilter || v === evFilter) { if (g.classList) g.classList.remove("dimmed"); }
+      else if (g.classList) g.classList.add("dimmed");
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (chip) {
+    chip.addEventListener("click", function () {
+      var v = chip.getAttribute ? chip.getAttribute("data-ev") : null;
+      evFilter = (evFilter === v) ? null : v;
+      Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (c) {
+        c.setAttribute("aria-pressed", (evFilter && c.getAttribute && c.getAttribute("data-ev") === evFilter) ? "true" : "false");
+      });
+      applyEvFilter();
+    });
   });
 })();
 </script>

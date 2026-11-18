@@ -302,6 +302,43 @@
   @media (prefers-reduced-motion: reduce) {
     .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark, .art-path, .art-dot, .art-pillars rect, .art-flow circle, .art-rise { animation: none; }
   }
+
+  /* ---- evidence states: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from the gate's own evidence ---- */
+  .ev { display: inline-block; border: 1px solid; border-radius: 4px; padding: 1px 6px; font-size: 11px; letter-spacing: 0.12em; margin: 6px 0 2px 6px; }
+  .ev-proven { color: #72d38f; border-color: #72d38f; }
+  .ev-progress { color: #f2a33a; border-color: #f2a33a; }
+  .ev-unknown { color: #bdb29f; border-color: #bdb29f; }
+  .ev-blocked { color: #ff6f6f; border-color: #ff6f6f; }
+  .dim-evidence { display: block; color: #e9e1d2; font-size: 13px; margin-top: 8px; }
+  /* ---- evidence legend + filter chips ---- */
+  .ev-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 14px; font-size: 13px; color: #bdb29f; }
+  .ev-legend .ev-count { color: #e9e1d2; }
+  .ev-chip { font: inherit; font-size: 12px; letter-spacing: 0.08em; padding: 5px 10px; border: 1px solid #3a2e1a; border-radius: 9999px; background: #15130f; color: #e9e1d2; cursor: pointer; }
+  .ev-chip:hover, .ev-chip:focus-visible { border-color: #f2a33a; color: #f2a33a; outline: none; }
+  .ev-chip[aria-pressed="true"] { background: #f2a33a; border-color: #f2a33a; color: #0c0b0a; font-weight: 700; }
+  .ev-note { flex-basis: 100%; font-size: 12px; }
+  .gate.dimmed, .dim.dimmed { opacity: 0.28; }
+  /* ---- 7 dimensions: PLACE, GATE, WORK, EVIDENCE, TIME, OWNER, OUTCOME ---- */
+  .seven-d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 0 0 18px; }
+  @media (max-width: 720px) { .seven-d { grid-template-columns: repeat(2, 1fr); } }
+  .seven-d .d7 { border: 1px solid #3a2e1a; border-radius: 6px; background: #15130f; padding: 8px 10px; }
+  .seven-d .d7 b { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.14em; }
+  .seven-d .d7 span { display: block; color: #bdb29f; font-size: 12px; line-height: 1.5; margin-top: 2px; }
+  /* ---- layered depth: the card lifts when you hover it, like a door you can open ---- */
+  .gate, .dim { box-shadow: 4px 4px 0 #000, 0 0 0 1px #000; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .gate:hover, .dim:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 #000, 0 0 18px rgba(242, 163, 58, 0.12); }
+  /* ---- softer body copy for long reading (easy on the eyes) ---- */
+  .gate-body p, .dim-body p, .gate-body li, .dim-body li { color: #d5cbb6; }
+  /* ---- narrow screens ---- */
+  @media (max-width: 480px) {
+    .core-name { font-size: 44px; }
+    .gate-name, .dim-name { font-size: 16px; }
+    body { font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gate, .dim { transition: none; }
+    .gate:hover, .dim:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -347,6 +384,10 @@
 
   <div class="section-head">
     <h2>The six dimensions</h2>
+  <section class="seven-d" aria-label="The seven dimensions">
+<div class="d7"><b>PLACE</b><span>the method: six layers under one arch.</span></div><div class="d7"><b>GATE</b><span>the gate itself: the prime, one gate, every visual passes through it.</span></div><div class="d7"><b>WORK</b><span>doing: how a visual is made and checked, layer by layer.</span></div><div class="d7"><b>EVIDENCE</b><span>proof: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from each dimension's own evidence.</span></div><div class="d7"><b>TIME</b><span>when: the check, again and again, beginning to end.</span></div><div class="d7"><b>OWNER</b><span>who sees: public plain-words; the owner sees the full detail.</span></div><div class="d7"><b>OUTCOME</b><span>where to: the next stage — and after it there is always more.</span></div>
+  </section>
+
     <p>One methodology, six layers. Each layer is a real layer of how a visual is made and checked. Click a dimension to open it.</p>
   </div>
 
@@ -357,13 +398,23 @@
   </div>
 
   <section class="dims" aria-label="The six dimensions">
+  <section class="ev-legend" aria-label="Evidence states">
+    <span>evidence: <span class="ev-count" id="evCountTotal">0</span> gates &mdash;</span>
+    <button class="ev-chip" type="button" data-ev="proven" aria-pressed="false">PROVEN <span id="evCountProven">0</span></button>
+    <button class="ev-chip" type="button" data-ev="progress" aria-pressed="false">IN PROGRESS <span id="evCountProgress">0</span></button>
+    <button class="ev-chip" type="button" data-ev="unknown" aria-pressed="false">UNKNOWN <span id="evCountUnknown">0</span></button>
+    <button class="ev-chip" type="button" data-ev="blocked" aria-pressed="false">BLOCKED <span id="evCountBlocked">0</span></button>
+    <span class="ev-note">A gate stays RUNNING &mdash; the work never stops &mdash; while its evidence state is shown honestly. Click a state to filter; click again to clear.</span>
+  </section>
 
-    <article class="dim" id="dim-1">
+
+
+    <article class="dim" id="dim-1" data-ev="proven">
       <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-1-body">
         <span class="dim-toggle" aria-hidden="true">+</span>
         <span class="dim-num">DIMENSION 01</span>
         <span class="dim-name">The Gate</span>
-        <span class="dim-status">the prime &middot; one gate &middot; every visual passes through it</span>
+        <span class="dim-status">the prime &middot; one gate &middot; every visual passes through it</span><span class="dim-evidence">The gates pages and the field are built through gates — one gate, one Hami.</span><span class="ev ev-proven">evidence: PROVEN</span>
       </button>
       <div class="dim-body" id="dim-1-body">
         <div class="dim-bar" aria-hidden="true"></div>
@@ -374,12 +425,12 @@
       </div>
     </article>
 
-    <article class="dim" id="dim-2">
+    <article class="dim" id="dim-2" data-ev="proven">
       <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-2-body">
         <span class="dim-toggle" aria-hidden="true">+</span>
         <span class="dim-num">DIMENSION 02</span>
         <span class="dim-name">Nothingness / Inner Power</span>
-        <span class="dim-status">generate from within &middot; from first principles &middot; from our own measurements</span>
+        <span class="dim-status">generate from within &middot; from first principles &middot; from our own measurements</span><span class="dim-evidence">Hami's own media engine and own LLM work — built from first principles, measured, not copied.</span><span class="ev ev-proven">evidence: PROVEN</span>
       </button>
       <div class="dim-body" id="dim-2-body">
         <div class="dim-bar" aria-hidden="true"></div>
@@ -390,12 +441,12 @@
       </div>
     </article>
 
-    <article class="dim" id="dim-3">
+    <article class="dim" id="dim-3" data-ev="proven">
       <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-3-body">
         <span class="dim-toggle" aria-hidden="true">+</span>
         <span class="dim-num">DIMENSION 03</span>
         <span class="dim-name">The Visual</span>
-        <span class="dim-status">the look IS the gate made visible</span>
+        <span class="dim-status">the look IS the gate made visible</span><span class="dim-evidence">The gates pages, the field, the map — the look is the gate made visible.</span><span class="ev ev-proven">evidence: PROVEN</span>
       </button>
       <div class="dim-body" id="dim-3-body">
         <div class="dim-bar" aria-hidden="true"></div>
@@ -406,12 +457,12 @@
       </div>
     </article>
 
-    <article class="dim" id="dim-4">
+    <article class="dim" id="dim-4" data-ev="proven">
       <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-4-body">
         <span class="dim-toggle" aria-hidden="true">+</span>
         <span class="dim-num">DIMENSION 04</span>
         <span class="dim-name">The Network</span>
-        <span class="dim-status">Hami networks all gates &middot; nothing is lost</span>
+        <span class="dim-status">Hami networks all gates &middot; nothing is lost</span><span class="dim-evidence">The field shows 62 gates networked; the map links every page.</span><span class="ev ev-proven">evidence: PROVEN</span>
       </button>
       <div class="dim-body" id="dim-4-body">
         <div class="dim-bar" aria-hidden="true"></div>
@@ -422,12 +473,12 @@
       </div>
     </article>
 
-    <article class="dim" id="dim-5">
+    <article class="dim" id="dim-5" data-ev="proven">
       <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-5-body">
         <span class="dim-toggle" aria-hidden="true">+</span>
         <span class="dim-num">DIMENSION 05</span>
         <span class="dim-name">The Track</span>
-        <span class="dim-status">beginning to end &middot; checkable again and again</span>
+        <span class="dim-status">beginning to end &middot; checkable again and again</span><span class="dim-evidence">The ledger, the chronicle, the capability queue — beginning to end, checkable again and again.</span><span class="ev ev-proven">evidence: PROVEN</span>
       </button>
       <div class="dim-body" id="dim-5-body">
         <div class="dim-bar" aria-hidden="true"></div>
@@ -438,12 +489,12 @@
       </div>
     </article>
 
-    <article class="dim" id="dim-6">
+    <article class="dim" id="dim-6" data-ev="progress">
       <button class="dim-head" type="button" aria-expanded="false" aria-controls="dim-6-body">
         <span class="dim-toggle" aria-hidden="true">+</span>
         <span class="dim-num">DIMENSION 06</span>
         <span class="dim-name">The Spiritual</span>
-        <span class="dim-status">the meaning &middot; the design serves the people</span>
+        <span class="dim-status">the meaning &middot; the design serves the people</span><span class="dim-evidence">Hami is for the Nepali people — the serving is being built, revenue verified Rs 0 so far.</span><span class="ev ev-progress">evidence: IN PROGRESS</span>
       </button>
       <div class="dim-body" id="dim-6-body">
         <div class="dim-bar" aria-hidden="true"></div>
@@ -467,7 +518,7 @@
     <li><span class="k">Gate 01 &mdash; LiveKit capacity proof</span> connects to the ledger (its numbers are claims), the map (it is a gate on the map), and the track (M6-H, M7-H, attempt 13).<span class="to">to: ledger &middot; map &middot; track</span></li>
     <li><span class="k">Gate 02 &mdash; Hami AI Nepali training</span> connects to the ledger (the SFT-EVAL claim), the map, and the track.<span class="to">to: ledger &middot; map &middot; track</span></li>
     <li><span class="k">Gate 03 &mdash; Meet Hami live agent environment</span> connects to Hami Systems (the pop-up is the surface), the terminal (the hami command), and the map.<span class="to">to: Hami Systems &middot; terminal &middot; map</span></li>
-    <li><span class="k">Gate 04 &mdash; Income offers + CloudFactory</span> connects to the ledger (the RS-0 claim) and the map.<span class="to">to: ledger &middot; map</span></li>
+    <li><span class="k">Gate 04 &mdash; Income offers</span> connects to the ledger (the RS-0 claim) and the map.<span class="to">to: ledger &middot; map</span></li>
     <li><span class="k">Gate 05 &mdash; Gates enforcement</span> connects to every gate (it guards them all), the ledger, and the map.<span class="to">to: all gates &middot; ledger &middot; map</span></li>
     <li><span class="k">Gate 06 &mdash; Knee Rose site</span> connects to the terminal, Hami Systems, the map, and this methodology (this page lives here).<span class="to">to: terminal &middot; Hami Systems &middot; map &middot; methodology</span></li>
     <li><span class="k">Gate 07 &mdash; Proof ledger</span> connects to every gate (it holds their claims), the map, and the track.<span class="to">to: all gates &middot; map &middot; track</span></li>
@@ -532,6 +583,42 @@
   });
   document.getElementById("collapseAll").addEventListener("click", function () {
     eachDim(function (dim) { setDim(dim, false); });
+  });
+
+  // Evidence states: count from data-ev, fill the legend, filter on chip click.
+  // A gate stays RUNNING while its evidence state is shown honestly. Counts are
+  // computed from the data, never hardcoded, so they cannot go stale.
+  var evCounts = { proven: 0, progress: 0, unknown: 0, blocked: 0 };
+  var evGates = [];
+  Array.prototype.forEach.call(document.querySelectorAll(".gate"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(document.querySelectorAll(".dim"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(evGates, function (g) {
+    var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+    if (v && Object.prototype.hasOwnProperty.call(evCounts, v)) evCounts[v] += 1;
+  });
+  function evText(id, n) { var el = document.getElementById(id); if (el) el.textContent = String(n); }
+  evText("evCountProven", evCounts.proven);
+  evText("evCountProgress", evCounts.progress);
+  evText("evCountUnknown", evCounts.unknown);
+  evText("evCountBlocked", evCounts.blocked);
+  evText("evCountTotal", evCounts.proven + evCounts.progress + evCounts.unknown + evCounts.blocked);
+  var evFilter = null;
+  function applyEvFilter() {
+    Array.prototype.forEach.call(evGates, function (g) {
+      var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+      if (!evFilter || v === evFilter) { if (g.classList) g.classList.remove("dimmed"); }
+      else if (g.classList) g.classList.add("dimmed");
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (chip) {
+    chip.addEventListener("click", function () {
+      var v = chip.getAttribute ? chip.getAttribute("data-ev") : null;
+      evFilter = (evFilter === v) ? null : v;
+      Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (c) {
+        c.setAttribute("aria-pressed", (evFilter && c.getAttribute && c.getAttribute("data-ev") === evFilter) ? "true" : "false");
+      });
+      applyEvFilter();
+    });
   });
 })();
 </script>

@@ -350,6 +350,43 @@
   @media (prefers-reduced-motion: reduce) {
     .mascot-bob, .mascot-eyes, .mascot-wave, .mascot-spark, .art-path, .art-dot, .art-pillars rect, .art-flow circle, .art-rise { animation: none; }
   }
+
+  /* ---- evidence states: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from the gate's own evidence ---- */
+  .ev { display: inline-block; border: 1px solid; border-radius: 4px; padding: 1px 6px; font-size: 11px; letter-spacing: 0.12em; margin: 6px 0 2px 6px; }
+  .ev-proven { color: #72d38f; border-color: #72d38f; }
+  .ev-progress { color: #f2a33a; border-color: #f2a33a; }
+  .ev-unknown { color: #bdb29f; border-color: #bdb29f; }
+  .ev-blocked { color: #ff6f6f; border-color: #ff6f6f; }
+  .dim-evidence { display: block; color: #e9e1d2; font-size: 13px; margin-top: 8px; }
+  /* ---- evidence legend + filter chips ---- */
+  .ev-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 14px; font-size: 13px; color: #bdb29f; }
+  .ev-legend .ev-count { color: #e9e1d2; }
+  .ev-chip { font: inherit; font-size: 12px; letter-spacing: 0.08em; padding: 5px 10px; border: 1px solid #3a2e1a; border-radius: 9999px; background: #15130f; color: #e9e1d2; cursor: pointer; }
+  .ev-chip:hover, .ev-chip:focus-visible { border-color: #f2a33a; color: #f2a33a; outline: none; }
+  .ev-chip[aria-pressed="true"] { background: #f2a33a; border-color: #f2a33a; color: #0c0b0a; font-weight: 700; }
+  .ev-note { flex-basis: 100%; font-size: 12px; }
+  .gate.dimmed, .dim.dimmed { opacity: 0.28; }
+  /* ---- 7 dimensions: PLACE, GATE, WORK, EVIDENCE, TIME, OWNER, OUTCOME ---- */
+  .seven-d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 0 0 18px; }
+  @media (max-width: 720px) { .seven-d { grid-template-columns: repeat(2, 1fr); } }
+  .seven-d .d7 { border: 1px solid #3a2e1a; border-radius: 6px; background: #15130f; padding: 8px 10px; }
+  .seven-d .d7 b { display: block; color: #f2a33a; font-size: 12px; letter-spacing: 0.14em; }
+  .seven-d .d7 span { display: block; color: #bdb29f; font-size: 12px; line-height: 1.5; margin-top: 2px; }
+  /* ---- layered depth: the card lifts when you hover it, like a door you can open ---- */
+  .gate, .dim { box-shadow: 4px 4px 0 #000, 0 0 0 1px #000; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .gate:hover, .dim:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 #000, 0 0 18px rgba(242, 163, 58, 0.12); }
+  /* ---- softer body copy for long reading (easy on the eyes) ---- */
+  .gate-body p, .dim-body p, .gate-body li, .dim-body li { color: #d5cbb6; }
+  /* ---- narrow screens ---- */
+  @media (max-width: 480px) {
+    .core-name { font-size: 44px; }
+    .gate-name, .dim-name { font-size: 16px; }
+    body { font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gate, .dim { transition: none; }
+    .gate:hover, .dim:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -396,24 +433,38 @@
   <div class="controls">
     <button id="expandAll" type="button">expand all</button>
     <button id="collapseAll" type="button">collapse all</button>
-    <span class="count">17 gates &middot; 3 steps + 10 helper gates + 4 live examples &middot; click a gate to open it</span>
+    <span class="count">19 gates &middot; 3 steps + 1 tip gate + 10 helper gates + 1 subjected gate + 4 live examples &middot; click a gate to open it</span>
   </div>
 
   <div class="section-head">
     <h2>The cycle &mdash; gate, subgate, lead</h2>
+  <section class="seven-d" aria-label="The seven dimensions">
+<div class="d7"><b>PLACE</b><span>the map of work: gate, subgate, lead.</span></div><div class="d7"><b>GATE</b><span>the gate itself: an order placed on an agent.</span></div><div class="d7"><b>WORK</b><span>doing: the cycle — gate, subgate, lead — and the helper gates that aid it.</span></div><div class="d7"><b>EVIDENCE</b><span>proof: PROVEN / IN PROGRESS / UNKNOWN / BLOCKED, from each gate's own evidence.</span></div><div class="d7"><b>TIME</b><span>when: the tip gate is set to the future — never met, always advancing.</span></div><div class="d7"><b>OWNER</b><span>who sees: public plain-words; the owner sees the full detail.</span></div><div class="d7"><b>OUTCOME</b><span>where to: the next stage — Hami AI takes the Lead seat — and after it there is always more.</span></div>
+  </section>
+
     <p>Three steps, in order, forever. A gate opens work. A subgate is what comes out of it. A lead is the new work the subgate opens. Then a new gate. Click a step to open it.</p>
   </div>
 
   <p class="cycle-note">AI coding works through gates. <span class="k">A gate is the situation you put yourself in.</span> <span class="k">A subgate is the outcome</span> &mdash; whatever blocker or achievement results. <span class="k">A lead is the new work</span> the outcome opens. Failures do not mean end. They mean new work starts.</p>
 
   <section class="gates" aria-label="The cycle">
+  <section class="ev-legend" aria-label="Evidence states">
+    <span>evidence: <span class="ev-count" id="evCountTotal">0</span> gates &mdash;</span>
+    <button class="ev-chip" type="button" data-ev="proven" aria-pressed="false">PROVEN <span id="evCountProven">0</span></button>
+    <button class="ev-chip" type="button" data-ev="progress" aria-pressed="false">IN PROGRESS <span id="evCountProgress">0</span></button>
+    <button class="ev-chip" type="button" data-ev="unknown" aria-pressed="false">UNKNOWN <span id="evCountUnknown">0</span></button>
+    <button class="ev-chip" type="button" data-ev="blocked" aria-pressed="false">BLOCKED <span id="evCountBlocked">0</span></button>
+    <span class="ev-note">A gate stays RUNNING &mdash; the work never stops &mdash; while its evidence state is shown honestly. Click a state to filter; click again to clear.</span>
+  </section>
 
-    <article class="gate" id="step-1">
+
+
+    <article class="gate" id="step-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="step-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">STEP 01</span>
         <span class="gate-name">The Gate &mdash; the situation</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">the task, the problem, the context you enter</span>
         <span class="gate-evidence">A gate is an order placed on an agent.</span>
       </button>
@@ -429,12 +480,12 @@
       </div>
     </article>
 
-    <article class="gate" id="step-2">
+    <article class="gate" id="step-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="step-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">STEP 02</span>
         <span class="gate-name">The Subgate &mdash; the outcome</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">whatever blocker or achievement results</span>
         <span class="gate-evidence">A subgate is never an end. It is a record, with evidence.</span>
       </button>
@@ -450,12 +501,12 @@
       </div>
     </article>
 
-    <article class="gate" id="step-3">
+    <article class="gate" id="step-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="step-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">STEP 03</span>
         <span class="gate-name">The Lead &mdash; the new work</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">every subgate opens new work</span>
         <span class="gate-evidence">A blocker is a lead. An achievement is a lead.</span>
       </button>
@@ -481,12 +532,12 @@
   </div>
 
   <section class="gates" aria-label="The tip gate">
-    <article class="gate" id="tip-gate">
+    <article class="gate" id="tip-gate" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="tip-gate-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">TIP GATE &mdash; MANDATORY</span>
         <span class="gate-name">The progress-demanding gate</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">always set to the future &middot; never met &middot; always advancing</span>
         <span class="gate-evidence">The gate is the future. The future is never reached. The work never stops.</span>
       </button>
@@ -541,13 +592,13 @@
 
   <section class="gates" aria-label="Helper gates">
 
-    <article class="gate" id="helper-1">
+    <article class="gate" id="helper-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 01</span>
         <span class="gate-name">Log everything</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">written the moment it happens, with its evidence</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">written the moment it happens, with its evidence</span><span class="gate-evidence">The daily log, the chronicle, the capability queue — written the moment it happens.</span>
       </button>
       <div class="gate-body" id="helper-1-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -556,13 +607,13 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-2">
+    <article class="gate" id="helper-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 02</span>
         <span class="gate-name">Summarize and finalize the next move</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">no outcome is left without a next step</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">no outcome is left without a next step</span><span class="gate-evidence">Every outcome carries a next step — the queue entries name the next move.</span>
       </button>
       <div class="gate-body" id="helper-2-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -571,13 +622,13 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-3">
+    <article class="gate" id="helper-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 03</span>
         <span class="gate-name">Advance every time</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every step moves the work forward</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">every step moves the work forward</span><span class="gate-evidence">Each step moves the work forward — the field, the gates, the LLM work all advance.</span>
       </button>
       <div class="gate-body" id="helper-3-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -586,13 +637,13 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-4">
+    <article class="gate" id="helper-4" data-ev="progress">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-4-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 04</span>
         <span class="gate-name">Speed at peak</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">zero gap between a finished step and the next order</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-progress">evidence: IN PROGRESS</span>
+        <span class="gate-status">zero gap between a finished step and the next order</span><span class="gate-evidence">Zero gap is the rule — the gaps that happened are recorded, and the watch closes them.</span>
       </button>
       <div class="gate-body" id="helper-4-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -601,13 +652,13 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-5">
+    <article class="gate" id="helper-5" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-5-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 05</span>
         <span class="gate-name">Never start from square one</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every new gate starts from what is already known</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">every new gate starts from what is already known</span><span class="gate-evidence">Every new gate starts from what is already known — the alpha sweep starts from experiment 1.</span>
       </button>
       <div class="gate-body" id="helper-5-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -616,12 +667,12 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-6">
+    <article class="gate" id="helper-6" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-6-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 06 &mdash; THE KEY RULE</span>
         <span class="gate-name">Advancement multiplies with time</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">never flat, never decreasing, no matter what</span>
         <span class="gate-evidence">The rate is a multiplier. It grows as time passes and knowledge accumulates.</span>
       </button>
@@ -632,13 +683,13 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-7">
+    <article class="gate" id="helper-7" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-7-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 07</span>
         <span class="gate-name">Verify from evidence</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">no claim without proof</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">no claim without proof</span><span class="gate-evidence">No claim without proof — the scores are re-added from the per-row JSON.</span>
       </button>
       <div class="gate-body" id="helper-7-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -647,13 +698,13 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-8">
+    <article class="gate" id="helper-8" data-ev="progress">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-8-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 08</span>
         <span class="gate-name">Nothing dormant</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">every line used, displayed, doing what it ought to do</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-progress">evidence: IN PROGRESS</span>
+        <span class="gate-status">every line used, displayed, doing what it ought to do</span><span class="gate-evidence">Dormant routes and orphaned files are listed in the audit — being worked through, not yet all cleared.</span>
       </button>
       <div class="gate-body" id="helper-8-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -662,12 +713,12 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-9">
+    <article class="gate" id="helper-9" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-9-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 09 &mdash; THE PRIME GATE</span>
         <span class="gate-name">Never copy</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">unchangeable &middot; unshakable &middot; above all</span>
         <span class="gate-evidence">NEVER REPLICATE OR COPY ANYTHING.</span>
       </button>
@@ -678,13 +729,13 @@
       </div>
     </article>
 
-    <article class="gate" id="helper-10">
+    <article class="gate" id="helper-10" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="helper-10-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">HELPER GATE 10</span>
         <span class="gate-name">Never lose track</span>
-        <span class="gate-state">state: RUNNING</span>
-        <span class="gate-status">missing is not an option</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
+        <span class="gate-status">missing is not an option</span><span class="gate-evidence">The field, the map, the queue track every gate — the unknowns are recorded, not lost.</span>
       </button>
       <div class="gate-body" id="helper-10-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -701,12 +752,12 @@
   </div>
 
   <section class="gates" aria-label="The subjected gate">
-    <article class="gate" id="subjected-gate">
+    <article class="gate" id="subjected-gate" data-ev="progress">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="subjected-gate-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">SUBJECTED GATE &mdash; MUSE</span>
         <span class="gate-name">Better all projects and all gates, always</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-progress">evidence: IN PROGRESS</span>
         <span class="gate-status">upgrading all things &middot; whilst doing what it does too</span>
         <span class="gate-evidence">Owner: Muse (Lead). Every solution is not perfect. Everything has space for upgrades.</span>
       </button>
@@ -730,12 +781,12 @@
 
   <section class="gates" aria-label="Live gates, subgates, and leads">
 
-    <article class="gate" id="live-1">
+    <article class="gate" id="live-1" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-1-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 01 &mdash; GATE 009</span>
         <span class="gate-name">M7-H GC heap fix</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">three identical stalls &middot; one finished verdict</span>
         <span class="gate-evidence">Owner: Copilot. Tuned2 run: 171/3,000 tracks complete; all 6,000 connections died.</span>
       </button>
@@ -750,12 +801,12 @@
       </div>
     </article>
 
-    <article class="gate" id="live-2">
+    <article class="gate" id="live-2" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-2-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 02 &mdash; HOME SITE</span>
         <span class="gate-name">Everything accessible from the public home site</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">built + verified &middot; deploy is the lead</span>
         <span class="gate-evidence">Owner: builder. Explore Hami: 49,156 B, 1,306 lines, TSC_OK, Vite build OK.</span>
       </button>
@@ -770,12 +821,12 @@
       </div>
     </article>
 
-    <article class="gate" id="live-3">
+    <article class="gate" id="live-3" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-3-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 03 &mdash; THE REBASE</span>
         <span class="gate-name">Deploy the pile</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">push rejected &middot; one conflict &middot; resolve and push</span>
         <span class="gate-evidence">Owner: Muse (Lead). Conflict: docs/CAPABILITY_QUEUE.md. Autostash: d2fd87a0.</span>
       </button>
@@ -790,12 +841,12 @@
       </div>
     </article>
 
-    <article class="gate" id="live-4">
+    <article class="gate" id="live-4" data-ev="proven">
       <button class="gate-head" type="button" aria-expanded="false" aria-controls="live-4-body">
         <span class="gate-toggle" aria-hidden="true">+</span>
         <span class="gate-num">LIVE 04 &mdash; THIS PAGE</span>
         <span class="gate-name">The AI engineering gates</span>
-        <span class="gate-state">state: RUNNING</span>
+        <span class="gate-state">state: RUNNING</span><span class="ev ev-proven">evidence: PROVEN</span>
         <span class="gate-status">built from within &middot; the next creation</span>
         <span class="gate-evidence">Owner: builder. This page + the written doc, verified by smoke test.</span>
       </button>
@@ -859,6 +910,42 @@
   });
   document.getElementById("collapseAll").addEventListener("click", function () {
     forEachGate(function (gate) { setGate(gate, false); });
+  });
+
+  // Evidence states: count from data-ev, fill the legend, filter on chip click.
+  // A gate stays RUNNING while its evidence state is shown honestly. Counts are
+  // computed from the data, never hardcoded, so they cannot go stale.
+  var evCounts = { proven: 0, progress: 0, unknown: 0, blocked: 0 };
+  var evGates = [];
+  Array.prototype.forEach.call(document.querySelectorAll(".gate"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(document.querySelectorAll(".dim"), function (g) { evGates.push(g); });
+  Array.prototype.forEach.call(evGates, function (g) {
+    var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+    if (v && Object.prototype.hasOwnProperty.call(evCounts, v)) evCounts[v] += 1;
+  });
+  function evText(id, n) { var el = document.getElementById(id); if (el) el.textContent = String(n); }
+  evText("evCountProven", evCounts.proven);
+  evText("evCountProgress", evCounts.progress);
+  evText("evCountUnknown", evCounts.unknown);
+  evText("evCountBlocked", evCounts.blocked);
+  evText("evCountTotal", evCounts.proven + evCounts.progress + evCounts.unknown + evCounts.blocked);
+  var evFilter = null;
+  function applyEvFilter() {
+    Array.prototype.forEach.call(evGates, function (g) {
+      var v = g.getAttribute ? g.getAttribute("data-ev") : null;
+      if (!evFilter || v === evFilter) { if (g.classList) g.classList.remove("dimmed"); }
+      else if (g.classList) g.classList.add("dimmed");
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (chip) {
+    chip.addEventListener("click", function () {
+      var v = chip.getAttribute ? chip.getAttribute("data-ev") : null;
+      evFilter = (evFilter === v) ? null : v;
+      Array.prototype.forEach.call(document.querySelectorAll(".ev-chip"), function (c) {
+        c.setAttribute("aria-pressed", (evFilter && c.getAttribute && c.getAttribute("data-ev") === evFilter) ? "true" : "false");
+      });
+      applyEvFilter();
+    });
   });
 })();
 </script>
