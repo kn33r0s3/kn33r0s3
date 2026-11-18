@@ -281,7 +281,7 @@
       <hr class="rule">
 
       <h2>Music — my own tracks</h2>
-      <p class="muted">Two tracks I made. Click a track or type <code>play summit</code> in the terminal below. No streaming service — the files live here, on this site.</p>
+      <p class="muted">Three tracks I made. Click a track or type <code>play summit</code> in the terminal below. No streaming service — the files live here, on this site.</p>
       <div class="player" id="player">
         <div class="player-row">
           <button class="player-btn" id="playBtn" type="button" aria-label="Play or pause">▶</button>
@@ -292,6 +292,7 @@
         <div class="track-list">
           <button class="track" type="button" data-track="summit"><span class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span class="track-name">Summit — KneeRose</span><span class="muted">play summit</span></button>
           <button class="track" type="button" data-track="kanai"><span class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span class="track-name">Kanai Huncha Mast (Ears are Blessed)</span><span class="muted">play kanai</span></button>
+          <button class="track" type="button" data-track="pilkington"><span class="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span class="track-name">Pilkington Dr 37</span><span class="muted">play pilkington</span></button>
         </div>
       </div>
       <audio id="audio" preload="metadata"></audio>
@@ -359,9 +360,10 @@
 
   var TRACKS = {
     summit: { src: "music/summit.mp3", name: "Summit \u2014 KneeRose" },
-    kanai: { src: "music/kanai-huncha-mast.mp3", name: "Kanai Huncha Mast (Ears are Blessed)" }
+    kanai: { src: "music/kanai-huncha-mast.mp3", name: "Kanai Huncha Mast (Ears are Blessed)" },
+    pilkington: { src: "music/pilkington-dr-37.m4a", name: "Pilkington Dr 37" }
   };
-  var ORDER = ["summit", "kanai"];
+  var ORDER = ["summit", "kanai", "pilkington"];
   var current = null;
   var history = [];
   var histIdx = -1;
@@ -517,7 +519,7 @@
     printLine("  ls / ls projects  list projects");
     printLine("  projects          list projects");
     printLine("  music             list my tracks");
-    printLine("  play [summit|kanai]  play a track");
+    printLine("  play [summit|kanai|pilkington]  play a track");
     printLine("  pause | stop | next");
     printLine("  hami <question>   ask the Hami engine");
     printLine("  about | contact");
@@ -542,7 +544,7 @@
       var k = ORDER[i];
       printLine("  " + k + "  — " + TRACKS[k].name + (current === k && !audio.paused ? "  (playing)" : ""));
     }
-    printLine("type: play summit  |  play kanai  |  pause  |  next");
+    printLine("type: play summit  |  play kanai  |  play pilkington  |  pause  |  next");
   }
   function cmdAbout() {
     printLine("I build software that connects data, reasoning, and useful action.");
@@ -606,13 +608,13 @@
     if (head === "play") {
       var key = (rest || "").toLowerCase();
       if (!key) { printGate(true, "media: local file \u00B7 authorization: public"); playTrack(current || ORDER[0], true); return; }
-      if (key === "summit" || key === "kanai") {
+      if (key === "summit" || key === "kanai" || key === "pilkington") {
         printGate(true, "media: local file \u00B7 authorization: public");
         playTrack(key, true);
         return;
       }
       printGate(false, "no such track: " + key);
-      printLine("no such track: " + key + " — try: play summit  |  play kanai");
+      printLine("no such track: " + key + " — try: play summit  |  play kanai  |  play pilkington");
       return;
     }
     if (head === "clear") {
