@@ -166,7 +166,7 @@
     var timer = null;
     if (typeof AbortController !== "undefined") {
       ctrl = new AbortController();
-      timer = setTimeout(function () { ctrl.abort(); }, 30000);
+      timer = setTimeout(function () { ctrl.abort(); }, 90000);
     }
     var payload = { message: text, history: history.slice(-MAX_HISTORY) };
     fetch(HAMI_URL, {

@@ -50,7 +50,8 @@ confirms the button and panel appear.
 each request, so the conversation has context.
 - On failure it prints the honest line
   ("hami is unreachable — the Mac tunnel may be down") and never invents a
-  reply. 30-second timeout. Input is disabled while waiting.
+  reply. 90-second timeout (matches the chat route's 90 s, so a slow Hami
+  reply still lands instead of timing out at 30 s). Input is disabled while waiting.
 - The greeting ("Hami Systems — ask me anything…") is shown once on first
   open and is never sent to the API.
 
