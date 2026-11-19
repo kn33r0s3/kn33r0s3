@@ -926,11 +926,11 @@
     "num": "GATE 02 · SFT-EVAL",
     "name": "SFT-EVAL — ADAPTER LOSES",
     "plain": "The Nepali-tuned adapter scores worse than the plain base model. The data is the problem, not the training.",
-    "what": "Held-out eval: base 73/120 vs adapter 58/120 on 20 rows (4 adapter wins, 9 base wins, 7 ties).",
+    "what": "Held-out eval: base 96/300 vs adapter 94/300 on 50 rows (19 adapter wins, 18 base wins, 13 ties).",
     "why": "Data quality is the blocker. Training harder on weak data will not fix it — the data must be fixed first.",
     "state": "running",
     "ev": "proven",
-    "evidence": "Base 73/120 vs adapter 58/120, 20 rows. Smoke test: 500-example MLX LoRA on Qwen3-4B, loss 1.265 → 0.810.",
+    "evidence": "Base 96/300 vs adapter 94/300, 50 rows. Smoke test: 500-example MLX LoRA on Qwen3-4B, loss 1.265 → 0.810.",
     "date": "2026-11-18",
     "owner": "Hami AI",
     "next": "Fix the data, not the model — data quality is the suspected bottleneck.",
@@ -943,7 +943,7 @@
       {
         "t": "Held-out eval",
         "s": "running",
-        "e": "Base 73/120 vs adapter 58/120 (20 rows)"
+        "e": "Base 96/300 vs adapter 94/300 (50 rows)"
       }
     ],
     "progress": {
@@ -994,7 +994,7 @@
     "why": "That is why the gates and the uniqueness, perseverance and non-leak stages exist: the gates make Hami its own gated way; uniqueness makes Hami its own thing; perseverance makes Hami keep learning on its own; non-leak keeps Hami's knowledge inside Hami.",
     "state": "running",
     "ev": "progress",
-    "evidence": "The owner set the gate 18 Nov 2026: the Hami AI LLM must be BUILT and BEAT ALL LLMs. Honest measured state: the Nepali adapter scores 58/120 on the held-out eval, worse than its own base Qwen3-4B at 73/120 — it beats nothing yet. Data quality is the blocker. The weight-space experiment is the first step. The fine-tuning is a stepping stone, NOT the destination.",
+    "evidence": "The owner set the gate 18 Nov 2026: the Hami AI LLM must be BUILT and BEAT ALL LLMs. Honest measured state: the Nepali adapter scores 94/300 on the held-out eval, worse than its own base Qwen3-4B at 96/300 — it beats nothing yet. Data quality is the blocker. The weight-space experiment is the first step. The fine-tuning is a stepping stone, NOT the destination.",
     "date": "2026-11-18",
     "owner": "owner",
     "next": "Keep building the stepping stones: data, then LoRA, then independence — and the next stage opens onward, never finished.",
@@ -1007,7 +1007,7 @@
       {
         "t": "The gate: build it and beat all LLMs",
         "s": "running",
-        "e": "Adapter 58/120 vs base 73/120 — it beats nothing yet; the weight-space experiment is the first step"
+        "e": "Adapter 94/300 vs base 96/300 — it beats nothing yet; the weight-space experiment is the first step"
       }
     ],
     "links": [
@@ -1053,7 +1053,7 @@
     "why": "Talking to Hami is the whole point of Meet Hami — a living system you can ask, not a page you read.",
     "state": "running",
     "ev": "proven",
-    "evidence": "Real reply 18 Nov 19:18. Full path works: Vercel → tunnel → gateway → Ollama gpt-oss:20b.",
+    "evidence": "Real reply 18 Nov 19:18. Full path works: Vercel → tunnel → gateway → hami-model.",
     "date": "2026-11-18",
     "owner": "Hami Systems",
     "next": "Keep it live; permanence is the subgate below.",
@@ -2355,7 +2355,7 @@
     "why": "The gates shape the weights, and the weights carry Hami. The next stage: Hami AI's weights ARE Hami — the model is the Lead Engineer, programmed in weight space by the gates and by all the data. And after that stage there is always more.",
     "state": "running",
     "ev": "proven",
-    "evidence": "The stepping stone is measured: the MLX LoRA of Qwen3-4B adds low-rank weight updates trained on Nepali data + the gates. Held-out eval: base 73/120 vs adapter 58/120 — the adapter loses, data quality is the blocker. That honest result is the evidence, and the gate keeps running on it.",
+    "evidence": "The stepping stone is measured: the MLX LoRA of Qwen3-4B adds low-rank weight updates trained on Nepali data + the gates. Held-out eval: base 96/300 vs adapter 94/300 — the adapter loses, data quality is the blocker. That honest result is the evidence, and the gate keeps running on it.",
     "date": "2026-11-18",
     "owner": "Hami AI",
     "next": "Fix the data, then the next weight update — the gates keep programming the weight space.",
@@ -2368,7 +2368,7 @@
       {
         "t": "Honest result",
         "s": "running",
-        "e": "Base 73/120 vs adapter 58/120 — the adapter loses; data quality is the blocker."
+        "e": "Base 96/300 vs adapter 94/300 — the adapter loses; data quality is the blocker."
       },
       {
         "t": "Next stage: weights ARE Hami",

@@ -31,7 +31,7 @@ A few concrete implementation records:
 - **Backend:** FastAPI, Node.js, Express
 - **Frontend:** React, Vite
 - **Data:** SQL, PostgreSQL, MongoDB
-- **Cloud and tools:** AWS, Vercel, Docker, Git, Ollama
+- **Cloud and tools:** AWS, Vercel, Docker, Git, Hami LLM
 - **AI:** generative AI, LLM-based workflows, local model experimentation
 
 This is a working list of technologies I have used or explored, not a claim of equal depth in every tool.

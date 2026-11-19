@@ -372,7 +372,7 @@
         <span class="gate-name">Hami AI Nepali training</span>
         <span class="gate-state">state: RUNNING</span><span class="ev ev-progress">evidence: IN PROGRESS</span>
         <span class="gate-status">data quality is the subgate</span>
-        <span class="gate-evidence">Adapter loses &mdash; base 73/120 vs adapter 58/120.</span>
+        <span class="gate-evidence">Adapter loses &mdash; base 96/300 vs adapter 94/300.</span>
       </button>
       <div class="gate-body" id="gate-2-body">
         <div class="gate-bar" aria-hidden="true"></div>
@@ -380,7 +380,7 @@
         <ul>
           <li><span class="k">Dataset</span> &mdash; alpaca-nepali-sft, 52,005 rows. Rights resolved: CC BY-NC 4.0, research-only, no commercial use.</li>
           <li><span class="k">Smoke test</span> &mdash; 500-example MLX LoRA on Qwen3-4B, loss 1.265 &rarr; 0.810.</li>
-          <li><span class="k">Held-out eval</span> &mdash; adapter LOSES: base 73/120 vs adapter 58/120 (20 rows). Data quality is the blocker.</li>
+          <li><span class="k">Held-out eval</span> &mdash; adapter LOSES: base 96/300 vs adapter 94/300 (50 rows). Data quality is the blocker.</li>
           <li><span class="k">Lamsal corpus</span> &mdash; BLOCKED on IEEE login (the owner creates a free IEEE account).</li>
         </ul>
       </div>
@@ -400,7 +400,7 @@
         <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
         <ul>
           <li><span class="k">Hami Systems pop-up</span> &mdash; LIVE on Knee Rose; staged on the Hami site (script tag in the shared layout, deploys with the next ForgeOS push).</li>
-          <li><span class="k">Chat</span> &mdash; VERIFIED: a real reply landed 19:18 (the six primitives, North Star, Purpose). The full path works (Vercel &rarr; tunnel &rarr; gateway &rarr; Ollama).</li>
+          <li><span class="k">Chat</span> &mdash; VERIFIED: a real reply landed 19:18 (the six primitives, North Star, Purpose). The full path works (Vercel &rarr; tunnel &rarr; gateway &rarr; hami-model).</li>
           <li><span class="k">Tunnel</span> &mdash; UP and stable. The earlier failure was latency/timeout, not a dead tunnel (fixed: widget waits 90 s, route retries transient 502s).</li>
           <li><span class="k">Permanence</span> &mdash; BLOCKED on approvals/001: needs the owner&rsquo;s Cloudflare account + zone/hostname for a named tunnel.</li>
         </ul>
@@ -503,7 +503,7 @@
         <p class="gate-line">gate: OPEN &mdash; evidence: measured &middot; authorization: public</p>
         <ul>
           <li><span class="k">One script tag puts the gated Hami pop-up on any site. One Hami backend, one gate, every surface.</span></li>
-          <li><span class="k">The engine is Hami AI (gpt-oss:20b via the gateway + tunnel). The pop-up is what delivers it to the world.</span></li>
+          <li><span class="k">The engine is Hami AI (hami-model via the gateway + tunnel). The pop-up is what delivers it to the world.</span></li>
         </ul>
       </div>
     </article>

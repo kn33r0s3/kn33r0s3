@@ -478,7 +478,7 @@
       </ul>
 
       <h3>Hami AI — Nepali language model <span class="tag">— research</span> <span class="status status--wip">work in progress</span></h3>
-      <p>Training Hami AI on Nepali data toward a large Nepali model. The real path is a Nepali data pipeline plus fine-tuning a small open model (Qwen3-4B via MLX LoRA on a Mac), not training from scratch. The dataset's rights are settled (Stanford Alpaca translation, CC BY-NC 4.0, research-only). Current honest result: on a 20-row held-out eval the small adapter still loses to the base model (58 vs 73), so data quality — not rights — is the blocker.</p>
+      <p>Training Hami AI on Nepali data toward a large Nepali model. The real path is a Nepali data pipeline plus fine-tuning a small open model (Qwen3-4B via MLX LoRA on a Mac), not training from scratch. The dataset's rights are settled (Stanford Alpaca translation, CC BY-NC 4.0, research-only). Current honest result: on a 50-row held-out eval the clean adapter still loses to the base model (94 vs 96), so data quality — not rights — is the blocker. The Alpaca pairs are borrowed-model data at root, so the next adapter trains on real Nepali text (FineWeb-2, Himalaya, Wikipedia, news, history, courses).</p>
 
       <h3><a href="https://www.instagram.com/np.explains/">@np.explains — Nepal, Explained</a> <span class="tag">— content</span></h3>
       <p>Nepali-first, comedy-forward short videos explaining Nepal. Also the documentary <strong>THE HANDS</strong> on brick kilns, child labour, and bonded labour (Jan 2021 CBS/ILO/UNICEF baseline research).</p>
@@ -510,7 +510,7 @@
       <span class="green">Backend:</span> FastAPI, Node.js, Express<br>
       <span class="green">Frontend:</span> React, Vite<br>
       <span class="green">Data:</span> SQL, PostgreSQL, MongoDB<br>
-      <span class="green">Cloud and tools:</span> AWS, Vercel, Docker, Git, Ollama<br>
+      <span class="green">Cloud and tools:</span> AWS, Vercel, Docker, Git, Hami LLM<br>
       <span class="green">AI:</span> generative AI, LLM-based workflows, local model experimentation</p>
       <p class="muted">A working list of technologies I have used or explored, not a claim of equal depth in every tool.</p>
 
